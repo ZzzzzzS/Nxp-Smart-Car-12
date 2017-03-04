@@ -6,7 +6,7 @@ void Stop_Car();
 void Send_Data();
 void Save_Inductance();
 void load_Inductance();
-void Key_Init();
+void Init_Key();
 void OLED_Interface();
 void OLED_Normalization_Interface();
 

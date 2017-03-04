@@ -15,7 +15,7 @@ void System_Init()
 	Motor_PID_Init();												//电机PID控制初始化
 	Get_Motor_Speed_Init();											//FTM正交解码初始化
 	OLED_Init();													//OLED初始化
-	Key_Init();														//初始化键盘
+	Init_Key();														//初始化键盘
 	Stop_Car_Init();												//停车检测初始化
 	lptmr_timing_ms(20);											//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, Main_Control_Interrupt);		//将系统控制主要中断函数加入到中断向量表中
@@ -72,8 +72,7 @@ void Main_Control_Interrupt()
 
 void Debug_Init()
 {
-	Service.OLED = true;											//使能OLED
-	Service.Send_Data = true;										//使能串口发送
+//这里暂时不需要写
 }
 
 

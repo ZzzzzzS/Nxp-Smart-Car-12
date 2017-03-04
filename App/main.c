@@ -6,7 +6,7 @@ void main()
 	Get_System_Ready();
 	while (true)
 	{
-		if (Service.Send_Data == true)
+		if (Service.Debug == true)
 		{
 			Send_Data();
 		}

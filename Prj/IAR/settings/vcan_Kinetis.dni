@@ -8,13 +8,13 @@ UseTrigger=1
 TriggerName=main
 LimitSize=0
 ByteLimit=50
-[JLinkDriver]
-CStepIntDis=_ 0
-LeaveTargetRunning=_ 0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
+[JLinkDriver]
+CStepIntDis=_ 0
+LeaveTargetRunning=_ 0
 [Disassemble mode]
 mode=0
 [Breakpoints2]

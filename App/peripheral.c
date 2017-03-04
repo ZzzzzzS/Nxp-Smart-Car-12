@@ -99,12 +99,12 @@ void load_Inductance()
 作用：初始化按键
 ==========================================*/
 
-void Key_Init()
+void Init_Key()
 {
 	key_init(KEY_U);
 	key_init(KEY_D);
 	key_init(KEY_R);
-	Ket_init(KEY_L);
+	key_init(KEY_L);
 	key_init(KEY_A);
 	key_init(KEY_B);
 }
@@ -138,5 +138,5 @@ void OLED_Normalization_Interface()
 	sprintf(OLED_Temp, "最小%d %d %d %d", Road_Data[0].Min_AD_Value, Road_Data[1].Min_AD_Value, Road_Data[2].Min_AD_Value, Road_Data[3].Min_AD_Value);
 	OLED_Print(0, 4, OLED_Temp);									//输出采集的最小电感值
 	sprintf(OLED_Temp, "当前%d %d %d %d", Road_Data[0].AD_Value, Road_Data[1].AD_Value, Road_Data[2].AD_Value, Road_Data[3].AD_Value);
-	OLED_Printf(0, 6, OLED_Temp);									//输出当前电感值
+	OLED_Print(0, 6, OLED_Temp);									//输出当前电感值
 }
