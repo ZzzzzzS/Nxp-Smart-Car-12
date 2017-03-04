@@ -109,10 +109,10 @@ void ADC_Weight_Init()
 void Get_AD_Value()
 {
 	char i, j;
-	Road_Data[LEFT_OUTSIDE].AD_Value = adc_once(AMP1, ADC_10bit);	//采集过程
-	Road_Data[LEFT_INSIDE].AD_Value = adc_once(AMP2, ADC_10bit);
-	Road_Data[RIGHT_INSIDE].AD_Value = adc_once(AMP3, ADC_10bit);
-	Road_Data[RIGHT_OUTSIDE].AD_Value = adc_once(AMP4, ADC_10bit);
+	Road_Data[LEFT_OUTSIDE].AD_Value = adc_once(AMP1, ADC_8bit);	//采集过程
+	Road_Data[LEFT_INSIDE].AD_Value = adc_once(AMP2, ADC_8bit);
+	Road_Data[RIGHT_INSIDE].AD_Value = adc_once(AMP3, ADC_8bit);
+	Road_Data[RIGHT_OUTSIDE].AD_Value = adc_once(AMP4, ADC_8bit);
 
 //我认为这段可以优化，存在数学关系
 	for (i = 0; i < 4; i++)

@@ -39,9 +39,12 @@ void Stop_Car()
 
 void Send_Data()
 {
-	char Send_Temp[50];
-	sprintf(Send_Temp, "%d %d %d %d", Road_Data[0].Normalized_Value, Road_Data[1].Normalized_Value, Road_Data[2].Normalized_Value, Road_Data[3].Normalized_Value);
-	uart_putstr(Bluetooth, (uint8_t *)Send_Temp);				//蓝牙发送
+	char var[4];
+	for (char i = 0; i < 4; i++)
+	{
+		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
+	}
+	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 }
 
 /*============================================

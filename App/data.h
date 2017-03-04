@@ -86,12 +86,12 @@ typedef struct speed
 
 typedef struct
 {
-	int16 AD_Value;								//ADC数模转换器采集到的值
-	int16 Max_AD_Value;							//ADC数模转换器采集到的最大值
-	int16 Min_AD_Value;							//ADC数模转换器采集到的最小值
-	int16 Normalized_Value;						//归一化的电感值
-	int16 normalization;						//归一化的分母值
-	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+	char AD_Value;								//ADC数模转换器采集到的值,8bit
+	char Max_AD_Value;							//ADC数模转换器采集到的最大值
+	char Min_AD_Value;							//ADC数模转换器采集到的最小值
+	char Normalized_Value;						//归一化的电感值
+	char normalization;							//归一化的分母值
+	char AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
 	char AD_Weight[4];							//权重向前滤波算法权重值
 }inductance;
 
@@ -108,7 +108,7 @@ typedef struct service
 extern speed Left_Speed;						//声明一个"Speed类"的"对象"，左轮数据
 extern speed Right_Speed;						//声明一个"Speed类"的"对象"，右轮数据
 
-extern inductance Road_Data[4];					//声明一个"Inductance类"的"对象"数组，电感信息
+extern inductance Road_Data[4];					//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
 
 extern direction Direction;						//声明一个"Direction类"的"对象"，方向信息
 
