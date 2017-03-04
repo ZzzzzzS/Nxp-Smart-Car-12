@@ -123,7 +123,20 @@ void OLED_Interface()
 	OLED_Print(35, 2, "威海校区");
 	OLED_Print(15, 4, "718创新实验室");
 	OLED_Print(27, 6, "牛逼车神组");
-	while (key_check(KEY_A) == KEY_UP);								//等待继续操作																	//缺少具体调试界面
+	while (key_check(KEY_A) == KEY_UP);								//等待继续操作
+	OLED_CLS();														//清屏OLED
+	OLED_Print(0, 0, "选择模式");
+	OLED_Print(0, 2, "A调试模式");
+	OLED_Print(0, 4, "B比赛模式");
+	while (key_check(KEY_B) == KEY_UP&&key_check(KEY_D) == KEY_UP);//等待继续操作
+	if (key_check(KEY_B) == KEY_DOWN)								//定义KEY_B按下为调试模式
+	{
+		Service.Debug = true;
+	}
+	else if (key_check(KEY_D) == KEY_DOWN)
+	{
+		Service.Debug = false;
+	}
 }
 
 /*============================================

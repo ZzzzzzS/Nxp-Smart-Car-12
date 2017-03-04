@@ -35,7 +35,7 @@ void Get_System_Ready()
 	{
 		Debug_Init();												//调试模式初始化
 
-		uart_init(Bluetooth, 115200);//暂时使用这个参数				//蓝牙4.0串口初始化
+		uart_init(Bluetooth, 115200);//暂时使用这个参数				//蓝牙串口初始化
 		Get_MaxMin_AD_Value();										//进行电感归一化
 		Save_Inductance();											//储存电感值到flash
 		OLED_CLS();													//发车前关闭OLED

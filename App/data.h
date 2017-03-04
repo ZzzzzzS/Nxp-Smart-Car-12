@@ -52,7 +52,7 @@ enum Inductance_Direction
 #define DC     PTC10_OUT						//OLED相关宏定义
 #define D1     PTC14_OUT						//OLED相关宏定义
 #define D0     PTC16_OUT						//OLED相关宏定义
-#define Bluetooth		UART4					//宏定义Bluetooth®发送端口
+#define Bluetooth		UART0					//宏定义Bluetooth®发送端口
 #define SECTOR_NUM		(FLASH_SECTOR_NUM-1)	//flash扇区宏定义，尽量用最后面的扇区，确保安全
 #define CAR_STOP		PTE8					//定义停车检测管脚
 #define CAR_STOP_NUM	8						//定义停车管脚号

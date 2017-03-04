@@ -16,7 +16,7 @@
 
 #ifndef __MK60_CONF_H__
 #define __MK60_CONF_H__
-
+#include "data.h"
 /*
  * 定义平台[放在工程选项里定义]
  */
@@ -85,7 +85,7 @@
 /*
  * 定义 printf函数 的 串口输出端口 和 串口信息
  */
-#define VCAN_PORT           UART0
+#define VCAN_PORT           Bluetooth
 #define VCAN_BAUD           115200
 
 /*
