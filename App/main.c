@@ -1,5 +1,5 @@
+//Ö÷·ÖÖ§
 #include "include.h"
-
 void main()
 {
 	System_Init();
