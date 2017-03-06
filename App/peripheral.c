@@ -95,6 +95,11 @@ void load_Inductance()
 	{
 		Road_Data[i - 4].Min_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
 	}
+
+	for (i = 0; i < 4; i++)										//计算归一化的分母
+	{
+		Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
+	}
 }
 
 /*============================================
