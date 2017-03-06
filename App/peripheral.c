@@ -86,7 +86,7 @@ void Save_Inductance()
 
 void load_Inductance()
 {
-	char i;
+	/*char i;
 	for (i = 0; i < 4; i++)
 	{
 		Road_Data[i].Max_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
@@ -94,7 +94,21 @@ void load_Inductance()
 	for (i = 4; i < 8; i++)
 	{
 		Road_Data[i - 4].Min_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
+	}*/
+
+	for (i = 0; i < 4; i++)
+	{
+		Road_Data[i].Max_AD_Value = 0;
 	}
+	for (i = 4; i < 8; i++)
+	{
+		Road_Data[i - 4].Min_AD_Value = 100;
+	}
+	for (i = 0; i < 4; i++)										//计算归一化的分母
+	{
+		Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
+	}
+
 }
 
 /*============================================
@@ -123,7 +137,13 @@ void OLED_Interface()
 	OLED_Print(35, 2, "威海校区");
 	OLED_Print(15, 4, "718创新实验室");
 	OLED_Print(27, 6, "牛逼车神组");
-	while (key_check(KEY_A) == KEY_UP);								//等待继续操作
+
+
+	Service.Debug = true;
+
+
+
+	/*while (key_check(KEY_A) == KEY_UP);								//等待继续操作
 	OLED_CLS();														//清屏OLED
 	OLED_Print(0, 0, "选择模式");
 	OLED_Print(0, 2, "A调试模式");
@@ -136,7 +156,7 @@ void OLED_Interface()
 	else if (key_check(KEY_D) == KEY_DOWN)
 	{
 		Service.Debug = false;
-	}
+	}*/
 }
 
 /*============================================

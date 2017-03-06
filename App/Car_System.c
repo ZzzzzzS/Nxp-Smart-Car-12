@@ -16,7 +16,7 @@ void System_Init()
 	Get_Motor_Speed_Init();											//FTM正交解码初始化
 	OLED_Init();													//OLED初始化
 	Init_Key();														//初始化键盘
-	Stop_Car_Init();												//停车检测初始化
+	//Stop_Car_Init();												//停车检测初始化
 	lptmr_timing_ms(20);											//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, Main_Control_Interrupt);		//将系统控制主要中断函数加入到中断向量表中
 	EnableInterrupts;												//宏定义，允许中断
@@ -30,7 +30,7 @@ void System_Init()
 
 void Get_System_Ready()
 {
-	OLED_Interface();												//初始参数设置界面
+	/*OLED_Interface();												//初始参数设置界面
 	if (Service.Debug == true)										//调试模式，用于日常调试和赛前归一化测试
 	{
 		Debug_Init();												//调试模式初始化
@@ -44,6 +44,9 @@ void Get_System_Ready()
 	{
 		load_Inductance();											//读取flash中的电感值
 	}
+	ADC_Weight_Init();												//初始化权重向前滤波法
+	*/
+	load_Inductance();
 	ADC_Weight_Init();												//初始化权重向前滤波法
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }

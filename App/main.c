@@ -8,7 +8,7 @@ void main()
 	{
 		if (Service.Debug == true)
 		{
-			Send_Data();
+			//Send_Data();
 		}
 	}
 }
