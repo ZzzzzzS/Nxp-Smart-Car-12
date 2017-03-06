@@ -6,19 +6,19 @@
 作用：停车检测初始化
 ==========================================*/
 
-void Stop_Car_Init()
+/*void Stop_Car_Init()
 {//不清楚上升沿还是下降沿
 	port_init(CAR_STOP, ALT1 | IRQ_FALLING | PULLUP);			//初始化停车干簧管，下降沿中断
 	set_vector_handler(PORTE_VECTORn, Stop_Car);				//设置停车中断向量
 	enable_irq(PORTE_IRQn);										//使能向量
-}
+}*/
 
 /*============================================
 函数名：Stop_Car()
 作用：停车检测
 ==========================================*/
 
-void Stop_Car()
+/*void Stop_Car()
 {
 	if (PORTA_ISFR & (1 << CAR_STOP_NUM))						//确定中断管脚号
 	{
@@ -30,7 +30,7 @@ void Stop_Car()
 		ftm_pwm_duty(FTM0, FTM_CH1, Right_Speed.Out_Speed);		//控制左轮转动
 		ftm_pwm_duty(FTM0, FTM_CH2, Left_Speed.Out_Speed);		//控制右轮转动
 	}
-}
+}*/
 
 /*============================================
 函数名：Send_Data()
@@ -95,6 +95,7 @@ void load_Inductance()
 	{
 		Road_Data[i - 4].Min_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
 	}*/
+        char i;
 
 	for (i = 0; i < 4; i++)
 	{
