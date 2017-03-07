@@ -24,7 +24,7 @@
 ==========================================*/
 void Motor_Init()
 {
-    ftm_pwm_init(MOTOR_FTM, MOTOR1_PWM,MOTOR_HZ,50);      //初始化 电机 PWM
+    ftm_pwm_init(MOTOR_FTM, MOTOR1_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
     ftm_pwm_init(MOTOR_FTM, MOTOR2_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
     ftm_pwm_init(MOTOR_FTM, MOTOR3_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
     ftm_pwm_init(MOTOR_FTM, MOTOR4_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
@@ -61,7 +61,7 @@ void Motor_Control()
 	}
         
         
-        ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM,Left_Speed.Out_Speed);
+        ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM,Right_Speed.Out_Speed);
         ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM,100);
         ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM,Right_Speed.Out_Speed);
         ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM,100);
@@ -77,11 +77,14 @@ void Motor_Control()
 
 void Motor_PID_Init()
 {
-	Left_Speed.Aim_Speed = 0;
-	Right_Speed.Aim_Speed = 0;
+	Left_Speed.Aim_Speed = 10;
+	Right_Speed.Aim_Speed = 10;
 
-	Left_Speed.Now_Speed = 100;
-	Right_Speed.Now_Speed = 100;
+	Left_Speed.Go_Speed = 10;
+	Left_Speed.Go_Speed = 10;
+
+	Left_Speed.Now_Speed = 0;
+	Right_Speed.Now_Speed = 0;
 
 	Left_Speed.Error_Speed = 0;
 	Right_Speed.Error_Speed = 0;

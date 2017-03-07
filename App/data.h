@@ -6,8 +6,8 @@
 电机控制相关宏定义
 ==========================================*/
 
-#define MAX_SPEED			1000				//定义最大速度
-#define MIN_SPEED			0					//定义最小速度
+#define MAX_SPEED			99					//定义最大速度
+#define MIN_SPEED			1					//定义最小速度
 				
 #define LEFT_MOTOR			PTA24				//定义电机控制管脚
 #define RIGHT_MOTOR			PTA27
