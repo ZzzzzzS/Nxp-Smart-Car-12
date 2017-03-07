@@ -44,7 +44,7 @@ void Send_Data()
 	{
 		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
 	}
-	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
+	//vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 }
 
 /*============================================
@@ -60,22 +60,22 @@ flash储存位置: L=最大值 S=最小值
 void Save_Inductance()
 {
 	char i;
-	flash_erase_sector(SECTOR_NUM);								//擦除flash扇区，准备写入
+	//flash_erase_sector(SECTOR_NUM);								//擦除flash扇区，准备写入
 
 	for (i = 0; i < 4; i++)										//储存电感归一化的分母
 	{
-		do
-		{
-			flash_write(SECTOR_NUM, i * 4, Road_Data[i].normalization);
-		} while (flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i].normalization);	//储存后验证是否储存正确
+		//do
+		//{
+			//flash_write(SECTOR_NUM, i * 4, Road_Data[i].normalization);
+		//} while //(flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i].normalization);	//储存后验证是否储存正确
 	}
 
 	for (i = 4; i < 8; i++)										//储存电感最小值
 	{
-		do
-		{
-			flash_write(SECTOR_NUM, i * 4, Road_Data[i-4].Min_AD_Value);
-		} while (flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i - 4].Min_AD_Value);//储存后验证是否储存正确
+		//do
+		//{
+			//flash_write(SECTOR_NUM, i * 4, Road_Data[i-4].Min_AD_Value);
+		//} while //(flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i - 4].Min_AD_Value);//储存后验证是否储存正确
 	}
 }
 
