@@ -10,6 +10,7 @@ void System_Init()
 {
 	DisableInterrupts;												//宏定义，禁止中断
 	//flash_init();													//flash初始化
+	//uart_init(UART0);
 	ADC_Init();														//ADC模数转换器初始化
 	Motor_Init();													//电机初始化
 	Motor_PID_Init();												//电机PID控制初始化

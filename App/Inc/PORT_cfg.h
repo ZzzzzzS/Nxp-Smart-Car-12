@@ -43,8 +43,8 @@
 
 //      模块通道    端口          可选范围              建议
 #define FTM0_CH0_PIN    PTC1        //PTC1、PTA3            PTA3不要用（与Jtag、SWD冲突）
-#define FTM0_CH1_PIN    PTA4        //PTC2、PTA4
-#define FTM0_CH2_PIN    PTA5        //PTC3、PTA5
+#define FTM0_CH1_PIN    PTC2        //PTC2、PTA4
+#define FTM0_CH2_PIN    PTC3        //PTC3、PTA5
 #define FTM0_CH3_PIN    PTA6        //PTC4、PTA6
 #define FTM0_CH4_PIN    PTA7        //PTD4、PTA7
 #define FTM0_CH5_PIN    PTD5        //PTD5、PTA0            PTA0不要用（与Jtag、SWD冲突）

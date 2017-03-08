@@ -7,6 +7,7 @@ void main()
 	Get_System_Ready();
 	while (true)
 	{
+		Send_Data();
           //Main_Control_Interrupt();
 	}
 }
