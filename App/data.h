@@ -9,8 +9,23 @@
 #define MAX_SPEED			99					//定义最大速度
 #define MIN_SPEED			1					//定义最小速度
 				
-#define LEFT_MOTOR			PTA24				//定义电机控制管脚
-#define RIGHT_MOTOR			PTA27
+#define MOTOR1_IO   PTD15
+#define MOTOR2_IO   PTA19
+#define MOTOR3_IO   PTA5
+#define MOTOR4_IO   PTA24
+
+#define MOTOR_FTM   FTM0
+#define MOTOR1_PWM  FTM_CH3
+#define MOTOR2_PWM  FTM_CH4
+#define MOTOR3_PWM  FTM_CH5
+#define MOTOR4_PWM  FTM_CH6
+
+#define MOTOR1_PWM_IO  FTM0_CH3
+#define MOTOR2_PWM_IO  FTM0_CH4
+#define MOTOR3_PWM_IO  FTM0_CH5
+#define MOTOR4_PWM_IO  FTM0_CH6
+
+#define MOTOR_HZ    20*1000
 
 /*============================================
 电感数据采集相关宏定义
@@ -18,17 +33,9 @@
 
 #define AMP1     ADC0_SE8						//PTB0
 #define AMP2     ADC0_SE9						//PTB1
-#define AMP3     ADC0_SE12						//PTB2
-#define AMP4     ADC0_SE13						//PTB3
 
-enum Inductance_Direction
-{
-	LEFT_OUTSIDE = 0,
-	LEFT_INSIDE  = 1,
-	RIGHT_INSIDE = 2,
-	RIGHT_OUTSIDE= 3
-};
-
+#define LEFT 0
+#define RIGHT 1
 
 #define DEFAULT_MAX_VALUE 0
 #define DEFAULT_MIN_VALUE 300
@@ -37,10 +44,9 @@ enum Inductance_Direction
 方向计算相关宏定义
 ==========================================*/
 
-#define LEFT_OUTSIDE_WEIGHT  10
-#define LEFT_INSIDE_WEIGHT   1
-#define RIGHT_INSIDE_WEIGHT  1
-#define RIGHT_OUTSIDE_WEIGHT 10
+#define LEFT_WEIGHT   1
+#define RIGHT_WEIGHT  1
+
 
 #define DIRECTION_WEIGHT 10
 
@@ -97,7 +103,7 @@ typedef struct
 
 typedef struct direction
 {
-	int16 err;
+	char err;
 }direction;
 
 typedef struct service

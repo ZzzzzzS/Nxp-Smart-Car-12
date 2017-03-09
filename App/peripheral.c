@@ -39,8 +39,8 @@
 
 void Send_Data()
 {
-	char var[4];
-	for (char i = 0; i < 4; i++)
+	char var[2];
+	for (char i = 0; i < 2; i++)
 	{
 		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
 	}
@@ -97,16 +97,10 @@ void load_Inductance()
 	}*/
         char i;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 2; i++)
 	{
 		Road_Data[i].Max_AD_Value = 0;
-	}
-	for (i = 4; i < 8; i++)
-	{
-		Road_Data[i - 4].Min_AD_Value = 100;
-	}
-	for (i = 0; i < 4; i++)										//计算归一化的分母
-	{
+		Road_Data[i].Min_AD_Value = 100;
 		Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
 	}
 
@@ -170,10 +164,10 @@ void OLED_Normalization_Interface()
 	char OLED_Temp[30];												//OLED显示使用的临时数组
 	OLED_CLS();														//输出前先清理屏幕，防止乱码出现
 	OLED_Print(0, 0, "正在获取最大最小值");
-	sprintf(OLED_Temp, "最大%d %d %d %d", Road_Data[0].Max_AD_Value, Road_Data[1].Max_AD_Value, Road_Data[2].Max_AD_Value, Road_Data[3].Max_AD_Value);
+	sprintf(OLED_Temp, "最大%d %d", Road_Data[0].Max_AD_Value, Road_Data[1].Max_AD_Value);
 	OLED_Print(0, 2, OLED_Temp);									//输出采集的最大电感值
-	sprintf(OLED_Temp, "最小%d %d %d %d", Road_Data[0].Min_AD_Value, Road_Data[1].Min_AD_Value, Road_Data[2].Min_AD_Value, Road_Data[3].Min_AD_Value);
+	sprintf(OLED_Temp, "最小%d %d", Road_Data[0].Min_AD_Value, Road_Data[1].Min_AD_Value);
 	OLED_Print(0, 4, OLED_Temp);									//输出采集的最小电感值
-	sprintf(OLED_Temp, "当前%d %d %d %d", Road_Data[0].AD_Value, Road_Data[1].AD_Value, Road_Data[2].AD_Value, Road_Data[3].AD_Value);
+	sprintf(OLED_Temp, "当前%d %d", Road_Data[0].AD_Value, Road_Data[1].AD_Value);
 	OLED_Print(0, 6, OLED_Temp);									//输出当前电感值
 }

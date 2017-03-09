@@ -1,22 +1,6 @@
 #include "include.h"
 
-#define MOTOR1_IO   PTD15
-#define MOTOR2_IO   PTA19
-#define MOTOR3_IO   PTA5
-#define MOTOR4_IO   PTA24
 
-#define MOTOR_FTM   FTM0
-#define MOTOR1_PWM  FTM_CH3
-#define MOTOR2_PWM  FTM_CH4
-#define MOTOR3_PWM  FTM_CH5
-#define MOTOR4_PWM  FTM_CH6
-
-#define MOTOR1_PWM_IO  FTM0_CH3
-#define MOTOR2_PWM_IO  FTM0_CH4
-#define MOTOR3_PWM_IO  FTM0_CH5
-#define MOTOR4_PWM_IO  FTM0_CH6
-
-#define MOTOR_HZ    20*1000
 
 /*============================================
 函数名：Motor_Init()
@@ -61,11 +45,11 @@ void Motor_Control()
 	}
         
         
-        ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM,Right_Speed.Out_Speed);
-        ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM,100);
-        ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM,Right_Speed.Out_Speed);
-        ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM,100);
-        
+	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 100 - Right_Speed.Out_Speed);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 100);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 100 - Right_Speed.Out_Speed);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 100);
+     //适应山外电驱   
         
         
 }
@@ -113,6 +97,25 @@ void Motor_PID_Init()
 
 void Motor_PID()
 {
+	if (Left_Speed.Aim_Speed >= 100)//合法性检测
+	{
+		Left_Speed.Aim_Speed = 99;
+	}
+	else if (Left_Speed.Aim_Speed <= 0)
+	{
+		Left_Speed.Aim_Speed = 1;
+	}
+	if (Right_Speed.Aim_Speed >= 100)
+	{
+		Right_Speed.Aim_Speed = 99;
+	}
+	else if (Right_Speed.Aim_Speed <= 0)
+	{
+		Right_Speed.Aim_Speed = 1;
+	}
+
+
+
 	Left_Speed.Error_Speed = Left_Speed.Aim_Speed - Left_Speed.Now_Speed;					//取得误差速度
 	Right_Speed.Error_Speed = Right_Speed.Aim_Speed - Right_Speed.Now_Speed;
 
@@ -160,4 +163,6 @@ void Get_Motor_Speed()
 	Right_Speed.Now_Speed = ftm_quad_get(FTM2);
 	ftm_quad_clean(FTM1);									//清正交解码脉冲数
 	ftm_quad_clean(FTM2);
+
+	//printf("NowSpeed %hd %hd", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
 }

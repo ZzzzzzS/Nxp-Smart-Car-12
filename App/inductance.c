@@ -10,8 +10,8 @@ void ADC_Init()
 {
 	adc_init(AMP1);													//初始化AMP1通道，PTB0
 	adc_init(AMP2);													//初始化AMP2通道，PTB1
-	adc_init(AMP3);													//初始化AMP3通道，PTB2
-	adc_init(AMP4);													//初始化AMP4通道，PTB3
+	//adc_init(AMP3);													//初始化AMP3通道，PTB2
+	//adc_init(AMP4);													//初始化AMP4通道，PTB3
 }
 
 /*============================================
@@ -30,8 +30,8 @@ void ADC_Init()
 void Get_MaxMin_AD_Value()
 {
 	int i;
-	int16 AD_Value_Temp[4] = { 0,0,0,0 };
-	for (i = 0; i < 4; i++)											//初始化最大最小值
+	int16 AD_Value_Temp[2] = { 0,0 };
+	for (i = 0; i < 2; i++)											//初始化最大最小值
 	{
 		Road_Data[i].Min_AD_Value = DEFAULT_MIN_VALUE;
 		Road_Data[i].Max_AD_Value = DEFAULT_MAX_VALUE;
@@ -39,12 +39,10 @@ void Get_MaxMin_AD_Value()
 
 	while (1)														//当开关一直按下时一直采集最大最小值并处理
 	{
-		AD_Value_Temp[LEFT_OUTSIDE] = adc_once(AMP1,ADC_10bit);		//采集过程
-		AD_Value_Temp[LEFT_INSIDE] = adc_once(AMP2, ADC_10bit);
-		AD_Value_Temp[RIGHT_INSIDE] = adc_once(AMP3, ADC_10bit);
-		AD_Value_Temp[RIGHT_OUTSIDE] = adc_once(AMP4, ADC_10bit);
+		AD_Value_Temp[LEFT] = adc_once(AMP1,ADC_8bit);				//采集过程
+		AD_Value_Temp[RIGHT] = adc_once(AMP2, ADC_8bit);
 	
-		for (i = 0; i < 4; i++)										//比较并替换最大最小值过程
+		for (i = 0; i < 2; i++)										//比较并替换最大最小值过程
 		{
 			if (AD_Value_Temp[i] > Road_Data[i].Max_AD_Value)		//比较最大值
 			{
@@ -55,7 +53,7 @@ void Get_MaxMin_AD_Value()
 				Road_Data[i].Min_AD_Value = AD_Value_Temp[i];
 			}
 		}
-		for (i = 0; i < 4; i++)										//计算归一化的分母
+		for (i = 0; i < 2; i++)										//计算归一化的分母
 		{
 			Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
 		}
@@ -78,7 +76,7 @@ void ADC_Weight_Init()
 {
 	char i, j;
 
-	for (i = 0; i < 4; i++)											//对前几次的电感值赋初值，避免影响前几次滤波后的数据
+	for (i = 0; i < 2; i++)											//对前几次的电感值赋初值，避免影响前几次滤波后的数据
 	{
 		for (j = 0; j < 4; j++)
 		{
@@ -86,7 +84,7 @@ void ADC_Weight_Init()
 		}
 	}
 
-	for (i = 0; i < 4; i++)											//滤波权重表赋初值
+	for (i = 0; i < 2; i++)											//滤波权重表赋初值
 	{
 		Road_Data[i].AD_Weight[0] = 1;
 		Road_Data[i].AD_Weight[1] = 2;
@@ -109,13 +107,11 @@ void ADC_Weight_Init()
 void Get_AD_Value()
 {
 	char i, j;
-	Road_Data[LEFT_OUTSIDE].AD_Value = adc_once(AMP1, ADC_8bit);	//采集过程
-	Road_Data[LEFT_INSIDE].AD_Value = adc_once(AMP2, ADC_8bit);
-	Road_Data[RIGHT_INSIDE].AD_Value = adc_once(AMP3, ADC_8bit);
-	Road_Data[RIGHT_OUTSIDE].AD_Value = adc_once(AMP4, ADC_8bit);
+	Road_Data[LEFT].AD_Value = adc_once(AMP1, ADC_8bit);	//采集过程
+	Road_Data[RIGHT].AD_Value = adc_once(AMP2, ADC_8bit);
 
 //我认为这段可以优化，存在数学关系
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 2; i++)
 	{
 		if (Road_Data[i].AD_Value > Road_Data[i].Max_AD_Value)		//若检测到的电感值大于最大值，则修正最大值
 		{
@@ -135,14 +131,14 @@ void Get_AD_Value()
 		Road_Data[i].AD_Value = 0;									//清空采集到的数据
 	}
 
-	for (i = 0; i < 4; i++)											//装入权重向前滤波法处理后的值
+	for (i = 0; i < 2; i++)											//装入权重向前滤波法处理后的值
 	{
 		for (j = 0; j < 4; j++)
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
 	}
-	for (i = 0; i < 4; i++)											//装入电感归一化处理后的值
+	for (i = 0; i < 2; i++)											//装入电感归一化处理后的值
 	{
 		Road_Data[i].Normalized_Value = (Road_Data[i].AD_Value - Road_Data[i].Min_AD_Value) / Road_Data[i].normalization;
 	}
@@ -156,10 +152,8 @@ void Get_AD_Value()
 void Direction_Control()
 {
 	Direction.err = 0;												//采用权重算法计算误差
-	Direction.err -= Road_Data[LEFT_OUTSIDE].Normalized_Value*LEFT_OUTSIDE_WEIGHT;
-	Direction.err -= Road_Data[LEFT_INSIDE].Normalized_Value*LEFT_INSIDE_WEIGHT;
-	Direction.err += Road_Data[RIGHT_INSIDE].Normalized_Value*RIGHT_INSIDE_WEIGHT;
-	Direction.err += Road_Data[RIGHT_OUTSIDE].Normalized_Value*RIGHT_OUTSIDE_WEIGHT;
+	Direction.err -= Road_Data[LEFT].Normalized_Value*LEFT_WEIGHT;
+	Direction.err += Road_Data[RIGHT].Normalized_Value*RIGHT_WEIGHT;
 
 	Left_Speed.Turn_Speed = Direction.err*DIRECTION_WEIGHT;
 	Right_Speed.Turn_Speed = -Direction.err*DIRECTION_WEIGHT;
