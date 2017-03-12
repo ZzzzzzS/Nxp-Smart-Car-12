@@ -98,7 +98,7 @@ typedef struct
 typedef struct direction
 {
 	char err;
-	int16 Normalization_Value;					//差比和电感值
+	unsigned char Normalization_Value;			//差比和电感值
 }direction;
 
 typedef struct service

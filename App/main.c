@@ -6,8 +6,4 @@ void main()
 {
 	System_Init();
 	Get_System_Ready();
-	while (true)
-	{
-		Send_Data();
-	}
 }

@@ -86,7 +86,7 @@ void Get_AD_Value()
 	for (i = 0; i < 2; i++)											//计算差比和后的电感值
 	{
 		temp = Road_Data[i].AD_Value;
-		Road_Data[i].Normalized_Value = (temp / Direction.Normalization_Value) * 100;
+		Road_Data[i].Normalized_Value = (temp / Direction.Normalization_Value) * 200;
 	}
 }
 

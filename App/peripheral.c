@@ -39,12 +39,18 @@
 
 void Send_Data()
 {
-	char var[2];
-	for (char i = 0; i < 2; i++)
+	if (Service.Debug == true)
 	{
-		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
+		char var[2];
+		for (char i = 0; i < 2; i++)
+		{
+			var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
+		}
+		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
+		printf("Out_Speed %d %d ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
+		printf("NowSpeed %hd %hd", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
 	}
-	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
+	
 }
 
 /*============================================

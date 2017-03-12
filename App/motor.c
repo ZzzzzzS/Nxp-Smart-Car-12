@@ -49,8 +49,7 @@ void Motor_Control()
 	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 100);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 100 - Right_Speed.Out_Speed);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 100);
-     //适应山外电驱   
-        
+     //适应山外电驱
         
 }
 
@@ -162,7 +161,5 @@ void Get_Motor_Speed()
 	Left_Speed.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
 	Right_Speed.Now_Speed = ftm_quad_get(FTM2);
 	ftm_quad_clean(FTM1);									//清正交解码脉冲数
-	ftm_quad_clean(FTM2);
-
-	//printf("NowSpeed %hd %hd", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
+	ftm_quad_clean(FTM2);	
 }
