@@ -1,4 +1,5 @@
 //先跑起来分支2电感
+//新的差比和算法
 #include "include.h"
 
 void main()
@@ -8,6 +9,5 @@ void main()
 	while (true)
 	{
 		Send_Data();
-          //Main_Control_Interrupt();
 	}
 }

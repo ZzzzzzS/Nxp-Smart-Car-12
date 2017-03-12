@@ -47,13 +47,10 @@
 #define LEFT_WEIGHT   1
 #define RIGHT_WEIGHT  1
 
-
-#define DIRECTION_WEIGHT 10
-
 /*============================================
 其它宏定义和typedef
 ==========================================*/
-
+												//修改OLED管脚时注意修改init的管脚!
 #define RESET  PTC12_OUT						//OLED相关宏定义
 #define DC     PTC10_OUT						//OLED相关宏定义
 #define D1     PTC14_OUT						//OLED相关宏定义
@@ -93,10 +90,7 @@ typedef struct speed
 typedef struct
 {
 	char AD_Value;								//ADC数模转换器采集到的值,8bit
-	char Max_AD_Value;							//ADC数模转换器采集到的最大值
-	char Min_AD_Value;							//ADC数模转换器采集到的最小值
-	char Normalized_Value;						//归一化的电感值
-	char normalization;							//归一化的分母值
+	char Normalized_Value;						//差比和的电感值
 	char AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
 	char AD_Weight[4];							//权重向前滤波算法权重值
 }inductance;
@@ -104,6 +98,7 @@ typedef struct
 typedef struct direction
 {
 	char err;
+	int16 Normalization_Value;					//差比和电感值
 }direction;
 
 typedef struct service

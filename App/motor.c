@@ -14,10 +14,10 @@ void Motor_Init()
     ftm_pwm_init(MOTOR_FTM, MOTOR4_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
 
     //IO管脚配置
-    gpio_init(MOTOR1_IO,GPO,LOW);
+    /*gpio_init(MOTOR1_IO,GPO,LOW);
     gpio_init(MOTOR2_IO,GPO,LOW);
     gpio_init(MOTOR3_IO,GPO,LOW);
-    gpio_init(MOTOR4_IO,GPO,LOW);
+    gpio_init(MOTOR4_IO,GPO,LOW);*/
 }
 
  /*============================================
