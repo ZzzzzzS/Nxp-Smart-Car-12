@@ -45,10 +45,10 @@ void Motor_Control()
 	}
         
         
-	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 100 - Right_Speed.Out_Speed);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 100);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 100 - Right_Speed.Out_Speed);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 100);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Right_Speed.Out_Speed);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);
      //适应山外电驱
         
 }

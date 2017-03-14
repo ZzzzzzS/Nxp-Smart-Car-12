@@ -105,8 +105,8 @@ void OLED_DLY_ms(word ms)
 void OLED_Init(void)        
 {
   gpio_init (PTC10, GPO,0);
-  gpio_init (PTC12, GPO,0);
-  gpio_init (PTC14, GPO,1);
+  gpio_init (PTC12, GPO,1);
+  gpio_init (PTC14, GPO,0);
   gpio_init (PTC16, GPO,0);
   RESET=0;
   OLED_DLY_ms(50);

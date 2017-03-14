@@ -27,7 +27,7 @@ void ADC_Init()
 
 void ADC_Weight_Init()
 {
-	for (i = 0; i < 2; i++)											//滤波权重表赋初值
+	for (char i = 0; i < 2; i++)											//滤波权重表赋初值
 	{
 		Road_Data[i].AD_Weight[0] = 1;
 		Road_Data[i].AD_Weight[1] = 2;

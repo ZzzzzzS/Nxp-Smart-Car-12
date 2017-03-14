@@ -17,13 +17,13 @@
 #define MOTOR_FTM   FTM0
 #define MOTOR1_PWM  FTM_CH3
 #define MOTOR2_PWM  FTM_CH4
-#define MOTOR3_PWM  FTM_CH5
-#define MOTOR4_PWM  FTM_CH6
+#define MOTOR3_PWM  FTM_CH1
+#define MOTOR4_PWM  FTM_CH2
 
 #define MOTOR1_PWM_IO  FTM0_CH3
 #define MOTOR2_PWM_IO  FTM0_CH4
-#define MOTOR3_PWM_IO  FTM0_CH5
-#define MOTOR4_PWM_IO  FTM0_CH6
+#define MOTOR3_PWM_IO  FTM0_CH1
+#define MOTOR4_PWM_IO  FTM0_CH2
 
 #define MOTOR_HZ    20*1000
 
@@ -51,11 +51,11 @@
 其它宏定义和typedef
 ==========================================*/
 												//修改OLED管脚时注意修改init的管脚!
-#define RESET  PTC12_OUT						//OLED相关宏定义
-#define DC     PTC10_OUT						//OLED相关宏定义
-#define D1     PTC14_OUT						//OLED相关宏定义
-#define D0     PTC16_OUT						//OLED相关宏定义
-#define Bluetooth		UART3					//宏定义Bluetooth®发送端口
+#define RESET  PTC14_OUT						//OLED相关宏定义
+#define DC     PTC16_OUT						//OLED相关宏定义
+#define D1     PTC12_OUT						//OLED相关宏定义
+#define D0     PTC10_OUT						//OLED相关宏定义
+#define Bluetooth		UART0					//宏定义Bluetooth®发送端口
 #define SECTOR_NUM		(FLASH_SECTOR_NUM-1)	//flash扇区宏定义，尽量用最后面的扇区，确保安全
 //#define CAR_STOP		PTE8					//定义停车检测管脚
 //#define CAR_STOP_NUM	8						//定义停车管脚号
