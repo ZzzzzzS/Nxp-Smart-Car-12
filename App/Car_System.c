@@ -49,6 +49,12 @@ void LPTMR_IRQHandler()
 	Motor_Control();												//输出最终速度
 	Send_Data();
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
+        
+         OLED_CLS();
+		char temp[10];
+		sprintf(temp,"Speed=%d %d",Left_Speed.Now_Speed,Right_Speed.Now_Speed);
+		OLED_Print(2, 2, temp);
+	
 }
 
 /*============================================
