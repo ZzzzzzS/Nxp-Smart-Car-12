@@ -44,10 +44,9 @@ void Motor_Control()
 		Right_Speed.Out_Speed = MIN_SPEED;
 	}
         
-        
 	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Right_Speed.Out_Speed);
+	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Left_Speed.Out_Speed);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);
      //适应山外电驱
         
