@@ -73,7 +73,7 @@ void Get_AD_Value()
 ==========================================*/
 
 	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
-	float temp;														//临时储存电感值
+	double temp;														//临时储存电感值
 
 	for (i = 0; i < 2; i++)											//装入权重向前滤波法处理后的值
 	{
