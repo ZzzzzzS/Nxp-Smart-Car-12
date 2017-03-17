@@ -117,8 +117,8 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	OLED_Print(15, 0, "test");
-	OLED_Print(35, 2, "test");
+	OLED_Print(0, 0, "电测V0.1");
+	OLED_Print(0, 2, "#########");
 	OLED_Print(15, 4, "718创新实验室");
 	OLED_Print(27, 6, "牛逼车神组");
 

@@ -2,7 +2,7 @@
 //新的差比和算法
 #include "include.h"
 
-void main()
+void main()     
 {
 	System_Init();
 	Get_System_Ready();

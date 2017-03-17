@@ -89,10 +89,10 @@ typedef struct speed
 
 typedef struct
 {
-	char AD_Value;								//ADC数模转换器采集到的值,8bit
-	char Normalized_Value;						//差比和的电感值
-	char AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-	char AD_Weight[4];							//权重向前滤波算法权重值
+	int16 AD_Value;								//ADC数模转换器采集到的值,8bit
+	int16 Normalized_Value;						//差比和的电感值
+	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+	int16 AD_Weight[4];							//权重向前滤波算法权重值
 }inductance;
 
 typedef struct direction
