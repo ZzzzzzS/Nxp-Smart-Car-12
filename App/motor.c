@@ -12,12 +12,6 @@ void Motor_Init()
     ftm_pwm_init(MOTOR_FTM, MOTOR2_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
     ftm_pwm_init(MOTOR_FTM, MOTOR3_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
     ftm_pwm_init(MOTOR_FTM, MOTOR4_PWM,MOTOR_HZ,100);      //初始化 电机 PWM
-
-    //IO管脚配置
-    /*gpio_init(MOTOR1_IO,GPO,LOW);
-    gpio_init(MOTOR2_IO,GPO,LOW);
-    gpio_init(MOTOR3_IO,GPO,LOW);
-    gpio_init(MOTOR4_IO,GPO,LOW);*/
 }
 
  /*============================================
@@ -48,7 +42,6 @@ void Motor_Control()
 	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Left_Speed.Out_Speed);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);
-     //适应山外电驱
         
 }
 

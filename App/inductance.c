@@ -29,6 +29,7 @@ void ADC_Weight_Init()
 {
 	for (char i = 0; i < 2; i++)											//滤波权重表赋初值
 	{
+		//注意:修改权重值时请修改data.h->MAX_WEIGHT!
 		Road_Data[i].AD_Weight[0] = 1;
 		Road_Data[i].AD_Weight[1] = 2;
 		Road_Data[i].AD_Weight[2] = 3;
@@ -81,6 +82,7 @@ void Get_AD_Value()
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
+		Road_Data[i].AD_Value /= MAX_WEIGHT;
 		Direction.Normalization_Value += Road_Data[i].AD_Value;		//计算本次差比和的和总值
 	}
 	for (i = 0; i < 2; i++)											//计算差比和后的电感值

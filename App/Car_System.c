@@ -11,11 +11,11 @@ void System_Init()
 	DisableInterrupts;												//宏定义，禁止中断
 	flash_init();													//flash初始化
 	ADC_Init();														//ADC模数转换器初始化
+	Init_Key();														//初始化按键	
 	Motor_Init();													//电机初始化
 	Motor_PID_Init();												//电机PID控制初始化
 	Get_Motor_Speed_Init();											//FTM正交解码初始化
 	OLED_Init();													//OLED初始化
-	//Init_Key();													//初始化键盘
 	//Stop_Car_Init();												//停车检测初始化
 	lptmr_timing_ms(20);											//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, LPTMR_IRQHandler);			//将系统控制主要中断函数加入到中断向量表中

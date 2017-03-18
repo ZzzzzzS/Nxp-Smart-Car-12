@@ -102,12 +102,14 @@ void load_Inductance()
 
 void Init_Key()
 {
-	key_init(KEY_U);
-	key_init(KEY_D);
-	key_init(KEY_R);
-	key_init(KEY_L);
-	key_init(KEY_A);
-	key_init(KEY_B);
+	port_init(Key1, ALT1 | PULLDOWN);
+	port_init(Key2, ALT1 | PULLDOWN);
+	port_init(Key3, ALT1 | PULLDOWN);
+	port_init(Key4, ALT1 | PULLDOWN);
+	gpio_init(Key1, GPI, 0);                       
+	gpio_init(Key2, GPI, 0);
+	gpio_init(Key3, GPI, 0); 
+	gpio_init(Key4, GPI, 0);
 }
 
 /*============================================
@@ -117,28 +119,23 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	OLED_Print(0, 0, "电测V0.1");
-	OLED_Print(0, 2, "#########");
-	OLED_Print(15, 4, "718创新实验室");
-	OLED_Print(27, 6, "牛逼车神组");
-
+  	
+	OLED_Print(15, 0, "718创新实验室");
+	OLED_Print(27, 2, "untitled组");
+        OLED_Rectangle(0, 35, 127, 45, 1);
+	OLED_Print(0, 6, "按键来继续...");
+	while (true)
+	{
+		if (gpio_get(PTC13) != 0)
+		{
+			DELAY_MS(10);
+			if (gpio_get(PTC13) != 0)
+			{
+                          OLED_CLS();
+			}
+			break;
+		}
+	}
 
 	Service.Debug = true;
-
-
-
-	/*while (key_check(KEY_A) == KEY_UP);								//等待继续操作
-	OLED_CLS();														//清屏OLED
-	OLED_Print(0, 0, "选择模式");
-	OLED_Print(0, 2, "A调试模式");
-	OLED_Print(0, 4, "B比赛模式");
-	while (key_check(KEY_B) == KEY_UP&&key_check(KEY_D) == KEY_UP);//等待继续操作
-	if (key_check(KEY_B) == KEY_DOWN)								//定义KEY_B按下为调试模式
-	{
-		Service.Debug = true;
-	}
-	else if (key_check(KEY_D) == KEY_DOWN)
-	{
-		Service.Debug = false;
-	}*/
 }
