@@ -181,7 +181,7 @@ void OLED_Rectangle(byte x1,byte y1,byte x2,byte y2,byte gif)
   for(n=x1;n<=x2;n++)
 	{
 		OLED_WrDat(0x01<<(y2%8)); 			
-		if(gif == 1) 	OLED_DLY_ms(25);
+		if(gif == 1) 	OLED_DLY_ms(10);
 	}
 	
 }  
