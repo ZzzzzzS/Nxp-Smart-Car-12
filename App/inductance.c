@@ -111,3 +111,13 @@ void Direction_Control()
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
 	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
 }
+
+/*============================================
+函数名：Direction_Control_Fuzzy()
+作用:模糊控制来控制方向
+==========================================*/
+
+void Direction_Control_Fuzzy()
+{
+	//暂时不需要写
+}

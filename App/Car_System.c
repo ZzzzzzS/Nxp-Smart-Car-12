@@ -45,7 +45,7 @@ void LPTMR_IRQHandler()
 	Get_AD_Value();													//获取ADC数模转换器的值
 	Direction_Control();											//获得目标转向角度
 	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
-	FuzzyPID();														//对PID参数模糊控制
+	//FuzzyPID();														//对PID参数模糊控制
 	Motor_PID();													//对电机进行增量式PID调节
 	Motor_Control();												//输出最终速度
 	Send_Data();
