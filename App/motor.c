@@ -110,14 +110,14 @@ void Motor_PID()
 	Left_Speed.Error_Speed = Left_Speed.Aim_Speed - Left_Speed.Now_Speed;					//取得误差速度
 	Right_Speed.Error_Speed = Right_Speed.Aim_Speed - Right_Speed.Now_Speed;
 
-	float Left_IncrementSpeed, Right_IncrementSpeed;										//增量式PID核心公式
-	Left_IncrementSpeed = Left_Speed.P*(Left_Speed.Error_Speed - Left_Speed.err_next);		//左轮
-	Left_IncrementSpeed += Left_Speed.I*Left_Speed.Error_Speed;
-	Left_IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);
+	//float Left_IncrementSpeed, Right_IncrementSpeed;										//增量式PID核心公式
+	Left_Speed.IncrementSpeed = Left_Speed.P*(Left_Speed.Error_Speed - Left_Speed.err_next);		//左轮
+	Left_Speed.IncrementSpeed += Left_Speed.I*Left_Speed.Error_Speed;
+	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);
 
-	Right_IncrementSpeed = Right_Speed.P*(Right_Speed.Error_Speed - Right_Speed.err_next);	//右轮
-	Right_IncrementSpeed += Right_Speed.I*Right_Speed.Error_Speed;
-	Right_IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);
+	Right_Speed.IncrementSpeed = Right_Speed.P*(Right_Speed.Error_Speed - Right_Speed.err_next);	//右轮
+	Right_Speed.IncrementSpeed += Right_Speed.I*Right_Speed.Error_Speed;
+	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);
 
 	Left_Speed.err_last = Left_Speed.err_next;
 	Right_Speed.err_last = Right_Speed.err_next;
@@ -125,8 +125,8 @@ void Motor_PID()
 	Left_Speed.err_next = Left_Speed.Error_Speed;
 	Right_Speed.err_next = Right_Speed.Error_Speed;
 
-	Left_Speed.PID_Out_Speed += Left_IncrementSpeed;
-	Right_Speed.PID_Out_Speed += Right_IncrementSpeed;
+	Left_Speed.PID_Out_Speed += Left_Speed.IncrementSpeed;
+	Right_Speed.PID_Out_Speed += Right_Speed.IncrementSpeed;
 
 	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;										//左右轮最终输出速度暂时等于pid处理后的当前速度
 	Right_Speed.Out_Speed = Right_Speed.PID_Out_Speed;
@@ -163,7 +163,14 @@ void Get_Motor_Speed()
 
 void FuzzyPID()
 {
+	Left_Speed.P = FuzzyKp(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);
+	Right_Speed.P = FuzzyKp(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);
 
+	Left_Speed.I = FuzzyKi(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);
+	Right_Speed.I = FuzzyKi(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);
+
+	Left_Speed.D = FuzzyKd(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);
+	Right_Speed.D = FuzzyKd(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);
 }
 
 /*============================================
@@ -171,9 +178,121 @@ void FuzzyPID()
 作用:模糊控制PID P值
 ==========================================*/
 
-void FuzzyKp()
+double FuzzyKp(int16 e,double ec)
 {
-
+	double Kp_calcu;
+	unsigned char num, pe, pec;
+	const char  eRule[7] = { -50,-25,-10,0.0,10,25,50 };   //误差E的模糊论域
+	const char  ecRule[7] = { -50,-25,-10,0.0,10,25,50 }; //误差变化率EC的模糊论域
+	double eFuzzy[2] = { 0.0,0.0 };				    //隶属于误差E的隶属程度
+	double ecFuzzy[2] = { 0.0,0.0 };            //隶属于误差变化率EC的隶属程度
+	const double  kpRule[4] = { 0.05,0.05,0.1,0.1 };			//Kp的模糊子集
+	double KpFuzzy[4] = { 0.0,0.0,0.0,0.0 };				//隶属于Kp的隶属程度
+	const unsigned char  KpRule[7][7] =					  		//Kp的模糊控制表
+	{
+		{ 3,3,3,3,3,3,3 },
+		{ 2,2,2,2,1,2,2 },
+		{ 1,1,1,1,1,1,1 },
+		{ 1,1,0,1,0,1,1 },
+		{ 0,0,1,0,0,1,0 },
+		{ 0,1,0,1,0,0,2 },
+		{ 3,3,3,3,3,3,3 }
+	};
+	/*****误差E隶属函数描述*****/
+	if (e<eRule[0])
+	{
+		eFuzzy[0] = 1.0;
+		pe = 0;
+	}
+	else if (eRule[0] <= e && e<eRule[1])
+	{
+		eFuzzy[0] = (eRule[1] - e) / (eRule[1] - eRule[0]);
+		pe = 0;
+	}
+	else if (eRule[1] <= e && e<eRule[2])
+	{
+		eFuzzy[0] = (eRule[2] - e) / (eRule[2] - eRule[1]);
+		pe = 1;
+	}
+	else if (eRule[2] <= e && e<eRule[3])
+	{
+		eFuzzy[0] = (eRule[3] - e) / (eRule[3] - eRule[2]);
+		pe = 2;
+	}
+	else if (eRule[3] <= e && e<eRule[4])
+	{
+		eFuzzy[0] = (eRule[4] - e) / (eRule[4] - eRule[3]);
+		pe = 3;
+	}
+	else if (eRule[4] <= e && e<eRule[5])
+	{
+		eFuzzy[0] = (eRule[5] - e) / (eRule[5] - eRule[4]);
+		pe = 4;
+	}
+	else if (eRule[5] <= e && e<eRule[6])
+	{
+		eFuzzy[0] = (eRule[6] - e) / (eRule[6] - eRule[5]);
+		pe = 5;
+	}
+	else
+	{
+		eFuzzy[0] = 0.0;
+		pe = 5;
+	}
+	eFuzzy[1] = 1.0 - eFuzzy[0];
+	/*****误差变化率EC隶属函数描述*****/
+	if (ec<ecRule[0])
+	{
+		ecFuzzy[0] = 1.0;
+		pec = 0;
+	}
+	else if (ecRule[0] <= ec && ec<ecRule[1])
+	{
+		ecFuzzy[0] = (ecRule[1] - ec) / (ecRule[1] - ecRule[0]);
+		pec = 0;
+	}
+	else if (ecRule[1] <= ec && ec<ecRule[2])
+	{
+		ecFuzzy[0] = (ecRule[2] - ec) / (ecRule[2] - ecRule[1]);
+		pec = 1;
+	}
+	else if (ecRule[2] <= ec && ec<ecRule[3])
+	{
+		ecFuzzy[0] = (ecRule[3] - ec) / (ecRule[3] - ecRule[2]);
+		pec = 2;
+	}
+	else if (ecRule[3] <= ec && ec<ecRule[4])
+	{
+		ecFuzzy[0] = (ecRule[4] - ec) / (ecRule[4] - ecRule[3]);
+		pec = 3;
+	}
+	else if (ecRule[4] <= ec && ec<ecRule[5])
+	{
+		ecFuzzy[0] = (ecRule[5] - ec) / (ecRule[5] - ecRule[4]);
+		pec = 4;
+	}
+	else if (ecRule[5] <= ec && ec<ecRule[6])
+	{
+		ecFuzzy[0] = (ecRule[6] - ec) / (ecRule[6] - ecRule[5]);
+		pec = 5;
+	}
+	else
+	{
+		ecFuzzy[0] = 0.0;
+		pec = 5;
+	}
+	ecFuzzy[1] = 1.0 - ecFuzzy[0];
+	/*********查询模糊规则表*********/
+	num = KpRule[pe][pec];
+	KpFuzzy[num] += eFuzzy[0] * ecFuzzy[0];
+	num = KpRule[pe][pec + 1];
+	KpFuzzy[num] += eFuzzy[0] * ecFuzzy[1];
+	num = KpRule[pe + 1][pec];
+	KpFuzzy[num] += eFuzzy[1] * ecFuzzy[0];
+	num = KpRule[pe + 1][pec + 1];
+	KpFuzzy[num] += eFuzzy[1] * ecFuzzy[1];
+	Kp_calcu = KpFuzzy[0] * kpRule[0] + KpFuzzy[1] * kpRule[1] + KpFuzzy[2] * kpRule[2] + KpFuzzy[3] * kpRule[3];
+	return Kp_calcu;
 }
 
 /*============================================
@@ -181,7 +300,7 @@ void FuzzyKp()
 作用:模糊控制PID I值
 ==========================================*/
 
-void FuzzyKi()
+double FuzzyKi(int e, double ec)
 {
 
 }
@@ -191,7 +310,7 @@ void FuzzyKi()
 作用:模糊控制PID D值
 ==========================================*/
 
-void FuzzyKd()
+double FuzzyKd(int e, double ec)
 {
 	
 }
