@@ -119,8 +119,8 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	Draw_BMP(0, 0, 127, 63, BMP);
-	DELAY_MS(500);
+	//Draw_BMP(0, 0, 127, 63, BMP);
+	//DELAY_MS(500);
 	OLED_Print(15, 0, "718创新实验室");
 	OLED_Print(27, 2, "untitled组");
     OLED_Rectangle(0, 35, 127, 45, 1);

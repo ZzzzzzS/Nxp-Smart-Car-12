@@ -10,7 +10,7 @@ void main()
 
 	while (true)
 	{
-		DELAY_MS(500);
+		DELAY_MS(100);
 		OLED_CLS();
 		char temp[10];
                 OLED_Print(2,0,"哈尔滨工业大学");

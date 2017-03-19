@@ -307,7 +307,7 @@ void OLED_Print(byte x, byte y, byte ch[])
 //参数：起始点坐标(x,y),x的范围0～127，y为页的范围0～7
 //返回：无
 //==============================================================
-void Draw_BMP(byte x0,byte y0,byte x1,byte y1,uint8 bmp[])
+void Draw_BMP(byte x0,byte y0,byte x1,byte y1,byte bmp[])
 { 	
   word ii=0;
   byte x,y;
