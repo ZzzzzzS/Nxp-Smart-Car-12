@@ -27,8 +27,10 @@
 		disable_irq(LPTMR_IRQn);								//禁止低功耗定时计数器中断
 		Right_Speed.Out_Speed = 0;								//调整速度为0
 		Left_Speed.Out_Speed = 0;								//调整速度为0
-		ftm_pwm_duty(FTM0, FTM_CH1, Right_Speed.Out_Speed);		//控制左轮转动
-		ftm_pwm_duty(FTM0, FTM_CH2, Left_Speed.Out_Speed);		//控制右轮转动
+		ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 0);					//电机输出
+		ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);					//电机输出
+		ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 0);					//电机输出
+		ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);					//电机输出
 	}
 }*/
 
@@ -123,7 +125,7 @@ void OLED_Interface()
 	//DELAY_MS(500);
 	OLED_Print(15, 0, "718创新实验室");
 	OLED_Print(27, 2, "untitled组");
-    OLED_Rectangle(0, 35, 127, 45, 1);
+    //OLED_Rectangle(0, 35, 127, 45, 1);
 	OLED_Print(0, 6, "按键来继续...");
 	while (true)
 	{
