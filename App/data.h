@@ -53,6 +53,8 @@
 #define LEFT_WEIGHT   1
 #define RIGHT_WEIGHT  1
 
+#define MAX_FUZZY_RULE 6
+
 /*============================================
 其它宏定义和typedef
 ==========================================*/
@@ -90,8 +92,8 @@ typedef struct speed
 	int16 Now_Speed;							//正交解码得出的当前速度
 	int16 Error_Speed;							//目标速度与当前速度的差值
 	double IncrementSpeed;						//速度增量
-	float err_next;								//定义上一个偏差值    
-	float err_last;								//定义最上前的偏差值
+	double err_next;								//定义上一个偏差值    
+	double err_last;								//定义最上前的偏差值
 }speed;
 
 /*============================================
@@ -103,14 +105,24 @@ typedef struct
 	int16 AD_Value;								//ADC数模转换器采集到的值,8bit
 	int16 Normalized_Value;						//差比和的电感值
 	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-        char AD_Weight[4];							//权重向前滤波算法权重值
+        char AD_Weight[4];						//权重向前滤波算法权重值
 }inductance;
 
-typedef struct direction
+/*============================================
+方向相关数据结构体
+==========================================*/
+
+typedef struct direction						//差比和法方向控制
 {
-	char err;
+	char err;									//偏差误差
 	unsigned char Normalization_Value;			//差比和电感值
 }direction;
+
+typedef struct fuzzy_direction					//模糊控制法方向控制
+{
+	double eFuzzy[MAX_FUZZY_RULE];				//模糊隶属度
+}fuzzy_direction;
+
 
 typedef struct service
 {
@@ -120,9 +132,11 @@ typedef struct service
 extern speed Left_Speed;						//声明一个"Speed类"的"对象"，左轮数据
 extern speed Right_Speed;						//声明一个"Speed类"的"对象"，右轮数据
 
-extern inductance Road_Data[4];					//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
+extern inductance Road_Data[AMP_MAX];			//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
 
 extern direction Direction;						//声明一个"Direction类"的"对象"，方向信息
+
+extern fuzzy_direction Fuzzy_Direction;			//声明一个"Fuzzy_Direction类"的"对象"，模糊控制方向信息
 
 extern service Service;							//声明一个"service类"的"对象"，串口发送等服务信息
 #endif  //__DATA_H__

@@ -53,7 +53,7 @@ void Motor_Control()
 void Motor_PID_Init()
 {
 	Left_Speed.Go_Speed = 100;
-	Left_Speed.Go_Speed = 100;
+	Right_Speed.Go_Speed = 100;
 
 	Left_Speed.Now_Speed = 0;
 	Right_Speed.Now_Speed = 0;
@@ -85,19 +85,11 @@ void Motor_PID_Init()
 
 void Motor_PID()
 {
-	if (Left_Speed.Aim_Speed >= 100)						//合法性检测
-	{
-		Left_Speed.Aim_Speed = 99;
-	}
-	else if (Left_Speed.Aim_Speed <= 0)
+	if (Left_Speed.Aim_Speed < 0)
 	{
 		Left_Speed.Aim_Speed = 1;
 	}
-	if (Right_Speed.Aim_Speed >= 100)
-	{
-		Right_Speed.Aim_Speed = 99;
-	}
-	else if (Right_Speed.Aim_Speed <= 0)
+	if (Right_Speed.Aim_Speed < 0)
 	{
 		Right_Speed.Aim_Speed = 1;
 	}
@@ -148,6 +140,10 @@ void Get_Motor_Speed()
 {
 	Left_Speed.Now_Speed = ftm_quad_get(FTM2);				//获取正交解码脉冲数
 	Right_Speed.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
+
+	ftm_quad_clean(FTM1);									//清正交解码脉冲数
+	ftm_quad_clean(FTM2);									//清正交解码脉冲数
+
 	if (Right_Speed.Now_Speed < 0)							//取绝对值
 	{
 		Right_Speed.Now_Speed = -Right_Speed.Now_Speed;
@@ -156,8 +152,9 @@ void Get_Motor_Speed()
 	{
 		Left_Speed.Now_Speed = -Left_Speed.Now_Speed;
 	}
-	ftm_quad_clean(FTM1);									//清正交解码脉冲数
-	ftm_quad_clean(FTM2);									//清正交解码脉冲数
+        
+        //Right_Speed.Now_Speed*=(43/30);
+        Right_Speed.Now_Speed=(int)(Right_Speed.Now_Speed*1.5);//适应大齿轮
 }
 
 /*============================================
