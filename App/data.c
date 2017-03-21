@@ -2,7 +2,7 @@
 speed Left_Speed;						//声明一个"speed类"的"对象"，左轮数据
 speed Right_Speed;						//声明一个"speed类"的"对象"，右轮数据
 
-inductance Road_Data[4];				//声明一个"inductance类"的"对象"数组，电感信息
+inductance Road_Data[AMP_MAX];			//声明一个"inductance类"的"对象"数组，电感信息
 
 direction Direction;					//声明一个"direction类"的"对象"，方向信息
 

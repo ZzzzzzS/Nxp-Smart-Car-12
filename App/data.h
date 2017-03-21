@@ -31,8 +31,12 @@
 电感数据采集相关宏定义
 ==========================================*/
 
-#define AMP1     ADC0_SE8						//PTB0
-#define AMP2     ADC0_SE9						//PTB1
+#define AMP1    ADC0_SE8						//PTB0
+#define AMP2    ADC0_SE9						//PTB1
+#define AMP3    ADC0_SE12						//PTB2
+#define AMP4	ADC0_SE13						//PTB3
+#define AMP5	ADC1_SE10						//PTB4
+#define AMP_MAX	2								//定义最大ADC端口数
 
 #define LEFT 0
 #define RIGHT 1

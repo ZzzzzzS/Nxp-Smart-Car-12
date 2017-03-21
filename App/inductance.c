@@ -12,6 +12,7 @@ void ADC_Init()
 	adc_init(AMP2);													//初始化AMP2通道，PTB1
 	//adc_init(AMP3);													//初始化AMP3通道，PTB2
 	//adc_init(AMP4);													//初始化AMP4通道，PTB3
+	//adc_init(AMP5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -27,7 +28,7 @@ void ADC_Init()
 
 void ADC_Weight_Init()
 {
-	for (char i = 0; i < 2; i++)											//滤波权重表赋初值
+	for (char i = 0; i < AMP_MAX; i++)											//滤波权重表赋初值
 	{
 		//注意:修改权重值时请修改data.h->MAX_WEIGHT!
 		Road_Data[i].AD_Weight[0] = 1;
@@ -53,8 +54,12 @@ void Get_AD_Value()
 	char i, j;
 	Road_Data[LEFT].AD_Value = adc_once(AMP1, ADC_8bit);	//采集过程
 	Road_Data[RIGHT].AD_Value = adc_once(AMP2, ADC_8bit);
+	//Road_Data[3].AD_Value = adc_once(AMP3, ADC_8bit);
+	//Road_Data[4].AD_Value = adc_once(AMP4, ADC_8bit);
+	//Road_Data[5].AD_Value = adc_once(AMP5, ADC_8bit);
 
-	for (i = 0; i < 2; i++)
+
+	for (i = 0; i < AMP_MAX; i++)
 	{
 		for (j = 0; j < 3; j++)										//对电感数据队列移位操作
 		{
@@ -76,7 +81,7 @@ void Get_AD_Value()
 	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
 	double temp;														//临时储存电感值
 
-	for (i = 0; i < 2; i++)											//装入权重向前滤波法处理后的值
+	for (i = 0; i < AMP_MAX; i++)											//装入权重向前滤波法处理后的值
 	{
 		for (j = 0; j < 4; j++)
 		{
@@ -85,7 +90,7 @@ void Get_AD_Value()
 		Road_Data[i].AD_Value /= MAX_WEIGHT;
 		Direction.Normalization_Value += Road_Data[i].AD_Value;		//计算本次差比和的和总值
 	}
-	for (i = 0; i < 2; i++)											//计算差比和后的电感值
+	for (i = 0; i < AMP_MAX; i++)											//计算差比和后的电感值
 	{
 		temp = Road_Data[i].AD_Value;
 		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 200.0);
@@ -102,7 +107,7 @@ void Direction_Control()
 	Direction.err = 0;												//采用权重算法计算误差
 	Direction.err -= Road_Data[LEFT].Normalized_Value*LEFT_WEIGHT;
 	Direction.err += Road_Data[RIGHT].Normalized_Value*RIGHT_WEIGHT;
-
+	//AMP_MAX需要修改！！！
 	Left_Speed.Turn_Speed = Direction.err;
 	Right_Speed.Turn_Speed = -Direction.err;
 
