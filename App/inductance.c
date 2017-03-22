@@ -118,21 +118,38 @@ void Direction_Control()
 }
 
 /*============================================
+函数名：eRule_Init_Fuzzy()
+作用:模糊控制论域eRule初始化
+==========================================*/
+
+void eRule_Init_Fuzzy()
+{
+	Fuzzy_Direction.eRule[0].eAngle = 0;
+	Fuzzy_Direction.eRule[1].eAngle = 0;
+	Fuzzy_Direction.eRule[2].eAngle = 0;
+	Fuzzy_Direction.eRule[3].eAngle = 0;
+	Fuzzy_Direction.eRule[4].eAngle = 0;
+	Fuzzy_Direction.eRule[5].eAngle = 0;
+	//注意修改MAX_FUZZY_RULE!
+
+	Fuzzy_Direction.eRule[0].eLength = 0;
+	Fuzzy_Direction.eRule[1].eLength = 0;
+	Fuzzy_Direction.eRule[2].eLength = 0;
+	Fuzzy_Direction.eRule[3].eLength = 0;
+	Fuzzy_Direction.eRule[4].eLength = 0;
+	Fuzzy_Direction.eRule[5].eLength = 0;
+	//注意修改MAX_FUZZY_RULE!
+
+}
+
+/*============================================
 函数名：Direction_Control_Fuzzy()
 作用:模糊控制计算方向,速度等
 ==========================================*/
 
 void Direction_Control_Fuzzy()
 {
-	const unsigned char eRule[MAX_FUZZY_RULE][5/*AMP_MAX*/] =		//模糊论域
-	{
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 }
-	};
+
 }
 
 /*============================================
@@ -149,46 +166,27 @@ void Direction_Control_Fuzzy()
 
 void Similarity_Count_Fuzzy()
 {
-	const unsigned char eRule[MAX_FUZZY_RULE][5/*AMP_MAX*/] =		//模糊论域
+	double eDenominator = 0;										//余弦分母
+	double eNumerator = 0;											//余弦分子/长度计算临时变量
+
+	/*****误差角度计算*****/
+	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算余弦分子
 	{
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 },
-		{ 0,0,0,0,0 }
-	};//研究结构体怎么初始化数组
-
-	double eDenominator[2];											//余弦分母
-	double eNumerator;												//余弦分子
-	double temp;
-
-	for (unsigned char i = 0; i < MAX_FUZZY_RULE; i++)				//求与MAX_FUZZY_RULE个值的隶属度
-	{
-		temp = 0;													//清零参数
-		eNumerator = 0;												//清零参数
-		eDenominator[0] = 0;										//清零参数
-		eDenominator[1] = 0;										//清零参数
-
-
-		for (unsigned char j = 0; j < AMP_MAX; j++)					//计算余弦分子
-		{
-			eNumerator += Road_Data[j].AD_Value * eRule[i][j];
-		}
-
-		for (unsigned char j = 0; j < AMP_MAX; j++)					//计算余弦分母1
-		{
-			temp += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
-		}
-		eDenominator[1] = sqrt(temp);//需要研究更好的开方函数
-		temp = 0;
-
-		for (unsigned char j = 0; j < AMP_MAX; j++)					//计算余弦分母2
-		{
-			temp += eRule[i][j] * eRule[i][j];
-		}
-		eDenominator[2] = sqrt(temp);
-
-		Fuzzy_Direction.eFuzzy[i] = eNumerator / (eDenominator[1] * eDenominator[2]);	//计算隶属度
+		eNumerator += Road_Data[j].AD_Value;
 	}
+
+	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算余弦分母
+	{
+			eDenominator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
+	}
+	eDenominator= sqrt(eDenominator);//需要研究更好的开方函数
+
+	Fuzzy_Direction.Position.eAngle = eNumerator / eDenominator;	//计算与(1,1,1,1,...)的夹角余弦值
+
+	/*****误差长度计算*****/
+	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算向量长度
+	{
+		eNumerator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
+	}
+	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);
 }

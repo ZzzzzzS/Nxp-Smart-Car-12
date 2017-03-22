@@ -58,10 +58,10 @@
 /*============================================
 其它宏定义和typedef
 ==========================================*/
-#define Key1   PTC13                                                    //按键管脚定义
-#define Key2   PTC11
-#define Key3   PTC9
-#define Key4   PTC7
+#define Key1   PTC13							//按键管脚定义
+#define Key2   PTC11							//按键管脚定义
+#define Key3   PTC9								//按键管脚定义
+#define Key4   PTC7								//按键管脚定义
 //修改OLED管脚时注意修改init的管脚!
 #define RESET  PTC14_OUT						//OLED相关宏定义
 #define DC     PTC16_OUT						//OLED相关宏定义
@@ -118,16 +118,36 @@ typedef struct direction						//差比和法方向控制
 	unsigned char Normalization_Value;			//差比和电感值
 }direction;
 
+/*============================================
+模糊控制方向相关数据结构体
+==========================================*/
+
+typedef struct position
+{
+	double eAngle;								//夹角信息
+	double eLength;								//长度信息
+}position;
+
 typedef struct fuzzy_direction					//模糊控制法方向控制
 {
-	double eFuzzy[MAX_FUZZY_RULE];				//模糊隶属度
+	position Position;							//临时储存隶属度
+	position ePosition[MAX_FUZZY_RULE];			//储存隶属度
+	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
+
 }fuzzy_direction;
 
+/*============================================
+其它数据结构体
+==========================================*/
 
 typedef struct service
 {
 	bool Debug;
 }service;
+
+/*============================================
+"对象""实例化"
+==========================================*/
 
 extern speed Left_Speed;						//声明一个"Speed类"的"对象"，左轮数据
 extern speed Right_Speed;						//声明一个"Speed类"的"对象"，右轮数据
