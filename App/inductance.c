@@ -143,16 +143,6 @@ void eRule_Init_Fuzzy()
 }
 
 /*============================================
-函数名：Direction_Control_Fuzzy()
-作用:模糊控制计算方向,速度等
-==========================================*/
-
-void Direction_Control_Fuzzy()
-{
-
-}
-
-/*============================================
 函数名：Similarity_Count_Fuzzy()
 作用:模糊控制计算模糊隶属度
 ==========================================*/
@@ -189,4 +179,39 @@ void Similarity_Count_Fuzzy()
 		eNumerator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
 	}
 	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);
+	/*****隶属度计算*****/
+	for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)
+	{
+		Fuzzy_Direction.ePosition[j].eAngle = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
+		Fuzzy_Direction.ePosition[j].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;
+	}
+	/*****隶属度排序(冒泡排序)*****/
+	/*for (unsigned char i = 0; i < MAX_FUZZY_RULE; i++)
+	{
+		for (unsigned char j = i + 1; j < MAX_FUZZY_RULE; j++)
+		{
+			if (Fuzzy_Direction.ePosition[i].eAngle > Fuzzy_Direction.ePosition[j].eAngle)
+			{
+				Fuzzy_Direction.ePosition[i].eAngle += Fuzzy_Direction.ePosition[j].eAngle;		//不依赖临时变量的位置交换
+				Fuzzy_Direction.ePosition[j].eAngle = Fuzzy_Direction.ePosition[i].eAngle - Fuzzy_Direction.ePosition[j].eAngle;
+				Fuzzy_Direction.ePosition[i].eAngle -= Fuzzy_Direction.ePosition[j].eAngle;
+			}
+			if (Fuzzy_Direction.ePosition[i].eLength > Fuzzy_Direction.ePosition[j].eLength)
+			{
+				Fuzzy_Direction.ePosition[i].eLength += Fuzzy_Direction.ePosition[j].eLength;	//不依赖临时变量的位置交换
+				Fuzzy_Direction.ePosition[j].eLength = Fuzzy_Direction.ePosition[i].eLength - Fuzzy_Direction.ePosition[j].eLength;
+				Fuzzy_Direction.ePosition[i].eLength -= Fuzzy_Direction.ePosition[j].eLength;
+			}
+		}
+	}*/
+}
+
+/*============================================
+函数名：Direction_Control_Fuzzy()
+作用:模糊控制计算方向,速度等
+==========================================*/
+
+void Direction_Control_Fuzzy()
+{
+
 }
