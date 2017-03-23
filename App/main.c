@@ -8,44 +8,33 @@ void main()
 	System_Init();
 	Get_System_Ready();
 
-        //Right_Speed.Go_Speed=0;
         
 	while (true)
 	{
-		DELAY_MS(100);
+		DELAY_MS(500);
 		OLED_CLS();
 		char temp[10];
-                OLED_Print(2,0,"哈尔滨工业大学");
+                sprintf(temp, "Out=L%d R%d", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
+                OLED_Print(2, 0, temp);
 		sprintf(temp, "Speed=L%d R%d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
 		OLED_Print(2, 2, temp);
 		sprintf(temp, "value=L%d R%d", Road_Data[LEFT].AD_Value, Road_Data[RIGHT].AD_Value);
 		OLED_Print(2, 4, temp);
 		//sprintf(temp, "%d %d", Road_Data[LEFT].Normalized_Value, Road_Data[RIGHT].Normalized_Value);
-                sprintf(temp, "L%d R%d", Left_Speed.Go_Speed, Right_Speed.Go_Speed);
+                sprintf(temp, "Aim=L%d R%d", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);
 		OLED_Print(2, 6, temp);
                 
                 
                 
             if (gpio_get(PTC11) != 0)
 			{
-				//DELAY_MS(10);
-				//if (gpio_get(PTC11) != 0)
-				//{
-					Left_Speed.Go_Speed++;
-					Right_Speed.Go_Speed++;
-				//}
+					Left_Speed.Go_Speed+=10;
+					Right_Speed.Go_Speed+=10;
 			}
             if (gpio_get(PTC7) != 0)
 			{
-				//DELAY_MS(10);
-				//if (gpio_get(PTC9) != 0)
-				//{
-					Left_Speed.Go_Speed--;
-					Right_Speed.Go_Speed--;
-
-
-					
-				//}
+					Left_Speed.Go_Speed-=10;
+					Right_Speed.Go_Speed-=10;
 			}
 		
             if (Left_Speed.Go_Speed < 0)

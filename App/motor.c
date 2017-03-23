@@ -67,8 +67,8 @@ void Motor_PID_Init()
 	Left_Speed.err_next = 0;
 	Right_Speed.err_next = 0;
 
-	Left_Speed.P = 0.2;										//开启模糊控制后不要调节这个值
-	Right_Speed.P = 0.2;									//开启模糊控制后不要调节这个值
+	Left_Speed.P = 0.3;										//开启模糊控制后不要调节这个值
+	Right_Speed.P = 0.3;									//开启模糊控制后不要调节这个值
 
 	Left_Speed.I = 0.015;									//开启模糊控制后不要调节这个值
 	Right_Speed.I = 0.015;									//开启模糊控制后不要调节这个值
@@ -151,7 +151,7 @@ void Get_Motor_Speed()
 	}
         
         //Right_Speed.Now_Speed*=(43/30);
-        Right_Speed.Now_Speed=(int)(Right_Speed.Now_Speed*1.5);//适应大齿轮
+       // Right_Speed.Now_Speed=(int)(Right_Speed.Now_Speed);//适应大齿轮
 
 	ftm_quad_clean(FTM1);									//清正交解码脉冲数
 	ftm_quad_clean(FTM2);									//清正交解码脉冲数
