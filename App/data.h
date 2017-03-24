@@ -50,10 +50,11 @@
 方向计算相关宏定义
 ==========================================*/
 
-#define LEFT_WEIGHT   1
-#define RIGHT_WEIGHT  1
+#define LEFT_WEIGHT		1
+#define RIGHT_WEIGHT	1
 
-#define MAX_FUZZY_RULE 6
+#define MAX_FUZZY_RULE		6					//模糊论域大小
+#define MAX_FUZZY_COUNT_NUM	3					//最大隶属度计算个数
 
 /*============================================
 其它宏定义和typedef
@@ -92,8 +93,8 @@ typedef struct speed
 	int16 Now_Speed;							//正交解码得出的当前速度
 	int16 Error_Speed;							//目标速度与当前速度的差值
 	double IncrementSpeed;						//速度增量
-	double err_next;								//定义上一个偏差值    
-	double err_last;								//定义最上前的偏差值
+	double err_next;							//定义上一个偏差值    
+	double err_last;							//定义最上前的偏差值
 }speed;
 
 /*============================================
@@ -105,7 +106,7 @@ typedef struct
 	int16 AD_Value;								//ADC数模转换器采集到的值,8bit
 	int16 Normalized_Value;						//差比和的电感值
 	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-        char AD_Weight[4];						//权重向前滤波算法权重值
+    char AD_Weight[4];							//权重向前滤波算法权重值
 }inductance;
 
 /*============================================
@@ -128,12 +129,18 @@ typedef struct position
 	double eLength;								//长度信息
 }position;
 
+typedef struct grade
+{
+	double eAngle;								//夹角隶属度
+	double eLength;								//长度隶属度
+	unsigned char eValue;						//大小信息
+}grade;
+
 typedef struct fuzzy_direction					//模糊控制法方向控制
 {
 	position Position;							//临时储存隶属度
-	position ePosition[MAX_FUZZY_RULE];			//储存隶属度
 	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
-
+	grade	 eGrade[MAX_FUZZY_COUNT_NUM];		//储存隶属度
 }fuzzy_direction;
 
 /*============================================

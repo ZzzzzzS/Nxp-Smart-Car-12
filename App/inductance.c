@@ -156,7 +156,7 @@ void eRule_Init_Fuzzy()
 
 void Similarity_Count_Fuzzy()
 {
-	double eDenominator = 0;										//余弦分母
+	double eDenominator = 0;										//余弦分母/临时变量
 	double eNumerator = 0;											//余弦分子/长度计算临时变量
 
 	/*****误差角度计算*****/
@@ -178,32 +178,32 @@ void Similarity_Count_Fuzzy()
 	{
 		eNumerator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
 	}
-	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);
-	/*****隶属度计算*****/
-	for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)
+	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);			//储存计算出的长度
+	/*****隶属度计算*****/											
+	for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)				//计算隶属度最大的位置储存在最右边
 	{
-		Fuzzy_Direction.ePosition[j].eAngle = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
-		Fuzzy_Direction.ePosition[j].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;
-	}
-	/*****隶属度排序(冒泡排序)*****/
-	/*for (unsigned char i = 0; i < MAX_FUZZY_RULE; i++)
-	{
-		for (unsigned char j = i + 1; j < MAX_FUZZY_RULE; j++)
+		eDenominator = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
+		if (eDenominator > Fuzzy_Direction.eGrade[0].eAngle)
 		{
-			if (Fuzzy_Direction.ePosition[i].eAngle > Fuzzy_Direction.ePosition[j].eAngle)
+			Fuzzy_Direction.eGrade[MAX_FUZZY_COUNT_NUM-1].eAngle = eDenominator;
+			Fuzzy_Direction.eGrade[MAX_FUZZY_COUNT_NUM - 1].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;
+			Fuzzy_Direction.eGrade[MAX_FUZZY_COUNT_NUM - 1].eValue = j;
+		}
+	}
+	for (unsigned char i = MAX_FUZZY_COUNT_NUM - 1 ; i > 0; --i)			//计算隶属度第i大的位置
+	{
+		for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)			//每次计算遍历数组
+		{
+			eDenominator = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
+			if (eDenominator > Fuzzy_Direction.eGrade[i].eAngle&&eDenominator<Fuzzy_Direction.eGrade[i-1].eAngle)
 			{
-				Fuzzy_Direction.ePosition[i].eAngle += Fuzzy_Direction.ePosition[j].eAngle;		//不依赖临时变量的位置交换
-				Fuzzy_Direction.ePosition[j].eAngle = Fuzzy_Direction.ePosition[i].eAngle - Fuzzy_Direction.ePosition[j].eAngle;
-				Fuzzy_Direction.ePosition[i].eAngle -= Fuzzy_Direction.ePosition[j].eAngle;
-			}
-			if (Fuzzy_Direction.ePosition[i].eLength > Fuzzy_Direction.ePosition[j].eLength)
-			{
-				Fuzzy_Direction.ePosition[i].eLength += Fuzzy_Direction.ePosition[j].eLength;	//不依赖临时变量的位置交换
-				Fuzzy_Direction.ePosition[j].eLength = Fuzzy_Direction.ePosition[i].eLength - Fuzzy_Direction.ePosition[j].eLength;
-				Fuzzy_Direction.ePosition[i].eLength -= Fuzzy_Direction.ePosition[j].eLength;
+				Fuzzy_Direction.eGrade[i].eAngle = eDenominator;
+				Fuzzy_Direction.eGrade[i].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;
+				Fuzzy_Direction.eGrade[i].eValue = j;
 			}
 		}
-	}*/
+	}
+
 }
 
 /*============================================
@@ -213,5 +213,38 @@ void Similarity_Count_Fuzzy()
 
 void Direction_Control_Fuzzy()
 {
+	char e=0;
+	/*****误差隶属函数描述*****/
+	for (unsigned char i = 0; i < MAX_FUZZY_COUNT_NUM; i++)				
+	{
+		if (0 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+		else if (1 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+		else if (2 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+		else if (3 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+		else if (4 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+		else if (5 == Fuzzy_Direction.eGrade[i].eValue)
+		{
+			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+		}
+	}
+	Left_Speed.Turn_Speed = e;
+	Right_Speed.Turn_Speed = -e;
 
+	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
+	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
 }
