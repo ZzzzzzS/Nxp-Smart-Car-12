@@ -84,17 +84,17 @@ typedef struct speed
 {
 	char Out_Speed;								//最终输出到电机的速度
 	char PID_Out_Speed;							//PID处理后的速度
-	double P;									//pid常量
-	double I;									//pid常量
-	double D;									//pid常量
+	float P;									//pid常量
+	float I;									//pid常量
+	float D;									//pid常量
 	int16 Aim_Speed;							//目标速度
 	int16 Turn_Speed;							//转向差速度
 	int16 Go_Speed;								//正常前进速度
 	int16 Now_Speed;							//正交解码得出的当前速度
 	int16 Error_Speed;							//目标速度与当前速度的差值
-	double IncrementSpeed;						//速度增量
-	double err_next;							//定义上一个偏差值    
-	double err_last;							//定义最上前的偏差值
+	float IncrementSpeed;						//速度增量
+	float err_next;								//定义上一个偏差值    
+	float err_last;								//定义最上前的偏差值
 }speed;
 
 /*============================================
@@ -125,14 +125,14 @@ typedef struct direction						//差比和法方向控制
 
 typedef struct position
 {
-	double eAngle;								//夹角信息
-	double eLength;								//长度信息
+	float eAngle;								//夹角信息
+	float eLength;								//长度信息
 }position;
 
 typedef struct grade
 {
-	double eAngle;								//夹角隶属度
-	double eLength;								//长度隶属度
+	float eAngle;								//夹角隶属度
+	float eLength;								//长度隶属度
 	unsigned char eValue;						//大小信息
 }grade;
 

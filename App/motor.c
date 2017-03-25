@@ -179,16 +179,16 @@ void FuzzyPID()
 作用:模糊控制PID P值
 ==========================================*/
 
-double FuzzyKp(int16 e,double ec)
+float FuzzyKp(int16 e, float ec)
 {
-	double Kp_calcu;																//模糊控制最终输出量
+	float Kp_calcu;																	//模糊控制最终输出量
 	unsigned char num, pe, pec;														//误差率，误差变化率的域
 	const char  eRule[7] = { -50,-25,-10,0.0,10,25,50 };							//误差E的模糊论域
 	const char  ecRule[7] = { -50,-25,-10,0.0,10,25,50 };							//误差变化率EC的模糊论域
-	double eFuzzy[2] = { 0.0,0.0 };													//隶属于误差E的隶属程度
-	double ecFuzzy[2] = { 0.0,0.0 };												//隶属于误差变化率EC的隶属程度
-	const double  kpRule[4] = { 0.05,0.05,0.1,0.1 };								//Kp的模糊子集
-	double KpFuzzy[4] = { 0.0,0.0,0.0,0.0 };										//隶属于Kp的隶属程度
+	float eFuzzy[2] = { 0.0,0.0 };													//隶属于误差E的隶属程度
+	float ecFuzzy[2] = { 0.0,0.0 };													//隶属于误差变化率EC的隶属程度
+	const float  kpRule[4] = { 0.05,0.05,0.1,0.1 };									//Kp的模糊子集
+	float KpFuzzy[4] = { 0.0,0.0,0.0,0.0 };											//隶属于Kp的隶属程度
 	const unsigned char  KpRule[7][7] =					  							//Kp的模糊控制表
 	{
 		{ 3,3,3,3,3,3,3 },
@@ -302,16 +302,16 @@ double FuzzyKp(int16 e,double ec)
 作用:模糊控制PID I值
 ==========================================*/
 
-double FuzzyKi(int e, double ec)
+float FuzzyKi(int e, float ec)
 {	//注释参见FuzzyKp
-	double Ki_calcu;
+	float Ki_calcu;
 	unsigned char num, pe, pec;
 	const char eRule[7] = { -50,-25,-10,0.0,10,25,50 };
 	const char ecRule[7] = { -50,-25,-10,0.0,10,25,50 };
-	double eFuzzy[2] = { 0.0,0.0 };
-	double ecFuzzy[2] = { 0.0,0.0 };
-	const double kiRule[4] = { 0.00,0.01,0.02,0.03 };
-	double KiFuzzy[4] = { 0.0,0.0,0.0,0.0 };
+	float eFuzzy[2] = { 0.0,0.0 };
+	float ecFuzzy[2] = { 0.0,0.0 };
+	const float kiRule[4] = { 0.00,0.01,0.02,0.03 };
+	float KiFuzzy[4] = { 0.0,0.0,0.0,0.0 };
 	const unsigned char KiRule[7][7] =
 	{
 		/*{0,0,0,0,0,0,0},
@@ -432,16 +432,16 @@ double FuzzyKi(int e, double ec)
 作用:模糊控制PID D值
 ==========================================*/
 
-double FuzzyKd(int e, double ec)
+float FuzzyKd(int e, float ec)
 {	//注释参见FuzzyKp
-	double Kd_calcu;
+	float Kd_calcu;
 	unsigned char num, pe, pec;
 	const char eRule[7] = { -50,-25,-10,0.0,10,25,50 };
 	const char ecRule[7] = { -50,-25,-10,0.0,10,25,50 };
-	double eFuzzy[2] = { 0.0,0.0 };
-	double ecFuzzy[2] = { 0.0,0.0 };
-	const double kdRule[4] = { 0.05,0.1,0.15,0.2 };
-	double KdFuzzy[4] = { 0.0,0.0,0.0,0.0 };
+	float eFuzzy[2] = { 0.0,0.0 };
+	float ecFuzzy[2] = { 0.0,0.0 };
+	const float kdRule[4] = { 0.05,0.1,0.15,0.2 };
+	float KdFuzzy[4] = { 0.0,0.0,0.0,0.0 };
 	const unsigned char KdRule[7][7] =
 	{
 		{ 3,3,3,2,2,2,2 },

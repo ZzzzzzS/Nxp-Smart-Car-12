@@ -72,7 +72,7 @@ void Get_AD_Value()
 //(采集到的值)/(Σ本次采集采集到的所有值)
 //作用:对采集的数据滤波消除偶然误差
 	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
-	double temp;													//临时储存电感值
+	float temp;													//临时储存电感值
 
 	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
@@ -86,7 +86,7 @@ void Get_AD_Value()
 	for (unsigned char i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
 	{
 		temp = Road_Data[i].AD_Value;
-		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 200.0);
+		Road_Data[i].Normalized_Value = (int)((temp / (float)Direction.Normalization_Value) * 200.0);
 	}
 }
 
@@ -188,8 +188,8 @@ void Get_AD_Value_Fuzzy()
 
 void Similarity_Count_Fuzzy()
 {
-	double eDenominator = 0;										//余弦分母/临时变量
-	double eNumerator = 0;											//余弦分子/长度计算临时变量
+	float eDenominator = 0;										//余弦分母/临时变量
+	float eNumerator = 0;											//余弦分子/长度计算临时变量
 
 	/*****误差角度计算*****/
 	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算余弦分子
