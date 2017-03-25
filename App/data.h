@@ -82,8 +82,8 @@ typedef char			bool;					//定义bool类型
 
 typedef struct speed
 {
-	int16 Out_Speed;							//最终输出到电机的速度
-	int16 PID_Out_Speed;						//PID处理后的速度
+	char Out_Speed;								//最终输出到电机的速度
+	char PID_Out_Speed;							//PID处理后的速度
 	double P;									//pid常量
 	double I;									//pid常量
 	double D;									//pid常量

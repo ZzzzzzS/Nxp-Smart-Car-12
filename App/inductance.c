@@ -10,9 +10,9 @@ void ADC_Init()
 {
 	adc_init(AMP1);													//初始化AMP1通道，PTB0
 	adc_init(AMP2);													//初始化AMP2通道，PTB1
-	//adc_init(AMP3);												//初始化AMP3通道，PTB2
-	//adc_init(AMP4);												//初始化AMP4通道，PTB3
-	//adc_init(AMP5);												//初始化AMP5通道，PTB4
+	//adc_init(AMP3);													//初始化AMP3通道，PTB2
+	//adc_init(AMP4);													//初始化AMP4通道，PTB3
+	//adc_init(AMP5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -51,46 +51,39 @@ void ADC_Weight_Init()
 
 void Get_AD_Value()
 {
-	char i, j;
-	Road_Data[LEFT].AD_Value = adc_once(AMP1, ADC_8bit);			//采集过程
-	Road_Data[RIGHT].AD_Value = adc_once(AMP2, ADC_8bit);
-	//Road_Data[3].AD_Value = adc_once(AMP3, ADC_8bit);
-	//Road_Data[4].AD_Value = adc_once(AMP4, ADC_8bit);
-	//Road_Data[5].AD_Value = adc_once(AMP5, ADC_8bit);
+	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);			//采集过程
+	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
+	//Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
+	//Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
+	//Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
 
 
-	for (i = 0; i < AMP_MAX; i++)
+	for (unsigned char i = 0; i < AMP_MAX; i++)
 	{
-		for (j = 0; j < 3; j++)										//对电感数据队列移位操作
+		for (unsigned char j = 0; j < 3; j++)						//对电感数据队列移位操作
 		{
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
 		Road_Data[i].AD_Value_Old[3] = Road_Data[i].AD_Value;		//更新队首数据值
 		Road_Data[i].AD_Value = 0;									//清空采集到的数据
 	}
-
-/*============================================
-作用:计算差比和
-==========================================*/
-/*============================================
-什么是差比和算法:
-(采集到的值)/(Σ本次采集采集到的所有值)
-作用:对采集的数据滤波消除偶然误差
-==========================================*/
-
+//作用:计算差比和
+//什么是差比和算法:
+//(采集到的值)/(Σ本次采集采集到的所有值)
+//作用:对采集的数据滤波消除偶然误差
 	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
 	double temp;													//临时储存电感值
 
-	for (i = 0; i < AMP_MAX; i++)									//装入权重向前滤波法处理后的值
+	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
-		for (j = 0; j < 4; j++)
+		for (unsigned char j = 0; j < 4; j++)
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
 		Road_Data[i].AD_Value /= MAX_WEIGHT;
 		Direction.Normalization_Value += Road_Data[i].AD_Value;		//计算本次差比和的和总值
 	}
-	for (i = 0; i < AMP_MAX; i++)									//计算差比和后的电感值
+	for (unsigned char i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
 	{
 		temp = Road_Data[i].AD_Value;
 		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 200.0);
@@ -143,6 +136,45 @@ void eRule_Init_Fuzzy()
 }
 
 /*============================================
+函数名：Get_AD_Value_Fuzzy()
+作用:采集ADC模数转换器传回的数据
+==========================================*/
+/*============================================
+权重向前滤波法队列说明：
+[0][1][2][3]
+旧数据        新数据
+低权值        高权值
+==========================================*/
+void Get_AD_Value_Fuzzy()
+{
+	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);				//采集过程
+	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
+	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
+	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
+	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
+	//注意修改通道初始化
+
+	for (unsigned char i = 0; i < AMP_MAX; i++)
+	{
+		for (unsigned char j = 0; j < 3; j++)						//对电感数据队列移位操作
+		{
+			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
+		}
+		Road_Data[i].AD_Value_Old[3] = Road_Data[i].AD_Value;		//更新队首数据值
+		Road_Data[i].AD_Value = 0;									//清空采集到的数据
+	}
+
+	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
+	{
+		for (unsigned char j = 0; j < 4; j++)
+		{
+			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
+		}
+		Road_Data[i].AD_Value /= MAX_WEIGHT;
+	}
+}
+
+/*============================================
 函数名：Similarity_Count_Fuzzy()
 作用:模糊控制计算模糊隶属度
 ==========================================*/
@@ -190,12 +222,12 @@ void Similarity_Count_Fuzzy()
 			Fuzzy_Direction.eGrade[MAX_FUZZY_COUNT_NUM - 1].eValue = j;
 		}
 	}
-	for (unsigned char i = MAX_FUZZY_COUNT_NUM - 1 ; i > 0; --i)			//计算隶属度第i大的位置
+	for (unsigned char i = MAX_FUZZY_COUNT_NUM - 1 ; i > 0; --i)	//计算隶属度第i大的位置
 	{
 		for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)			//每次计算遍历数组
 		{
 			eDenominator = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
-			if (eDenominator > Fuzzy_Direction.eGrade[i].eAngle&&eDenominator<Fuzzy_Direction.eGrade[i-1].eAngle)
+			if ((eDenominator > Fuzzy_Direction.eGrade[i].eAngle) && (eDenominator < Fuzzy_Direction.eGrade[i + 1].eAngle))
 			{
 				Fuzzy_Direction.eGrade[i].eAngle = eDenominator;
 				Fuzzy_Direction.eGrade[i].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;

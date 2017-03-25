@@ -8,5 +8,6 @@ void Direction_Control();
 void Direction_Control_Fuzzy();
 void Similarity_Count_Fuzzy();
 void eRule_Init_Fuzzy();
+void Get_AD_Value_Fuzzy();
 
 #endif //__INDUCTANCE_H__
