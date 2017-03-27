@@ -14,6 +14,8 @@
 #define MOTOR3_IO   PTA5
 #define MOTOR4_IO   PTA24
 
+
+
 #define MOTOR_FTM   FTM0
 #define MOTOR1_PWM  FTM_CH3
 #define MOTOR2_PWM  FTM_CH4
