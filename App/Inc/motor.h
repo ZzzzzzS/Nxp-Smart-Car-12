@@ -8,8 +8,8 @@ extern void Motor_PID();
 extern void Get_Motor_Speed_Init();
 extern void Get_Motor_Speed();
 extern void FuzzyPID();
-extern float FuzzyKp(int16 e, float ec);
-extern float FuzzyKi(int e, float ec);
-extern float FuzzyKd(int e, float ec);
+extern double FuzzyKp(int16 e, double ec);
+extern double FuzzyKi(int e, double ec);
+extern double FuzzyKd(int e, double ec);
 
 #endif //__MOTOR_H__
