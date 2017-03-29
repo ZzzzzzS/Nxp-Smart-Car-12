@@ -9,7 +9,7 @@ void main()
 	Get_System_Ready();
 
         
-	while (true)
+	while (true) 
 	{
 		DELAY_MS(500);
 		OLED_CLS();
