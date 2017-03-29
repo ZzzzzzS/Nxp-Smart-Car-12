@@ -5,14 +5,19 @@
 函数名：ADC_Init()
 作用:初始化ADC模数转换器
 ==========================================*/
+/*============================================
+电感布局
+		AMP5	AMP4
+	AMP2	AMP3	AMP1
+==========================================*/
 
 void ADC_Init()
 {
 	adc_init(AMP1);													//初始化AMP1通道，PTB0
 	adc_init(AMP2);													//初始化AMP2通道，PTB1
-	//adc_init(AMP3);													//初始化AMP3通道，PTB2
-	//adc_init(AMP4);													//初始化AMP4通道，PTB3
-	//adc_init(AMP5);													//初始化AMP5通道，PTB4
+	adc_init(AMP3);													//初始化AMP3通道，PTB2
+	adc_init(AMP4);													//初始化AMP4通道，PTB3
+	adc_init(AMP5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -53,9 +58,9 @@ void Get_AD_Value()
 {
 	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);			//采集过程
 	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
-	//Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
-	//Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
-	//Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
+	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
+	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
+	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
 
 
 	for (unsigned char i = 0; i < AMP_MAX; i++)
