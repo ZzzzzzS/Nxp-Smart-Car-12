@@ -49,7 +49,7 @@ void LPTMR_IRQHandler()
 	Motor_PID();													//对电机进行增量式PID调节
 	Speed_Chack_PID();												//检测PID数值合法性，防止过度积分
 	Motor_Control();												//输出最终速度
-	Send_Data();
+	pit_hander();
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
         
 	

@@ -193,7 +193,8 @@ typedef struct fuzzy_direction					//模糊控制法方向控制
 typedef struct service
 {
 	bool Debug;
-
+    mode flag;
+	char count;
 }service;
 
 /*============================================

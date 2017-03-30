@@ -87,6 +87,7 @@ void OLED_Interface()
 
 	while (true)
 	{
+          DELAY_MS(100);
 		if (gpio_get(Key1) != 0)							//确认按钮
 		{
 			DELAY_MS(10);									//消抖延时
@@ -132,9 +133,8 @@ void OLED_Interface()
 
 void DeBug_Interface()
 {
-	mode flag = 0;
 	data temp[10];
-	if (flag == Inductance_Interface)
+	if (Service.flag == Inductance_Interface)
 	{
 		OLED_CLS();
 		OLED_Print(Position(Line1), "电感调试");
@@ -143,7 +143,7 @@ void DeBug_Interface()
 		sprintf(temp, "L=%d M=%d R=%d", Road_Data[LEFT].AD_Value, 0, Road_Data[RIGHT].AD_Value);
 		OLED_Print(Position(Line3), temp);
 	}
-	else if (flag == Speed_Interface)
+	else if (Service.flag == Speed_Interface)
 	{
 		OLED_CLS();																															//先清屏
 		sprintf(temp, "out=L%d R%d", Left_Speed.Out_Speed, Right_Speed.Out_Speed);					//电机输出功率
@@ -174,9 +174,9 @@ void DeBug_Interface()
 	
 	if (gpio_get(Key1) != 0)
 	{
-		flag++;
-		if (flag >=MAX_Interface)
-			flag = 0;
+		Service.flag++;
+		if (Service.flag >=MAX_Interface)
+			Service.flag = 0;
 	}
 }
 
@@ -187,9 +187,11 @@ void DeBug_Interface()
 
 void Debug_Init()
 {
-	pit_init(PIT0, 100);																	//定时中断100ms
-	set_vector_handler(PIT0_VECTORn, pit_hander);					// 设置中断服务函数到中断向量表里
-	enable_irq(PIT0_IRQn);														 // 使能 PIT 中断
+	//pit_init(PIT0, 1000);																	//定时中断100ms
+	//set_vector_handler(PIT0_VECTORn, pit_hander);					// 设置中断服务函数到中断向量表里
+	//enable_irq(PIT0_IRQn);														 // 使能 PIT 中断
+	Service.Debug = true;
+	Service.flag = 0;
 }
 
 /*============================================
@@ -199,6 +201,14 @@ void Debug_Init()
 
 void pit_hander()
 {
-	DeBug_Interface();
-	Send_Data();
+	if (Service.Debug == true)
+	{
+		Service.count++;
+		if (Service.count >= 20)
+		{
+			DeBug_Interface();
+			//Send_Data();
+			Service.count = 0;
+		}
+	}
 }
