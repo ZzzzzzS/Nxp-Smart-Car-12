@@ -4,10 +4,10 @@
 void Stop_Car_Init();
 void Stop_Car();
 void Send_Data();
-void Save_Inductance();
-void load_Inductance();
 void Init_Key();
 void OLED_Interface();
-void OLED_Normalization_Interface();
+void DeBug_Interface();
+void Debug_Init();
+void pit_hander();
 
 #endif // __PERIPHERAL_H__

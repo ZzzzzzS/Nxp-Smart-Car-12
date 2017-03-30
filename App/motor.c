@@ -116,8 +116,10 @@ void Motor_PID()
 	Left_Speed.PID_Out_Speed += Left_Speed.IncrementSpeed;
 	Right_Speed.PID_Out_Speed += Right_Speed.IncrementSpeed;
 
+
 	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;										//左右轮最终输出速度暂时等于pid处理后的当前速度
 	Right_Speed.Out_Speed = Right_Speed.PID_Out_Speed;
+
 }
 
 /*============================================
@@ -155,6 +157,16 @@ void Get_Motor_Speed()
 
 	ftm_quad_clean(FTM1);									//清正交解码脉冲数
 	ftm_quad_clean(FTM2);									//清正交解码脉冲数
+}
+
+/*============================================
+函数名： Speed_Chack_PID()
+作用:PID速度合法性检测，防止过度积分
+==========================================*/
+
+void Speed_Chack_PID()
+{
+	//暂时不需要
 }
 
 /*============================================

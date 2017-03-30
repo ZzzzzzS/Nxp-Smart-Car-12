@@ -39,14 +39,25 @@
 #define AMP4	ADC0_SE13						//PTB3
 #define AMP5	ADC1_SE10						//PTB4
 #define AMP_MAX	2								//定义最大ADC端口数
-
-#define LEFT 0
-#define RIGHT 1
-
+/*
+#define LEFT		  0										//定义电感位置
+#define RIGHT	  1										//定义电感位置
+#define MIDDLE 2										//定义电感位置
+#define Front_LEFT  3								//定义电感位置
+#define Front_Right 4								//定义电感位置*/
 #define DEFAULT_MAX_VALUE 0
 #define DEFAULT_MIN_VALUE 300
 
 #define MAX_WEIGHT 10
+
+typedef enum Inductance_Position
+{
+	LEFT,
+	RIGHT,
+	MIDDLE,
+	FRONT_LEFT,
+	FRONT_RIGHT
+}Inductance_Position;
 
 /*============================================
 方向计算相关宏定义
@@ -56,27 +67,57 @@
 #define RIGHT_WEIGHT	1
 
 #define MAX_FUZZY_RULE		6					//模糊论域大小
-#define MAX_FUZZY_COUNT_NUM	3					//最大隶属度计算个数
+#define MAX_FUZZY_COUNT_NUM	3			//最大隶属度计算个数
 
 /*============================================
 其它宏定义和typedef
 ==========================================*/
-#define Key1   PTC13							//按键管脚定义
-#define Key2   PTC11							//按键管脚定义
-#define Key3   PTC9								//按键管脚定义
-#define Key4   PTC7								//按键管脚定义
+#define Key1   PTC13									//按键管脚定义
+#define Key2   PTC11									//按键管脚定义
+#define Key3   PTC9									//按键管脚定义,这个按钮有问题
+#define Key4   PTC7									//按键管脚定义
 //修改OLED管脚时注意修改init的管脚!
-#define RESET  PTC14_OUT						//OLED相关宏定义
-#define DC     PTC16_OUT						//OLED相关宏定义
-#define D1     PTC12_OUT						//OLED相关宏定义
-#define D0     PTC10_OUT						//OLED相关宏定义
-#define Bluetooth		UART0					//宏定义Bluetooth®发送端口
+#define RESET	 PTC14_OUT						//OLED相关宏定义
+#define DC		 PTC16_OUT						//OLED相关宏定义
+#define D1		 PTC12_OUT						//OLED相关宏定义
+#define D0		 PTC10_OUT						//OLED相关宏定义
+#define Bluetooth		UART0						//宏定义Bluetooth®发送端口
 #define SECTOR_NUM		(FLASH_SECTOR_NUM-1)	//flash扇区宏定义，尽量用最后面的扇区，确保安全
-//#define CAR_STOP		PTE8					//定义停车检测管脚
-//#define CAR_STOP_NUM	8						//定义停车管脚号
-#define true			1						//定义逻辑真
-#define false			0						//定义逻辑假
-typedef char			bool;					//定义bool类型
+//#define CAR_STOP		PTE8						//定义停车检测管脚
+//#define CAR_STOP_NUM	8					//定义停车管脚号
+#define true			1									//定义逻辑真
+#define false			0									//定义逻辑假
+typedef char						bool;					//定义bool类型
+
+/*============================================
+调试模式宏定义
+==========================================*/
+
+/*#define Inductance_Interface 0					//电感显示界面
+#define Speed_Interface		 1					//速度显示界面
+#define Line1						 0					//定义行坐标
+#define Line2						 2					//定义行坐标
+#define Line3						 4					//定义行坐标
+#define Line4						 6					//定义行坐标*/
+#define Position(OLED_Line)			 0,(OLED_Line)			//坐标定义
+typedef char						data;					//定义data类型
+typedef unsigned char		mode;				//定义模式选择类型
+typedef unsigned char		counter;			//定义累加器类型
+typedef enum OLED_Line
+{
+	Line1 = 0,
+	Line2 = 2,
+	Line3 = 4,
+	Line4 = 6
+}OLED_Line;
+
+typedef enum Debug_Interface
+{
+	Inductance_Interface,
+	Speed_Interface,
+
+	MAX_Interface
+}Debug_Interface;
 
 /*============================================
 速度相关数据结构体
@@ -152,6 +193,7 @@ typedef struct fuzzy_direction					//模糊控制法方向控制
 typedef struct service
 {
 	bool Debug;
+
 }service;
 
 /*============================================

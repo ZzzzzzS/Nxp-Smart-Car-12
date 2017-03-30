@@ -9,7 +9,6 @@
 void System_Init()
 {
 	DisableInterrupts;												//宏定义，禁止中断
-	flash_init();													//flash初始化
 	ADC_Init();														//ADC模数转换器初始化
 	//eRule_Init_Fuzzy();											//方向模糊控制论域初始化
 	Init_Key();														//初始化按键	
@@ -46,8 +45,9 @@ void LPTMR_IRQHandler()
 	Get_AD_Value();													//获取ADC数模转换器的值
 	Direction_Control();											//获得目标转向角度
 	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
-	//FuzzyPID();														//对PID参数模糊控制
+	//FuzzyPID();													//对PID参数模糊控制
 	Motor_PID();													//对电机进行增量式PID调节
+	Speed_Chack_PID();												//检测PID数值合法性，防止过度积分
 	Motor_Control();												//输出最终速度
 	Send_Data();
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
@@ -55,15 +55,6 @@ void LPTMR_IRQHandler()
 	
 }
 
-/*============================================
-函数名：Debug_Init()
-作用：调试模式时初始化调试组件
-==========================================*/
-
-void Debug_Init()
-{
-//这里暂时不需要写
-}
 
 
 

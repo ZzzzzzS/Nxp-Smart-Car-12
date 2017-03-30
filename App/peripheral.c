@@ -56,58 +56,16 @@ void Send_Data()
 }
 
 /*============================================
-函数名：Save_Inductance()
-作用：flash储存电感数值
-==========================================*/
-/*============================================
-flash储存位置: L=最大值 S=最小值
-偏移量:0  1  2  3  4  5  6  7
-	   L0 L1 L2 L3 S0 S1 S2 S3
-==========================================*/
-
-void Save_Inductance()
-{
-	char i;
-	//flash_erase_sector(SECTOR_NUM);								//擦除flash扇区，准备写入
-
-	for (i = 0; i < 4; i++)										//储存电感归一化的分母
-	{
-		//do
-		//{
-			//flash_write(SECTOR_NUM, i * 4, Road_Data[i].normalization);
-		//} while //(flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i].normalization);	//储存后验证是否储存正确
-	}
-
-	for (i = 4; i < 8; i++)										//储存电感最小值
-	{
-		//do
-		//{
-			//flash_write(SECTOR_NUM, i * 4, Road_Data[i-4].Min_AD_Value);
-		//} while //(flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i - 4].Min_AD_Value);//储存后验证是否储存正确
-	}
-}
-
-/*============================================
-函数名：Save_Inductance()
-作用：flash储存电感数值
-==========================================*/
-
-void load_Inductance()
-{
-	//储存速度信息等
-}
-
-/*============================================
 函数名：Key_Init()
 作用：初始化按键
 ==========================================*/
 
 void Init_Key()
 {
-	port_init(Key1, ALT1 | PULLDOWN);
+	/*port_init(Key1, ALT1 | PULLDOWN);
 	port_init(Key2, ALT1 | PULLDOWN);
 	port_init(Key3, ALT1 | PULLDOWN);
-	port_init(Key4, ALT1 | PULLDOWN);
+	port_init(Key4, ALT1 | PULLDOWN);*/
 	gpio_init(Key1, GPI, 0);                       
 	gpio_init(Key2, GPI, 0);
 	gpio_init(Key3, GPI, 0); 
@@ -121,24 +79,126 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	//Draw_BMP(0, 0, 127, 63, BMP);
-	//DELAY_MS(500);
 	OLED_Print(15, 0, "718创新实验室");
 	OLED_Print(27, 2, "untitled组");
-    //OLED_Rectangle(0, 35, 127, 45, 1);
-	OLED_Print(0, 6, "按键来继续...");
+	OLED_Print(Position(Line3), "调试模式   <-");
+	OLED_Print(Position(Line4), "发布模式");
+	unsigned char flag = 0;								//模式判断标志位
+
 	while (true)
 	{
-		if (gpio_get(PTC13) != 0)
+		if (gpio_get(Key1) != 0)							//确认按钮
 		{
-			DELAY_MS(10);
-			if (gpio_get(PTC13) != 0)
+			DELAY_MS(10);									//消抖延时
+			if (gpio_get(Key1) != 0)
 			{
                           OLED_CLS();
+						  if (0 == flag % 2)
+						  {
+							  Debug_Init();
+						  }
 			}
 			break;
 		}
+
+		if (gpio_get(Key4) != 0)						//选择按钮
+		{
+			DELAY_MS(10);								//消抖延时
+			if (gpio_get(Key4) != 0)
+			{
+				flag++;
+				OLED_CLS();
+				OLED_Print(15, 0, "718创新实验室");
+				OLED_Print(27, 2, "untitled组");
+				if (0 == flag % 2)
+				{
+					OLED_Print(Position(Line3), "调试模式   <-");
+					OLED_Print(Position(Line4), "发布模式");
+				}
+				else
+				{
+					OLED_Print(Position(Line3), "调试模式");
+					OLED_Print(Position(Line4), "发布模式   <-");
+				}
+			}
+		}
+	}
+}
+
+/*============================================
+函数名：DeBug_Interface()
+作用：OLED显示调试时界面
+==========================================*/
+
+void DeBug_Interface()
+{
+	mode flag = 0;
+	data temp[10];
+	if (flag == Inductance_Interface)
+	{
+		OLED_CLS();
+		OLED_Print(Position(Line1), "电感调试");
+		sprintf(temp, "   FL=%d FR=%d", 0, 0);
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "L=%d M=%d R=%d", Road_Data[LEFT].AD_Value, 0, Road_Data[RIGHT].AD_Value);
+		OLED_Print(Position(Line3), temp);
+	}
+	else if (flag == Speed_Interface)
+	{
+		OLED_CLS();																															//先清屏
+		sprintf(temp, "out=L%d R%d", Left_Speed.Out_Speed, Right_Speed.Out_Speed);					//电机输出功率
+		OLED_Print(Position(Line1), temp);
+		sprintf(temp, "now=L%d R%d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);				//当前速度
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "aim=L%d R%d", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);					//目标速度
+		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "set=L%d R%d", Left_Speed.Go_Speed, Right_Speed.Go_Speed);						//设定速度
+		OLED_Print(Position(Line4), temp);
 	}
 
-	Service.Debug = true;
+	if (gpio_get(Key2) != 0)
+	{
+		Left_Speed.Go_Speed += 10;
+		Right_Speed.Go_Speed += 10;
+	}
+	if (gpio_get(Key4) != 0)
+	{
+		Left_Speed.Go_Speed -= 10;
+		Right_Speed.Go_Speed -= 10;
+
+		if (Left_Speed.Go_Speed < 0)
+			Left_Speed.Go_Speed = 0;
+		if (Right_Speed.Go_Speed < 0)
+			Right_Speed.Go_Speed = 0;
+	}
+	
+	if (gpio_get(Key1) != 0)
+	{
+		flag++;
+		if (flag >=MAX_Interface)
+			flag = 0;
+	}
+}
+
+/*============================================
+函数名：Debug_Init()
+作用：调试模式时初始化调试组件
+==========================================*/
+
+void Debug_Init()
+{
+	pit_init(PIT0, 100);																	//定时中断100ms
+	set_vector_handler(PIT0_VECTORn, pit_hander);					// 设置中断服务函数到中断向量表里
+	enable_irq(PIT0_IRQn);														 // 使能 PIT 中断
+}
+
+/*============================================
+函数名：pit_hander()
+作用：调试模式定时中断
+==========================================*/
+
+void pit_hander()
+{
+	DeBug_Interface();
+	Send_Data();
 }
