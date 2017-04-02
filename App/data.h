@@ -38,7 +38,7 @@
 #define AMP3    ADC0_SE12						//PTB2
 #define AMP4	ADC0_SE13						//PTB3
 #define AMP5	ADC1_SE10						//PTB4
-#define AMP_MAX	2								//定义最大ADC端口数
+#define AMP_MAX	5								//定义最大ADC端口数
 /*
 #define LEFT		  0										//定义电感位置
 #define RIGHT	  1										//定义电感位置
@@ -146,10 +146,11 @@ typedef struct speed
 
 typedef struct
 {
-	int16 AD_Value;								//ADC数模转换器采集到的值,8bit
-	int16 Normalized_Value;						//差比和的电感值
-	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-    char AD_Weight[4];							//权重向前滤波算法权重值
+	int AD_Value;								//ADC数模转换器采集到的值,8bit
+	int AD_Value_fixed;						//滤波后的值
+	int Normalized_Value;						//差比和的电感值
+	int AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+    unsigned char AD_Weight[4];							//权重向前滤波算法权重值
 }inductance;
 
 /*============================================

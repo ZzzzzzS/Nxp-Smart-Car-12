@@ -2,6 +2,11 @@
 #include "data.h"
 
 /*============================================
+电感顺序：
+	左 中 上左 上右 右
+==========================================*/
+
+/*============================================
 函数名：ADC_Init()
 作用:初始化ADC模数转换器
 ==========================================*/
@@ -10,9 +15,9 @@ void ADC_Init()
 {
 	adc_init(AMP1);													//初始化AMP1通道，PTB0
 	adc_init(AMP2);													//初始化AMP2通道，PTB1
-	//adc_init(AMP3);													//初始化AMP3通道，PTB2
-	//adc_init(AMP4);													//初始化AMP4通道，PTB3
-	//adc_init(AMP5);													//初始化AMP5通道，PTB4
+	adc_init(AMP3);									 				//初始化AMP3通道，PTB2
+	adc_init(AMP4);													//初始化AMP4通道，PTB3
+	adc_init(AMP5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -53,9 +58,9 @@ void Get_AD_Value()
 {
 	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);			//采集过程
 	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
-	//Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
-	//Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
-	//Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
+	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
+	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
+	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
 
 
 	for (unsigned char i = 0; i < AMP_MAX; i++)
@@ -65,7 +70,6 @@ void Get_AD_Value()
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
 		Road_Data[i].AD_Value_Old[3] = Road_Data[i].AD_Value;		//更新队首数据值
-		Road_Data[i].AD_Value = 0;									//清空采集到的数据
 	}
 //作用:计算差比和
 //什么是差比和算法:
@@ -76,17 +80,18 @@ void Get_AD_Value()
 
 	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
+		Road_Data[i].AD_Value_fixed = 0;
 		for (unsigned char j = 0; j < 4; j++)
 		{
-			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
+			Road_Data[i].AD_Value_fixed += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
-		Road_Data[i].AD_Value /= MAX_WEIGHT;
-		Direction.Normalization_Value += Road_Data[i].AD_Value;		//计算本次差比和的和总值
+		Road_Data[i].AD_Value_fixed /= MAX_WEIGHT;
+		Direction.Normalization_Value += Road_Data[i].AD_Value_fixed;		//计算本次差比和的和总值
 	}
 	for (unsigned char i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
 	{
-		temp = Road_Data[i].AD_Value;
-		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 200.0);
+		temp = Road_Data[i].AD_Value_fixed;
+		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 100.0);
 	}
 }
 
@@ -98,8 +103,8 @@ void Get_AD_Value()
 void Direction_Control()
 {
 	Direction.err = 0;												//采用权重算法计算误差
-	Direction.err -= Road_Data[LEFT].Normalized_Value*LEFT_WEIGHT;
-	Direction.err += Road_Data[RIGHT].Normalized_Value*RIGHT_WEIGHT;
+	Direction.err -= Road_Data[0].Normalized_Value*LEFT_WEIGHT;
+	Direction.err += Road_Data[1].Normalized_Value*RIGHT_WEIGHT;
 	//AMP_MAX需要修改！！！
 	Left_Speed.Turn_Speed = Direction.err;
 	Right_Speed.Turn_Speed = -Direction.err;

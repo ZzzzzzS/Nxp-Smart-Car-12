@@ -15,6 +15,7 @@ void System_Init()
 	Motor_Init();													//电机初始化
 	Motor_PID_Init();												//电机PID控制初始化
 	Get_Motor_Speed_Init();											//FTM正交解码初始化
+	ADC_Weight_Init();												//初始化权重向前滤波法
 	OLED_Init();													//OLED初始化
 	//Stop_Car_Init();												//停车检测初始化
 	lptmr_timing_ms(20);											//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
@@ -31,7 +32,6 @@ void System_Init()
 void Get_System_Ready()
 {
 	OLED_Interface();												//初始参数设置界面
-	ADC_Weight_Init();												//初始化权重向前滤波法
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -49,7 +49,7 @@ void LPTMR_IRQHandler()
 	Motor_PID();													//对电机进行增量式PID调节
 	Speed_Chack_PID();												//检测PID数值合法性，防止过度积分
 	Motor_Control();												//输出最终速度
-	pit_hander();
+	pit();
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
         
 	

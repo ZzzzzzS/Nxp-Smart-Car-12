@@ -138,9 +138,9 @@ void DeBug_Interface()
 	{
 		OLED_CLS();
 		OLED_Print(Position(Line1), "电感调试");
-		sprintf(temp, "   FL=%d FR=%d", 0, 0);
+		sprintf(temp, "    FL=%d FR=%d", Road_Data[FRONT_LEFT].AD_Value, Road_Data[FRONT_RIGHT].AD_Value);
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "L=%d M=%d R=%d", Road_Data[LEFT].AD_Value, 0, Road_Data[RIGHT].AD_Value);
+		sprintf(temp, "L=%d M=%d R=%d", Road_Data[LEFT].AD_Value, Road_Data[MIDDLE].AD_Value, Road_Data[RIGHT].AD_Value);
 		OLED_Print(Position(Line3), temp);
 	}
 	else if (Service.flag == Speed_Interface)
@@ -199,7 +199,7 @@ void Debug_Init()
 作用：调试模式定时中断
 ==========================================*/
 
-void pit_hander()
+void pit()
 {
 	if (Service.Debug == true)
 	{
