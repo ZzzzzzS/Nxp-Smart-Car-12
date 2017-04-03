@@ -41,18 +41,15 @@
 
 void Send_Data()
 {
-	if (Service.Debug == true)
+	/*char var[2];
+	for (char i = 0; i < 2; i++)
 	{
-		char var[2];
-		for (char i = 0; i < 2; i++)
-		{
-			var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
-		}
-		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
-		printf("Out_Speed %d %d ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
-		printf("NowSpeed %hd %hd", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
+		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
 	}
-	
+	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
+	printf("Out_Speed %d %d ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
+	printf("NowSpeed %d %d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);*/
+  //printf("test");
 }
 
 /*============================================
@@ -191,11 +188,31 @@ void Debug_Init()
 }
 
 /*============================================
-函数名：pit_hander()
+函数名：System_Error(error Error_Number)
+作用：调试模式系统错误紧急停车
+==========================================*/
+
+void System_Error(error Error_Number)
+{
+	disable_irq(LPTMR_IRQn);									//禁止低功耗定时计数器中断
+	Right_Speed.Out_Speed = 0;								//调整速度为0
+	Left_Speed.Out_Speed = 0;								//调整速度为0
+	Motor_Control();												//控制电机
+	if (Error_Number == Motor_Stop)
+	{
+		OLED_Init();
+		OLED_Print(0, 0, "电机堵转");
+	}
+
+        while(1);
+}
+
+/*============================================
+函数名：Debug()
 作用：调试模式定时中断
 ==========================================*/
 
-void pit()
+void Debug()
 {
 	if (Service.Debug == true)
 	{
@@ -203,7 +220,7 @@ void pit()
 		if (Service.count >= 20)
 		{
 			DeBug_Interface();
-			//Send_Data();
+			Send_Data();
 			Service.count = 0;
 		}
 	}

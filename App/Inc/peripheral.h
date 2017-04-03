@@ -8,6 +8,6 @@ void Init_Key();
 void OLED_Interface();
 void DeBug_Interface();
 void Debug_Init();
-void pit();
+void Debug();
 
 #endif // __PERIPHERAL_H__

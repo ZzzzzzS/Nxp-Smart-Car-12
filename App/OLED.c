@@ -111,8 +111,6 @@ void OLED_Init(void)
 	RESET = 0;
 	OLED_DLY_ms(50);
 	RESET = 1;
-
-
 	OLED_WrCmd(0xae);//--turn off oled panel
 	OLED_WrCmd(0x00);//---set low column address
 	OLED_WrCmd(0x10);//---set high column address

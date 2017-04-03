@@ -24,8 +24,8 @@
 #define UART0_RX_PIN    PTD6        //PTA1、PTA15、PTB16、PTD6          PTA1不要用（与Jtag冲突）
 #define UART0_TX_PIN    PTD7        //PTA2、PTA14、PTB17、PTD7          PTA2不要用（与Jtag冲突）
 
-#define UART1_RX_PIN    PTC3        //PTC3、PTE1
-#define UART1_TX_PIN    PTC4        //PTC4、PTE0
+#define UART1_RX_PIN    PTE1        //PTC3、PTE1、PTC3
+#define UART1_TX_PIN    PTE0        //PTC4、PTE0、PTC4
 
 #define UART2_RX_PIN    PTD2        //PTD2
 #define UART2_TX_PIN    PTD3        //PTD3

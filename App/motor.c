@@ -21,22 +21,6 @@ void Motor_Init()
 
 void Motor_Control()
 {
-	if (Left_Speed.Out_Speed > MAX_SPEED)					//判断速度是否会超过边界
-	{
-		Left_Speed.Out_Speed = MAX_SPEED;
-	}
-	else if (Left_Speed.Out_Speed < MIN_SPEED)
-	{
-		Left_Speed.Out_Speed = MIN_SPEED;
-	}
-	if (Right_Speed.Out_Speed > MAX_SPEED)
-	{
-		Right_Speed.Out_Speed = MAX_SPEED;
-	}
-	else if (Right_Speed.Out_Speed < MIN_SPEED)
-	{
-		Right_Speed.Out_Speed = MIN_SPEED;
-	}
         
 	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);	//电机输出
 	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);						//电机输出
@@ -67,8 +51,8 @@ void Motor_PID_Init()
 	Left_Speed.err_next = 0;
 	Right_Speed.err_next = 0;
 
-	Left_Speed.P = 0.3;										//开启模糊控制后不要调节这个值
-	Right_Speed.P = 0.3;									//开启模糊控制后不要调节这个值
+	Left_Speed.P = 0.5;										//开启模糊控制后不要调节这个值
+	Right_Speed.P = 0.5;									//开启模糊控制后不要调节这个值
 
 	Left_Speed.I = 0.015;									//开启模糊控制后不要调节这个值
 	Right_Speed.I = 0.015;									//开启模糊控制后不要调节这个值
@@ -160,13 +144,37 @@ void Get_Motor_Speed()
 }
 
 /*============================================
-函数名： Speed_Chack_PID()
-作用:PID速度合法性检测，防止过度积分
+函数名： Speed_Chack()
+作用:速度合法性检测，防止堵转等
 ==========================================*/
 
-void Speed_Chack_PID()
+void Speed_Chack()
 {
-	//暂时不需要
+	if (Left_Speed.Out_Speed >= MAX_SPEED)					//判断速度是否会超过边界
+	{
+		Left_Speed.Out_Speed = MAX_SPEED;
+	}
+	else if (Left_Speed.Out_Speed <= MIN_SPEED)
+	{
+		Left_Speed.Out_Speed = MIN_SPEED;
+	}
+	if (Right_Speed.Out_Speed >= MAX_SPEED)
+	{
+		Right_Speed.Out_Speed = MAX_SPEED;
+	}
+	else if (Right_Speed.Out_Speed <= MIN_SPEED)
+	{
+		Right_Speed.Out_Speed = MIN_SPEED;
+	}
+
+
+	if ((Right_Speed.Now_Speed < 10) && (Right_Speed.Out_Speed > 70))
+	{
+		if ((Left_Speed.Now_Speed < 10) && (Left_Speed.Out_Speed > 70))
+		{
+                    //System_Error(0);
+		}
+	}
 }
 
 /*============================================

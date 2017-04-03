@@ -64,7 +64,7 @@ typedef enum Inductance_Position
 #define DC		 PTC16_OUT						//OLED相关宏定义
 #define D1		 PTC12_OUT						//OLED相关宏定义
 #define D0		 PTC10_OUT						//OLED相关宏定义
-#define Bluetooth		UART0						//宏定义Bluetooth®发送端口
+#define Bluetooth		UART4						//宏定义Bluetooth®发送端口
 //#define CAR_STOP		PTE8						//定义停车检测管脚
 //#define CAR_STOP_NUM	8					//定义停车管脚号
 #define true			1									//定义逻辑真
@@ -79,6 +79,7 @@ typedef char						bool;					//定义bool类型
 typedef char										data;					//定义data类型
 typedef unsigned char						mode;				//定义模式选择类型
 typedef unsigned char						counter;			//定义累加器类型
+typedef unsigned char						error;				//定义错误类型
 typedef enum OLED_Line
 {
 	Line1 = 0,
@@ -88,6 +89,12 @@ typedef enum OLED_Line
 
 	MAX_Line
 }OLED_Line;
+
+typedef enum
+{
+	Motor_Stop,
+	MAX_error
+}Error_Num;
 
 typedef enum Debug_Interface
 {
