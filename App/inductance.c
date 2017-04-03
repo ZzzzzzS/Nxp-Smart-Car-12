@@ -63,9 +63,9 @@ void Get_AD_Value()
 	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
 
 
-	for (unsigned char i = 0; i < AMP_MAX; i++)
+	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		for (unsigned char j = 0; j < 3; j++)						//对电感数据队列移位操作
+		for (counter j = 0; j < 3; j++)						//对电感数据队列移位操作
 		{
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
@@ -78,17 +78,17 @@ void Get_AD_Value()
 	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
 	double temp;													//临时储存电感值
 
-	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
+	for (counter i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
 		Road_Data[i].AD_Value_fixed = 0;
-		for (unsigned char j = 0; j < 4; j++)
+		for (counter j = 0; j < 4; j++)
 		{
 			Road_Data[i].AD_Value_fixed += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
 		Road_Data[i].AD_Value_fixed /= MAX_WEIGHT;
 		Direction.Normalization_Value += Road_Data[i].AD_Value_fixed;		//计算本次差比和的和总值
 	}
-	for (unsigned char i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
+	for (counter i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
 	{
 		temp = Road_Data[i].AD_Value_fixed;
 		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 100.0);
@@ -159,9 +159,9 @@ void Get_AD_Value_Fuzzy()
 	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
 	//注意修改通道初始化
 
-	for (unsigned char i = 0; i < AMP_MAX; i++)
+	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		for (unsigned char j = 0; j < 3; j++)						//对电感数据队列移位操作
+		for (counter j = 0; j < 3; j++)						//对电感数据队列移位操作
 		{
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
@@ -169,9 +169,9 @@ void Get_AD_Value_Fuzzy()
 		Road_Data[i].AD_Value = 0;									//清空采集到的数据
 	}
 
-	for (unsigned char i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
+	for (counter i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
-		for (unsigned char j = 0; j < 4; j++)
+		for (counter j = 0; j < 4; j++)
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
@@ -197,12 +197,12 @@ void Similarity_Count_Fuzzy()
 	double eNumerator = 0;											//余弦分子/长度计算临时变量
 
 	/*****误差角度计算*****/
-	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算余弦分子
+	for (counter j = 0; j < AMP_MAX; j++)						//计算余弦分子
 	{
 		eNumerator += Road_Data[j].AD_Value;
 	}
 
-	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算余弦分母
+	for (counter j = 0; j < AMP_MAX; j++)						//计算余弦分母
 	{
 			eDenominator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
 	}
@@ -211,13 +211,13 @@ void Similarity_Count_Fuzzy()
 	Fuzzy_Direction.Position.eAngle = eNumerator / eDenominator;	//计算与(1,1,1,1,...)的夹角余弦值
 
 	/*****误差长度计算*****/
-	for (unsigned char j = 0; j < AMP_MAX; j++)						//计算向量长度
+	for (counter j = 0; j < AMP_MAX; j++)						//计算向量长度
 	{
 		eNumerator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
 	}
 	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);			//储存计算出的长度
 	/*****隶属度计算*****/											
-	for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)				//计算隶属度最大的位置储存在最右边
+	for (counter j = 0; j < MAX_FUZZY_RULE; j++)				//计算隶属度最大的位置储存在最右边
 	{
 		eDenominator = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
 		if (eDenominator > Fuzzy_Direction.eGrade[0].eAngle)
@@ -227,9 +227,9 @@ void Similarity_Count_Fuzzy()
 			Fuzzy_Direction.eGrade[MAX_FUZZY_COUNT_NUM - 1].eValue = j;
 		}
 	}
-	for (unsigned char i = MAX_FUZZY_COUNT_NUM - 1 ; i > 0; --i)	//计算隶属度第i大的位置
+	for (counter i = MAX_FUZZY_COUNT_NUM - 1 ; i > 0; --i)	//计算隶属度第i大的位置
 	{
-		for (unsigned char j = 0; j < MAX_FUZZY_RULE; j++)			//每次计算遍历数组
+		for (counter j = 0; j < MAX_FUZZY_RULE; j++)			//每次计算遍历数组
 		{
 			eDenominator = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
 			if ((eDenominator > Fuzzy_Direction.eGrade[i].eAngle) && (eDenominator < Fuzzy_Direction.eGrade[i + 1].eAngle))
@@ -252,7 +252,7 @@ void Direction_Control_Fuzzy()
 {
 	char e=0;
 	/*****误差隶属函数描述*****/
-	for (unsigned char i = 0; i < MAX_FUZZY_COUNT_NUM; i++)				
+	for (counter i = 0; i < MAX_FUZZY_COUNT_NUM; i++)
 	{
 		if (0 == Fuzzy_Direction.eGrade[i].eValue)
 		{

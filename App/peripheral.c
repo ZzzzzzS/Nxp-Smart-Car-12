@@ -62,10 +62,6 @@ void Send_Data()
 
 void Init_Key()
 {
-	/*port_init(Key1, ALT1 | PULLDOWN);
-	port_init(Key2, ALT1 | PULLDOWN);
-	port_init(Key3, ALT1 | PULLDOWN);
-	port_init(Key4, ALT1 | PULLDOWN);*/
 	gpio_init(Key1, GPI, 0);                       
 	gpio_init(Key2, GPI, 0);
 	gpio_init(Key3, GPI, 0); 
@@ -83,7 +79,7 @@ void OLED_Interface()
 	OLED_Print(27, 2, "untitled组");
 	OLED_Print(Position(Line3), "调试模式   <-");
 	OLED_Print(Position(Line4), "发布模式");
-	unsigned char flag = 0;								//模式判断标志位
+	mode flag = 0;											//模式判断标志位
 
 	while (true)
 	{

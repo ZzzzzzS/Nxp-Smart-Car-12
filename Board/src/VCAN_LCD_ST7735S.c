@@ -33,7 +33,7 @@ uint16  st7735s_h   = ST7735S_H;
 uint16  st7735s_w   = ST7735S_W;
 uint8   st7735s_dir = ST7735S_DIR_DEFAULT;
 
-void LCD_ST7735S_wr_data(uint8 data)
+/*void LCD_ST7735S_wr_data(uint8 data)
 {
     LCD_ST7735S_RD_OUT = 1;
     LCD_ST7735S_RS_OUT = 1;
@@ -66,7 +66,7 @@ void LCD_ST7735S_wr_cmd(uint8 cmd)
  *  @brief      LCD_ST7735S初始化
  *  @since      v5.0
  */
-void    LCD_ST7735S_init()
+/*void    LCD_ST7735S_init()
 {
     uint8 n ;
 
@@ -97,7 +97,7 @@ void    LCD_ST7735S_init()
     ST7735S_DELAY_MS(120);      //Delay 120ms
     //------------------------------------ST7735S Frame Rate-----------------------------------------//
     /* Set the frame frequency of the full colors normal mode. */
-    LCD_ST7735S_WR_8CMD(0xB1);     //In Normal Mode (Full Colors)    全屏模式
+    /*LCD_ST7735S_WR_8CMD(0xB1);     //In Normal Mode (Full Colors)    全屏模式
     LCD_ST7735S_WR_8DATA(0x05);    //设置 RTNA Set 1-line  Period  一行周期
     LCD_ST7735S_WR_8DATA(0x3A);    //设置 FPA: Front Porch
     LCD_ST7735S_WR_8DATA(0x3A);    //设置 BPA: Back Porch
@@ -105,13 +105,13 @@ void    LCD_ST7735S_init()
     //其中 fosc = 850kHz
 
     /* Set the frame frequency of the Idle mode.  */
-    LCD_ST7735S_WR_8CMD(0xB2);     //In Idle Mode (8-colors)
+   /* LCD_ST7735S_WR_8CMD(0xB2);     //In Idle Mode (8-colors)
     LCD_ST7735S_WR_8DATA(0x05);
     LCD_ST7735S_WR_8DATA(0x3A);
     LCD_ST7735S_WR_8DATA(0x3A);
 
     /* Set the frame frequency of the Partial mode/ full colors. */
-    LCD_ST7735S_WR_8CMD(0xB3);
+   /* LCD_ST7735S_WR_8CMD(0xB3);
     LCD_ST7735S_WR_8DATA(0x05);
     LCD_ST7735S_WR_8DATA(0x3A);
     LCD_ST7735S_WR_8DATA(0x3A);
@@ -188,14 +188,14 @@ void    LCD_ST7735S_init()
 
     LCD_ST7735S_dir(st7735s_dir);
 
-}
+}*/
 
 /*!
  *  @brief      设置ST7735S GRAM指针扫描方向
  *  @param      option    方向选择（正看（焊接排线在下面） 为 0 ，90度为1，180度为2，270度为2）
  *  @since      v5.0
  */
-void LCD_ST7735S_dir(uint8 option)
+/*void LCD_ST7735S_dir(uint8 option)
 {
     ASSERT(option < 4);
 
@@ -282,7 +282,7 @@ void LCD_ST7735S_dir(uint8 option)
         break;
     }
 
-}
+}*/
 
 /*!
  *  @brief      设置 ST7735S 开窗
@@ -290,7 +290,7 @@ void LCD_ST7735S_dir(uint8 option)
  *  @param      size        开窗大小
  *  @since      v5.0
  */
-void LCD_ST7735S_ptlon(Site_t site, Size_t size)
+/*void LCD_ST7735S_ptlon(Site_t site, Size_t size)
 {
     if(st7735s_dir&0x01)
     {
@@ -314,7 +314,7 @@ void LCD_ST7735S_ptlon(Site_t site, Size_t size)
     LCD_ST7735S_WR_8DATA((uint8)((site.y + size.H - 1) >> 8));
     LCD_ST7735S_WR_8DATA((uint8)(site.y + size.H - 1));
 
-}
+}*/
 
 /*!
  *  @brief      获取 ST7735S 高度

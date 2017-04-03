@@ -7,25 +7,13 @@
 ==========================================*/
 
 #define MAX_SPEED			99					//定义最大速度
-#define MIN_SPEED			1					//定义最小速度
-				
-#define MOTOR1_IO   PTD15
-#define MOTOR2_IO   PTA19
-#define MOTOR3_IO   PTA5
-#define MOTOR4_IO   PTA24
-
-
+#define MIN_SPEED			0					//定义最小速度
 
 #define MOTOR_FTM   FTM0
 #define MOTOR1_PWM  FTM_CH3
 #define MOTOR2_PWM  FTM_CH4
 #define MOTOR3_PWM  FTM_CH1
 #define MOTOR4_PWM  FTM_CH2
-
-#define MOTOR1_PWM_IO  FTM0_CH3
-#define MOTOR2_PWM_IO  FTM0_CH4
-#define MOTOR3_PWM_IO  FTM0_CH1
-#define MOTOR4_PWM_IO  FTM0_CH2
 
 #define MOTOR_HZ    20*1000
 
@@ -39,12 +27,7 @@
 #define AMP4	ADC0_SE13						//PTB3
 #define AMP5	ADC1_SE10						//PTB4
 #define AMP_MAX	5								//定义最大ADC端口数
-/*
-#define LEFT		  0										//定义电感位置
-#define RIGHT	  1										//定义电感位置
-#define MIDDLE 2										//定义电感位置
-#define Front_LEFT  3								//定义电感位置
-#define Front_Right 4								//定义电感位置*/
+
 #define DEFAULT_MAX_VALUE 0
 #define DEFAULT_MIN_VALUE 300
 
@@ -82,7 +65,6 @@ typedef enum Inductance_Position
 #define D1		 PTC12_OUT						//OLED相关宏定义
 #define D0		 PTC10_OUT						//OLED相关宏定义
 #define Bluetooth		UART0						//宏定义Bluetooth®发送端口
-#define SECTOR_NUM		(FLASH_SECTOR_NUM-1)	//flash扇区宏定义，尽量用最后面的扇区，确保安全
 //#define CAR_STOP		PTE8						//定义停车检测管脚
 //#define CAR_STOP_NUM	8					//定义停车管脚号
 #define true			1									//定义逻辑真
@@ -93,22 +75,18 @@ typedef char						bool;					//定义bool类型
 调试模式宏定义
 ==========================================*/
 
-/*#define Inductance_Interface 0					//电感显示界面
-#define Speed_Interface		 1					//速度显示界面
-#define Line1						 0					//定义行坐标
-#define Line2						 2					//定义行坐标
-#define Line3						 4					//定义行坐标
-#define Line4						 6					//定义行坐标*/
-#define Position(OLED_Line)			 0,(OLED_Line)			//坐标定义
-typedef char						data;					//定义data类型
-typedef unsigned char		mode;				//定义模式选择类型
-typedef unsigned char		counter;			//定义累加器类型
+#define Position(OLED_Line)				0,(OLED_Line)	//坐标定义
+typedef char										data;					//定义data类型
+typedef unsigned char						mode;				//定义模式选择类型
+typedef unsigned char						counter;			//定义累加器类型
 typedef enum OLED_Line
 {
 	Line1 = 0,
 	Line2 = 2,
 	Line3 = 4,
-	Line4 = 6
+	Line4 = 6,
+
+	MAX_Line
 }OLED_Line;
 
 typedef enum Debug_Interface
@@ -126,18 +104,18 @@ typedef enum Debug_Interface
 typedef struct speed
 {
 	char Out_Speed;								//最终输出到电机的速度
-	char PID_Out_Speed;							//PID处理后的速度
-	double P;									//pid常量
-	double I;									//pid常量
-	double D;									//pid常量
-	int16 Aim_Speed;							//目标速度
-	int16 Turn_Speed;							//转向差速度
+	char PID_Out_Speed;						//PID处理后的速度
+	float P;												//pid常量
+	float I;												//pid常量
+	float D;												//pid常量
+	int16 Aim_Speed;								//目标速度
+	int16 Turn_Speed;								//转向差速度
 	int16 Go_Speed;								//正常前进速度
-	int16 Now_Speed;							//正交解码得出的当前速度
-	int16 Error_Speed;							//目标速度与当前速度的差值
-	double IncrementSpeed;						//速度增量
-	double err_next;							//定义上一个偏差值    
-	double err_last;							//定义最上前的偏差值
+	int16 Now_Speed;								//正交解码得出的当前速度
+	int16 Error_Speed;								//目标速度与当前速度的差值
+	float IncrementSpeed;						//速度增量
+	float err_next;									//定义上一个偏差值    
+	float err_last;										//定义最上前的偏差值
 }speed;
 
 /*============================================
@@ -157,9 +135,9 @@ typedef struct
 方向相关数据结构体
 ==========================================*/
 
-typedef struct direction						//差比和法方向控制
+typedef struct direction									//差比和法方向控制
 {
-	char err;									//偏差误差
+	char err;													//偏差误差
 	unsigned char Normalization_Value;			//差比和电感值
 }direction;
 
@@ -195,7 +173,7 @@ typedef struct service
 {
 	bool Debug;
     mode flag;
-	char count;
+	counter count;
 }service;
 
 /*============================================
