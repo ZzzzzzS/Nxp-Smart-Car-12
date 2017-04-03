@@ -4,12 +4,6 @@
 
 void main()     
 {
-  
-  while(1)
-  printf("test");
-//System_Init();
- // Get_System_Ready();
-
-
-
+	System_Init();
+	Get_System_Ready();
 }

@@ -39,7 +39,7 @@ typedef enum Inductance_Position
 	RIGHT,
 	MIDDLE,
 	FRONT_LEFT,
-	FRONT_RIGHT
+	FRONT_RIGHT,
 }Inductance_Position;
 
 /*============================================

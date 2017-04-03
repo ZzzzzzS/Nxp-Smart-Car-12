@@ -1,6 +1,20 @@
 #include "include.h"
 
 
+/*============================================
+函数名： Speed_Analyse()
+作用：全局控制速度
+==========================================*/
+
+void Speed_Control()
+{
+	/*****PID方案1*****/
+	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
+	//FuzzyPID();													//对PID参数模糊控制
+	Motor_PID();													//对电机进行增量式PID调节
+	Speed_Chack();												//检测速度合法性，防止堵转等
+	Motor_Control();												//输出最终速度
+}
 
 /*============================================
 函数名：Motor_Init()
@@ -71,14 +85,12 @@ void Motor_PID()
 {
 	if (Left_Speed.Aim_Speed < 0)
 	{
-		Left_Speed.Aim_Speed = 1;
+		Left_Speed.Aim_Speed = 0;
 	}
 	if (Right_Speed.Aim_Speed < 0)
 	{
-		Right_Speed.Aim_Speed = 1;
+		Right_Speed.Aim_Speed = 0;
 	}
-
-
 	/*****PID调节核心部分*****/
 	Left_Speed.Error_Speed = Left_Speed.Aim_Speed - Left_Speed.Now_Speed;					//取得误差速度
 	Right_Speed.Error_Speed = Right_Speed.Aim_Speed - Right_Speed.Now_Speed;
@@ -100,6 +112,7 @@ void Motor_PID()
 	Left_Speed.PID_Out_Speed += Left_Speed.IncrementSpeed;
 	Right_Speed.PID_Out_Speed += Right_Speed.IncrementSpeed;
 
+	//每次穿越积分清零，防退饱和超调???
 
 	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;										//左右轮最终输出速度暂时等于pid处理后的当前速度
 	Right_Speed.Out_Speed = Right_Speed.PID_Out_Speed;
@@ -570,3 +583,218 @@ double FuzzyKd(int e, double ec)
 	Kd_calcu = KdFuzzy[0] * kdRule[0] + KdFuzzy[1] * kdRule[1] + KdFuzzy[2] * kdRule[2] + KdFuzzy[3] * kdRule[3];
 	return Kd_calcu;
 }
+
+/*============================================
+函数名：PID_LearnSelf()
+作用:自主学习修正PID值
+==========================================*/
+
+double PID_LearnSelf()
+{
+	return 0.0;
+}
+
+/*============================================
+函数名：PID_Anti_Blooming()
+作用:带抗饱和积分的PID控制
+==========================================*/
+
+void PID_Anti_Blooming()
+{
+
+}
+
+
+
+/*
+/********************************************
+功能说明： 电机PI调节    反馈200，输出2000
+智能型PI调节器(采用位置式，学习型)
+积分分离+分段PI
+根据单片机及编码器特性，积分量化误差可以不计，具体根据Err_speed-Err_speed_old看
+原理根据电力拖动第3版，数字PI调节器
+
+目前：位置式，
+需双限幅
+参考电拖P109位置式数字PI调节器框图
+
+**********************************************/
+/*void PI_control(void)       //分开控制，调一边对另一边无影响  
+{
+	//初值确定，在车上测试，等系统学习一段时间可知道          
+	Kp_left[q] = Kp_L;
+	Ki_left[q] = Ki_L;
+	Kp_right[q] = Kp_R;
+	Ki_right[q] = Ki_R;
+
+
+
+	x1 = Err_speed_left;                           //转速偏差                          
+	x2 = x2 + Err_speed_left;                        //转速偏差积分            
+	x3 = left_speed_old - now_left_speed;            //实际转速变化率负值      
+
+	y1 = Err_speed_right;
+	y2 = y2 + Err_speed_right;
+	y3 = right_speed_old - now_right_speed;
+
+
+	//积分限幅     小点好
+	/*
+	if(x2>=300)  x2=300;
+	else if(x2<=-300)  x2=-300;
+
+	if(y2>=300) y2=300;
+	else if(y2<=-300)  y2=-300;
+	*/
+
+	//每次穿越积分清零，防退饱和超调
+
+
+
+	//积分分离      左
+	/*if (abs(Err_speed_left) <= 30)     // 0.1~0.2Err
+	{
+		//分段PI      左
+		if (x1*x3<0)         //
+		{
+			Kp_left[q + 1] = Kp_left[q] - p1*0.0001;
+			if (x1*x2>0)
+				Ki_left[q + 1] = Ki_left[q] + i1*0.001;
+			else
+				Ki_left[q + 1] = Ki_left[q] - i1*0.001;
+		}
+		else if (x1*x3>0)
+		{
+			Kp_left[q + 1] = Kp_left[q] + p2*0.0001;
+			if (x1*x2>0)
+				Ki_left[q + 1] = Ki_left[q] + i1*0.001;
+			else
+				Ki_left[q + 1] = Ki_left[q] - i1*0.001;
+		}
+		else if (x1*x3 == 0)
+		{
+			Kp_left[q + 1] = Kp_left[q];
+			Ki_left[q + 1] = Ki_left[q];
+		}
+
+		Kp_L = Kp_left[q + 1];
+		Ki_L = Ki_left[q + 1];
+
+		if (Kp_L<0) { Kp_L = 0; }
+		if (Ki_L<0) { Ki_L = 0; }
+		// if(Kp_L>13) {Kp_L=13;}
+		// if(Ki_L>10) {Ki_L=10;}
+
+	}
+	else if (abs(Err_speed_left)>30)
+	{
+		Kp_L = 1900 / abs(x1);
+		x2 = 0;
+	}
+	//应PI>=0
+
+	//积分分离      右
+	if (abs(Err_speed_right) <= 55)            // 0.1~0.2Err
+	{
+		//分段PI      右
+		if (y1*y3<0)                       //偏差在减小
+		{
+			Kp_right[q + 1] = Kp_right[q] - p1*0.0001;
+			if (y1*y2>0)
+				Ki_right[q + 1] = Ki_right[q] + i1*0.001;
+			else
+				Ki_right[q + 1] = Ki_right[q] - i1*0.001;
+		}
+		else if (y1*y3>0)                   //偏差在增大
+		{
+			Kp_right[q + 1] = Kp_right[q] + p2*0.0001;
+			if (y1*y2>0)
+				Ki_right[q + 1] = Ki_right[q] + i1*0.001;
+			else
+				Ki_right[q + 1] = Ki_right[q] - i1*0.001;
+		}
+		else if (y1*y3 == 0)                 //稳态
+		{
+			Kp_right[q + 1] = Kp_right[q];
+			Ki_right[q + 1] = Ki_right[q];
+		}
+
+		Kp_R = Kp_right[q + 1];
+		Ki_R = Ki_right[q + 1];
+
+		if (Kp_R<0) { Kp_R = 0; }
+		if (Ki_R<0) { Ki_R = 0; }
+		if (Kp_R>13) { Kp_R = 13; }
+		if (Ki_R>10) { Ki_R = 10; }
+
+	}
+
+	else if (abs(Err_speed_right)>55)
+	{
+		Kp_R = 1900 / (abs(y1));    //自动调整P
+		y2 = 0;
+	}
+
+
+
+	//双限幅程序
+
+
+
+
+	MOTOR_pwm_left = (int16)(Kp_L*x1 + Ki_L*x2);
+	MOTOR_pwm_right = (int16)(Kp_R*y1 + Ki_R*y2);
+
+	if (MOTOR_pwm_left>1900)           //输出限幅 左
+	{
+		MOTOR_pwm_left = 1900;
+	}
+	else
+		if (MOTOR_pwm_left<-1900)
+		{
+			MOTOR_pwm_left = -1900;
+		}
+
+	if (MOTOR_pwm_right>1900)          //输出限幅 you
+	{
+		MOTOR_pwm_right = 1900;
+	}
+	else
+		if (MOTOR_pwm_right<-1900)
+		{
+			MOTOR_pwm_right = -1900;
+		}
+
+
+	//赋值
+	if (MOTOR_pwm_left >= 0)                //正转
+	{
+		MOTOR_GO_left(MOTOR_pwm_left);     //赋值左边
+	}
+	if (MOTOR_pwm_left<0)                 //反转
+	{
+		MOTOR_BACK_left(abs(MOTOR_pwm_left));
+	}
+
+	if (MOTOR_pwm_right >= 0)
+	{
+		MOTOR_GO_right(MOTOR_pwm_right);   //赋值右边
+	}
+	if (MOTOR_pwm_right<0)
+	{
+		MOTOR_BACK_right(abs(MOTOR_pwm_right));
+	}
+
+	//偏差存储  x2存了
+	//Err_speed_old_left=Err_speed_left;
+	//Err_speed_old_right=Err_speed_right;
+
+	//实际速度存储
+	left_speed_old = now_left_speed;
+	right_speed_old = now_right_speed;
+
+	//学习3次   实际一直学
+	q++;
+	if (q>2)
+		q = 0;
+}*/

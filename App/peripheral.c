@@ -41,15 +41,14 @@
 
 void Send_Data()
 {
-	/*char var[2];
-	for (char i = 0; i < 2; i++)
+	char var[AMP_MAX];
+	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
+		var[i] = Road_Data[i].AD_Value;						//向上位机发送电感归一化后的值
 	}
 	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	printf("Out_Speed %d %d ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
-	printf("NowSpeed %d %d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);*/
-  //printf("test");
+	printf("NowSpeed %d %d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
 }
 
 /*============================================
