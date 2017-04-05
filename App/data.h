@@ -80,6 +80,7 @@ typedef char										data;					//定义data类型
 typedef unsigned char						mode;				//定义模式选择类型
 typedef unsigned char						counter;			//定义累加器类型
 typedef unsigned char						error;				//定义错误类型
+typedef char										flag;					//定义标志类型
 typedef enum OLED_Line
 {
 	Line1 = 0,
