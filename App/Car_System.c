@@ -41,13 +41,10 @@ void Get_System_Ready()
 
 void LPTMR_IRQHandler()
 {
-	Get_AD_Value();													//获取ADC数模转换器的值
-	Direction_Control();											//获得目标转向角度
+	Direction_Control();												//全局控制方向
 	Speed_Control();													//全局控制速度
 	Debug();																//系统调试
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
-        
-	
 }
 
 

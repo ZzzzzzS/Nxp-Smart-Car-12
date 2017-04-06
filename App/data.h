@@ -166,9 +166,10 @@ typedef struct position
 
 typedef struct fuzzy_direction					//模糊控制法方向控制
 {
-	position Position;							//临时储存隶属度
+	position Position;											//临时储存隶属度
 	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
-	position eGrade[MAX_FUZZY_RULE];		//储存隶属度
+	position eGrade[MAX_FUZZY_RULE];				//储存隶属度
+	flag		isMatched;										//判断是否匹配到
 }fuzzy_direction;
 
 /*============================================

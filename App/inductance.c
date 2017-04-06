@@ -35,6 +35,22 @@ void ADC_Init()
 	}
 }
 
+/*============================================
+函数名：Direction_Control()
+作用:全局控制方向
+==========================================*/
+
+void Direction_Control()
+{
+	Get_AD_Value();
+	Similarity_Count_Fuzzy();
+	Direction_Control_Fuzzy();
+	if (!Fuzzy_Direction.isMatched)
+	{
+		Direction_Calculate();
+	}
+}
+
 
 /*============================================
 函数名：Get_AD_Value()
@@ -74,53 +90,19 @@ void Get_AD_Value()
 		Road_Data[i].AD_Value_fixed /= MAX_WEIGHT;
 	}
 }
-/*void Get_AD_Value()
-{
-	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);			//采集过程
-	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
-	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
-	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
-	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
-
-
-	for (counter i = 0; i < AMP_MAX; i++)
-	{
-		for (counter j = 0; j < 3; j++)						//对电感数据队列移位操作
-		{
-			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
-		}
-		Road_Data[i].AD_Value_Old[3] = Road_Data[i].AD_Value;		//更新队首数据值
-	}
-//作用:计算差比和
-//什么是差比和算法:
-//(采集到的值)/(Σ本次采集采集到的所有值)
-//作用:对采集的数据滤波消除偶然误差
-	Direction.Normalization_Value = 0;								//清空上一次差比和的和总值
-	double temp;													//临时储存电感值
-
-	for (counter i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
-	{
-		Road_Data[i].AD_Value_fixed = 0;
-		for (counter j = 0; j < 4; j++)
-		{
-			Road_Data[i].AD_Value_fixed += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
-		}
-		Road_Data[i].AD_Value_fixed /= MAX_WEIGHT;
-		Direction.Normalization_Value += Road_Data[i].AD_Value_fixed;		//计算本次差比和的和总值
-	}
-	for (counter i = 0; i < AMP_MAX; i++)						//计算差比和后的电感值
-	{
-		temp = Road_Data[i].AD_Value_fixed;
-		Road_Data[i].Normalized_Value = (int)((temp / (double)Direction.Normalization_Value) * 100.0);
-	}
-}*/
 
 /*============================================
 函数名：Direction_Control()
 作用:控制方向,速度等
 ==========================================*/
+/*============================================
+作用:计算差比和
+什么是差比和算法:
+(采集到的值)/(Σ本次采集采集到的所有值)
+作用:对采集的数据滤波消除偶然误差
+==========================================*/
 
-void Direction_Control()
+void Direction_Calculate()
 {
 	Direction.sum[0] = (Road_Data[LEFT].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
 	Direction.sum[1] = (Road_Data[LEFT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
@@ -204,7 +186,7 @@ void Similarity_Count_Fuzzy()
 	/*****误差长度计算*****/
 	for (counter j = 0; j < AMP_MAX; j++)						//计算向量长度
 	{
-		eNumerator += Road_Data[j].AD_Value * Road_Data[j].AD_Value;
+		eNumerator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
 	}
 	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);			//储存计算出的长度
 
@@ -224,52 +206,46 @@ void Similarity_Count_Fuzzy()
 void Direction_Control_Fuzzy()
 {
 	int16 e=0;
-	 
+	Fuzzy_Direction.isMatched = false;													//标记为未匹配到
 
-
-
-
-
-
-
-
-
-
-
-
-
-	/*****误差隶属函数描述*****/
-	for (counter i = 0; i < MAX_FUZZY_COUNT_NUM; i++)
+	for (counter i = 0; i < MAX_FUZZY_RULE; i++)
 	{
-		if (0 == Fuzzy_Direction.eGrade[i].eValue)
+		if (Fuzzy_Direction.eGrade[i].eAngle < 0.1)
 		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
-		}
-		else if (1 == Fuzzy_Direction.eGrade[i].eValue)
-		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
-		}
-		else if (2 == Fuzzy_Direction.eGrade[i].eValue)
-		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
-		}
-		else if (3 == Fuzzy_Direction.eGrade[i].eValue)
-		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
-		}
-		else if (4 == Fuzzy_Direction.eGrade[i].eValue)
-		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
-		}
-		else if (5 == Fuzzy_Direction.eGrade[i].eValue)
-		{
-			e += 0 * Fuzzy_Direction.eGrade[i].eAngle * i;
+			Fuzzy_Direction.isMatched = true;
+			if (0 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
+			else if (1 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
+			else if (2 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
+			else if (3 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
+			else if (4 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
+			else if (5 == i)
+			{
+				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+			}
 		}
 	}
-	e /= MAX_FUZZY_COUNT_NUM;
-	Left_Speed.Turn_Speed = e;
-	Right_Speed.Turn_Speed = -e;
+	
+	if (Fuzzy_Direction.isMatched)
+	{
+		Left_Speed.Turn_Speed = e;
+		Right_Speed.Turn_Speed = -e;
 
-	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
-	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
+		Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
+		Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
+	}
 }
