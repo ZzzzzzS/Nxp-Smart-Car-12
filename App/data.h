@@ -50,7 +50,11 @@ typedef enum Inductance_Position
 #define RIGHT_WEIGHT	1
 
 #define MAX_FUZZY_RULE		6					//模糊论域大小
-#define MAX_FUZZY_COUNT_NUM	3			//最大隶属度计算个数
+
+#define k1				1
+#define k2			1
+#define b1				0
+#define b2			0
 
 /*============================================
 其它宏定义和typedef
@@ -121,6 +125,7 @@ typedef struct speed
 	int16 Go_Speed;								//正常前进速度
 	int16 Now_Speed;								//正交解码得出的当前速度
 	int16 Error_Speed;								//目标速度与当前速度的差值
+	int16 Intergate_Speed;						//定义积分速度
 	float IncrementSpeed;						//速度增量
 	float err_next;									//定义上一个偏差值    
 	float err_last;										//定义最上前的偏差值
@@ -146,7 +151,7 @@ typedef struct
 typedef struct direction									//差比和法方向控制
 {
 	char err;													//偏差误差
-	unsigned char Normalization_Value;			//差比和电感值
+	int16 sum[3];
 }direction;
 
 /*============================================
@@ -159,18 +164,11 @@ typedef struct position
 	double eLength;								//长度信息
 }position;
 
-typedef struct grade
-{
-	double eAngle;								//夹角隶属度
-	double eLength;								//长度隶属度
-	unsigned char eValue;						//大小信息
-}grade;
-
 typedef struct fuzzy_direction					//模糊控制法方向控制
 {
 	position Position;							//临时储存隶属度
 	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
-	grade	 eGrade[MAX_FUZZY_COUNT_NUM];		//储存隶属度
+	position eGrade[MAX_FUZZY_RULE];		//储存隶属度
 }fuzzy_direction;
 
 /*============================================
