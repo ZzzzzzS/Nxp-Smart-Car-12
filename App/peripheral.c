@@ -47,8 +47,11 @@ void Send_Data()
 		var[i] = Road_Data[i].AD_Value;						//向上位机发送电感归一化后的值
 	}
 	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
-	printf("Out_Speed %d %d ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
-	printf("NowSpeed %d %d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
+	printf("Out_Speed %d %d\n ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
+	printf("NowSpeed %d %d\n", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
+	printf("AimSpeed %d %d\n", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);
+	printf("p=%f %f\n", Left_Speed.P, Right_Speed.P);
+	printf("I=%f %f\n", Left_Speed.I, Right_Speed.I);
 }
 
 /*============================================
@@ -212,6 +215,6 @@ void System_Error(error Error_Number)
 void Debug()
 {
 		DELAY_MS(5);
-		DeBug_Interface();
+		//DeBug_Interface();
 		Send_Data();
 }
