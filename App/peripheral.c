@@ -58,10 +58,11 @@ void Send_Data()
 
 void Init_Key()
 {
-	gpio_init(Key1, GPI, 0);                       
-	gpio_init(Key2, GPI, 0);
-	gpio_init(Key3, GPI, 0); 
-	gpio_init(Key4, GPI, 0);
+	gpio_init(Key1, GPI, 0);                       //按键初始化
+	gpio_init(Key2, GPI, 0);						//按键初始化
+	gpio_init(Key3, GPI, 0);                      //按键初始化
+	gpio_init(Key4, GPI, 0);                      //按键初始化
+	gpio_init(key5, GPI, 0);					    //按键初始化
 }
 
 /*============================================
@@ -179,10 +180,7 @@ void DeBug_Interface()
 
 void Debug_Init()
 {
-	//pit_init(PIT0, 1000);																	//定时中断100ms
-	//set_vector_handler(PIT0_VECTORn, pit_hander);					// 设置中断服务函数到中断向量表里
-	//enable_irq(PIT0_IRQn);														 // 使能 PIT 中断
-	Service.Debug = true;
+	Service.isDebug = true;
 	Service.flag = 0;
 }
 
@@ -213,14 +211,7 @@ void System_Error(error Error_Number)
 
 void Debug()
 {
-	if (Service.Debug == true)
-	{
-		Service.count++;
-		if (Service.count >= 20)
-		{
-			DeBug_Interface();
-			Send_Data();
-			Service.count = 0;
-		}
-	}
+		DELAY_MS(5);
+		DeBug_Interface();
+		Send_Data();
 }

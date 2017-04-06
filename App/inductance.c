@@ -24,8 +24,7 @@ void ADC_Init()
 	adc_init(AMP4);													//初始化AMP4通道，PTB3
 	adc_init(AMP5);													//初始化AMP5通道，PTB4
 
-
-	for (counter i = 0; i < AMP_MAX; i++)								//滤波权重表赋初值
+	for (counter i = 0; i < AMP_MAX; i++)				//滤波权重表赋初值
 	{
 		//注意:修改权重值时请修改data.h->MAX_WEIGHT!
 		Road_Data[i].AD_Weight[0] = 1;
@@ -45,7 +44,7 @@ void Direction_Control()
 	Get_AD_Value();
 	Similarity_Count_Fuzzy();
 	Direction_Control_Fuzzy();
-	if (!Fuzzy_Direction.isMatched)
+	if (Fuzzy_Direction.isMatched==false)
 	{
 		Direction_Calculate();
 	}
@@ -65,10 +64,10 @@ void Direction_Control()
 void Get_AD_Value()
 {
 	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);				//采集过程
-	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);
-	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);
-	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);
-	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);
+	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);				//采集过程
+	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);				//采集过程
+	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);				//采集过程
+	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);				//采集过程
 	//注意修改通道初始化
 
 	for (counter i = 0; i < AMP_MAX; i++)
@@ -118,7 +117,7 @@ void Direction_Calculate()
 	}
 	Direction.err /= 3;
 
-	Left_Speed.Turn_Speed = Direction.err;
+	Left_Speed.Turn_Speed = Direction.err;					//计算差速
 	Right_Speed.Turn_Speed = -Direction.err;
 
 	//差弯道是否降低Go_Speed
@@ -134,20 +133,20 @@ void Direction_Calculate()
 
 void eRule_Init_Fuzzy()
 {
-	Fuzzy_Direction.eRule[0].eAngle = 0;
-	Fuzzy_Direction.eRule[1].eAngle = 0;
-	Fuzzy_Direction.eRule[2].eAngle = 0;
-	Fuzzy_Direction.eRule[3].eAngle = 0;
-	Fuzzy_Direction.eRule[4].eAngle = 0;
-	Fuzzy_Direction.eRule[5].eAngle = 0;
+	Fuzzy_Direction.eRule[0].eAngle = 0;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[1].eAngle = 0;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[2].eAngle = 0;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[3].eAngle = 0;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[4].eAngle = 0;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[5].eAngle = 0;					//初始化角度相似规则
 	//注意修改MAX_FUZZY_RULE!
 
-	Fuzzy_Direction.eRule[0].eLength = 0;
-	Fuzzy_Direction.eRule[1].eLength = 0;
-	Fuzzy_Direction.eRule[2].eLength = 0;
-	Fuzzy_Direction.eRule[3].eLength = 0;
-	Fuzzy_Direction.eRule[4].eLength = 0;
-	Fuzzy_Direction.eRule[5].eLength = 0;
+	Fuzzy_Direction.eRule[0].eLength = 0;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[1].eLength = 0;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[2].eLength = 0;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[3].eLength = 0;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[4].eLength = 0;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[5].eLength = 0;				//初始化长度相似规则
 	//注意修改MAX_FUZZY_RULE!
 
 }
@@ -166,16 +165,16 @@ void eRule_Init_Fuzzy()
 
 void Similarity_Count_Fuzzy()
 {
-	float eDenominator = 0;										//余弦分母/临时变量
-	float eNumerator = 0;											//余弦分子/长度计算临时变量
+	float eDenominator = 0;														//余弦分母/临时变量
+	float eNumerator = 0;															//余弦分子/长度计算临时变量
 
 	/*****误差角度计算*****/
-	for (counter j = 0; j < AMP_MAX; j++)						//计算余弦分子
+	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分子
 	{
 		eNumerator += Road_Data[j].AD_Value_fixed;
 	}
 
-	for (counter j = 0; j < AMP_MAX; j++)						//计算余弦分母
+	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分母
 	{
 			eDenominator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
 	}
@@ -184,7 +183,7 @@ void Similarity_Count_Fuzzy()
 	Fuzzy_Direction.Position.eAngle = eNumerator / eDenominator;	//计算与(1,1,1,1,...)的夹角余弦值
 
 	/*****误差长度计算*****/
-	for (counter j = 0; j < AMP_MAX; j++)						//计算向量长度
+	for (counter j = 0; j < AMP_MAX; j++)									//计算向量长度
 	{
 		eNumerator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
 	}
@@ -210,39 +209,39 @@ void Direction_Control_Fuzzy()
 
 	for (counter i = 0; i < MAX_FUZZY_RULE; i++)
 	{
-		if (Fuzzy_Direction.eGrade[i].eAngle < 0.1)
+		if (Fuzzy_Direction.eGrade[i].eAngle < 0.1)										//匹配相似度90%
 		{
-			Fuzzy_Direction.isMatched = true;
-			if (0 == i)
+			Fuzzy_Direction.isMatched = true;												//匹配成功标记
+			if (0 == i)																					//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
-			else if (1 == i)
+			else if (1 == i)																			//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
-			else if (2 == i)
+			else if (2 == i)																			//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
-			else if (3 == i)
+			else if (3 == i)																			//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
-			else if (4 == i)
+			else if (4 == i)																			//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
-			else if (5 == i)
+			else if (5 == i)																			//根据匹配结果执行不同操作
 			{
 				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
 			}
 		}
 	}
 	
-	if (Fuzzy_Direction.isMatched)
+	if (Fuzzy_Direction.isMatched==true)
 	{
-		Left_Speed.Turn_Speed = e;
+		Left_Speed.Turn_Speed = e;																					//计算差速
 		Right_Speed.Turn_Speed = -e;
 
 		Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度

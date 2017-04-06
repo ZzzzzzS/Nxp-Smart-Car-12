@@ -30,7 +30,7 @@ void System_Init()
 
 void Get_System_Ready()
 {
-	OLED_Interface();												//初始参数设置界面
+	OLED_Interface();														//初始参数设置界面
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -43,7 +43,6 @@ void LPTMR_IRQHandler()
 {
 	Direction_Control();												//全局控制方向
 	Speed_Control();													//全局控制速度
-	Debug();																//系统调试
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
 
