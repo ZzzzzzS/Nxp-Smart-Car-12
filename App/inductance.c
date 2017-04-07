@@ -44,7 +44,7 @@ void Direction_Control()
 	Get_AD_Value();
 	Similarity_Count_Fuzzy();
 	Direction_Control_Fuzzy();
-	if (Fuzzy_Direction.isMatched==false)
+	if (!Fuzzy_Direction.isMatched)
 	{
 		Direction_Calculate();
 	}
@@ -86,7 +86,7 @@ void Get_AD_Value()
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
 		}
-		Road_Data[i].AD_Value_fixed /= MAX_WEIGHT;
+		Road_Data[i].AD_Value_fixed=Road_Data[i].AD_Value/MAX_WEIGHT;
 	}
 }
 
@@ -239,7 +239,7 @@ void Direction_Control_Fuzzy()
 		}
 	}
 	
-	if (Fuzzy_Direction.isMatched==true)
+	if (Fuzzy_Direction.isMatched)
 	{
 		Left_Speed.Turn_Speed = e;																					//º∆À„≤ÓÀŸ
 		Right_Speed.Turn_Speed = -e;

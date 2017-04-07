@@ -43,6 +43,10 @@ void LPTMR_IRQHandler()
 {
 	Direction_Control();												//全局控制方向
 	Speed_Control();													//全局控制速度
+    while (Service.isDebug)
+	{
+		Debug();															//调试模式
+	}
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
 

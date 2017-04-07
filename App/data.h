@@ -67,7 +67,7 @@ typedef enum Inductance_Position				//枚举定义电感位置
 #define D1		 PTC12_OUT						//OLED相关宏定义
 #define D0		 PTC10_OUT						//OLED相关宏定义
 #define Bluetooth		UART4						//宏定义Bluetooth®发送端口
-#define Bluetooth_Band	115200				//宏定义Bluetooth®发送波特率
+#define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 //#define CAR_STOP		PTE8						//定义停车检测管脚
 //#define CAR_STOP_NUM	8					//定义停车管脚号
 #define true			1									//定义逻辑真

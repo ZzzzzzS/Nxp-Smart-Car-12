@@ -44,7 +44,7 @@ void Send_Data()
 	char var[AMP_MAX];
 	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		var[i] = Road_Data[i].AD_Value;						//向上位机发送电感归一化后的值
+		var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
 	}
 	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	printf("Out_Speed %d %d\n ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
@@ -214,7 +214,6 @@ void System_Error(error Error_Number)
 
 void Debug()
 {
-		DELAY_MS(5);
 		//DeBug_Interface();
 		Send_Data();
 }
