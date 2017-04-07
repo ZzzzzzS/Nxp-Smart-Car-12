@@ -47,10 +47,5 @@ void LPTMR_IRQHandler()
 	//FuzzyPID();														//对PID参数模糊控制
 	Motor_PID();													//对电机进行增量式PID调节
 	Motor_Control();												//输出最终速度
-	//	Debug();															//调试模式
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
-
-
-
-

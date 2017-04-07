@@ -35,23 +35,6 @@ void ADC_Init()
 }
 
 /*============================================
-函数名：Direction_Control()
-作用:全局控制方向
-==========================================*/
-
-void Direction_Control()
-{
-	Get_AD_Value();
-	//Similarity_Count_Fuzzy();
-	//Direction_Control_Fuzzy();
-	//if (!Fuzzy_Direction.isMatched)
-	//{
-		Direction_Calculate();
-	//}
-}
-
-
-/*============================================
 函数名：Get_AD_Value()
 作用:采集ADC模数转换器传回的数据
 ==========================================*/
@@ -61,6 +44,7 @@ void Direction_Control()
 旧数据        新数据
 低权值        高权值
 ==========================================*/
+
 void Get_AD_Value()
 {
 	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);				//采集过程
