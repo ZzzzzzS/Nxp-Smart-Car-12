@@ -65,7 +65,7 @@ void Init_Key()
 	gpio_init(Key2, GPI, 0);						//按键初始化
 	gpio_init(Key3, GPI, 0);                      //按键初始化
 	gpio_init(Key4, GPI, 0);                      //按键初始化
-	gpio_init(key5, GPI, 0);					    //按键初始化
+	//gpio_init(key5, GPI, 0);					    //按键初始化
 }
 
 /*============================================

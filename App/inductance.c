@@ -42,12 +42,12 @@ void ADC_Init()
 void Direction_Control()
 {
 	Get_AD_Value();
-	Similarity_Count_Fuzzy();
-	Direction_Control_Fuzzy();
-	if (!Fuzzy_Direction.isMatched)
-	{
+	//Similarity_Count_Fuzzy();
+	//Direction_Control_Fuzzy();
+	//if (!Fuzzy_Direction.isMatched)
+	//{
 		Direction_Calculate();
-	}
+	//}
 }
 
 
@@ -103,25 +103,23 @@ void Get_AD_Value()
 
 void Direction_Calculate()
 {
-	Direction.sum[0] = (Road_Data[LEFT].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
-	Direction.sum[1] = (Road_Data[LEFT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
-	Direction.sum[2] = (Road_Data[MIDDLE].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
+	Direction.sum[0] = 100*(Road_Data[LEFT].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
+	Direction.sum[1] = 100*(Road_Data[LEFT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
+	Direction.sum[2] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
 
 	Direction.sum[1] = k1*Direction.sum[1] + b1;
 	Direction.sum[2] = k2*Direction.sum[1] + b2;
 
-	Direction.err = 0;	
-	for (counter i = 0; i < 3; i++)
-	{
-		Direction.err += Direction.sum[i];
-	}
-	Direction.err /= 3;
+	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
 
 	Left_Speed.Turn_Speed = Direction.err;					//计算差速
 	Right_Speed.Turn_Speed = -Direction.err;
 
 	//差弯道是否降低Go_Speed
 
+        Left_Speed.Turn_Speed = 0;					//计算差速
+		Right_Speed.Turn_Speed = 0;
+        
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
 	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
 }

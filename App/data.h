@@ -9,11 +9,17 @@
 #define MAX_SPEED			99					//定义最大速度
 #define MIN_SPEED			0					//定义最小速度
 
-#define MOTOR_FTM	  FTM0				//定义电机管脚
-#define MOTOR1_PWM  FTM_CH3		//定义电机管脚
-#define MOTOR2_PWM  FTM_CH4		//定义电机管脚
-#define MOTOR3_PWM  FTM_CH1		//定义电机管脚
-#define MOTOR4_PWM  FTM_CH2		//定义电机管脚
+
+#define MOTOR_FTM   FTM0
+#define MOTOR1_PWM  FTM_CH3
+#define MOTOR2_PWM  FTM_CH4
+#define MOTOR3_PWM  FTM_CH5
+#define MOTOR4_PWM  FTM_CH6
+
+#define MOTOR1_PWM_IO  FTM0_CH3
+#define MOTOR2_PWM_IO  FTM0_CH4
+#define MOTOR3_PWM_IO  FTM0_CH5
+#define MOTOR4_PWM_IO  FTM0_CH6
 
 #define MOTOR_HZ    20*1000				//定义电机工作频率
 
@@ -43,15 +49,15 @@ typedef enum Inductance_Position				//枚举定义电感位置
 方向计算相关宏定义
 ==========================================*/
 
-#define LEFT_WEIGHT		1						//定义转向权重
-#define RIGHT_WEIGHT	1						//定义转向权重
+#define LEFT_WEIGHT		5						//定义转向权重
+#define RIGHT_WEIGHT	5						//定义转向权重
 
 #define MAX_FUZZY_RULE		6				//模糊论域大小
 
-#define k1				1									//定义拟合曲线K值
-#define k2			1									//定义拟合曲线K值
-#define b1				0									//定义拟合曲线b值
-#define b2			0									//定义拟合曲线b值
+#define k1				1.2497									//定义拟合曲线K值
+#define k2			-1.3511									//定义拟合曲线K值
+#define b1				-0.3874									//定义拟合曲线b值
+#define b2			0.3968									//定义拟合曲线b值
 
 /*============================================
 其它宏定义和typedef
@@ -151,7 +157,7 @@ typedef struct
 typedef struct direction							//差比和法方向控制
 {
 	char err;											//偏差误差
-	int16 sum[3];										//差比和相关定义
+	float sum[3];										//差比和相关定义
 }direction;
 
 /*============================================
