@@ -148,9 +148,6 @@ void Get_Motor_Speed()
 		Left_Speed.Now_Speed = -Left_Speed.Now_Speed;
 	}
 
-	//Right_Speed.Now_Speed*=(43/30);
-	// Right_Speed.Now_Speed=(int)(Right_Speed.Now_Speed);//适应大齿轮
-
 	ftm_quad_clean(FTM1);									//清正交解码脉冲数
 	ftm_quad_clean(FTM2);									//清正交解码脉冲数
 }
