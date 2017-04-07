@@ -41,12 +41,13 @@ void Get_System_Ready()
 
 void LPTMR_IRQHandler()
 {
-	Direction_Control();												//全局控制方向
-	Speed_Control();													//全局控制速度
-    //while (Service.isDebug)
-	//{
-		Debug();															//调试模式
-	//}
+	Get_AD_Value();													//获取ADC数模转换器的值
+	Direction_Calculate();
+	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
+	//FuzzyPID();														//对PID参数模糊控制
+	Motor_PID();													//对电机进行增量式PID调节
+	Motor_Control();												//输出最终速度
+	//	Debug();															//调试模式
 	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
 

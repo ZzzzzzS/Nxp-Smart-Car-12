@@ -13,13 +13,13 @@
 #define MOTOR_FTM   FTM0
 #define MOTOR1_PWM  FTM_CH3
 #define MOTOR2_PWM  FTM_CH4
-#define MOTOR3_PWM  FTM_CH5
-#define MOTOR4_PWM  FTM_CH6
+#define MOTOR3_PWM  FTM_CH1
+#define MOTOR4_PWM  FTM_CH2
 
 #define MOTOR1_PWM_IO  FTM0_CH3
 #define MOTOR2_PWM_IO  FTM0_CH4
-#define MOTOR3_PWM_IO  FTM0_CH5
-#define MOTOR4_PWM_IO  FTM0_CH6
+#define MOTOR3_PWM_IO  FTM0_CH1
+#define MOTOR4_PWM_IO  FTM0_CH2
 
 #define MOTOR_HZ    20*1000				//定义电机工作频率
 
@@ -80,9 +80,9 @@ typedef enum Inductance_Position				//枚举定义电感位置
 #define false			0									//定义逻辑假
 typedef char			bool;								//定义bool类型
 
-/*============================================
-调试模式宏定义
-==========================================*/
+															/*============================================
+															调试模式宏定义
+															==========================================*/
 
 #define Position(OLED_Line)				0,(OLED_Line)	//坐标定义
 typedef char										data;					//定义data类型
@@ -147,7 +147,7 @@ typedef struct
 	int16 AD_Value_fixed;						//滤波后的值
 	int16 Normalized_Value;					//差比和的电感值
 	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-    unsigned char AD_Weight[4];			//权重向前滤波算法权重值
+	unsigned char AD_Weight[4];			//权重向前滤波算法权重值
 }inductance;
 
 /*============================================
@@ -185,7 +185,7 @@ typedef struct fuzzy_direction							//模糊控制法方向控制
 typedef struct service
 {
 	bool isDebug;									//定义是否启动调试
-    mode flag;										//调试模式相关标志位
+	mode flag;										//调试模式相关标志位
 }service;
 
 /*============================================

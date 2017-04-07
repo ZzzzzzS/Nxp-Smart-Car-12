@@ -116,9 +116,6 @@ void Direction_Calculate()
 	Right_Speed.Turn_Speed = -Direction.err;
 
 	//差弯道是否降低Go_Speed
-
-        Left_Speed.Turn_Speed = 0;					//计算差速
-		Right_Speed.Turn_Speed = 0;
         
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
 	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
