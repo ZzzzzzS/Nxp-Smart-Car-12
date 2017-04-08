@@ -17,7 +17,7 @@ void System_Init()
 	Get_Motor_Speed_Init();																//FTM正交解码初始化
 	OLED_Init();																					//OLED初始化
 	//Stop_Car_Init();																			//停车检测初始化
-	lptmr_timing_ms(20);																		//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
+	lptmr_timing_ms(10);																		//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, LPTMR_IRQHandler);			//将系统控制主要中断函数加入到中断向量表中
 	EnableInterrupts;																			//宏定义，允许中断
 	disable_irq(LPTMR_IRQn);																//关闭低功耗定时计数器中断
@@ -41,11 +41,7 @@ void Get_System_Ready()
 
 void LPTMR_IRQHandler()
 {
-	Get_AD_Value();													//获取ADC数模转换器的值
-	Direction_Calculate();
-	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
-	//FuzzyPID();														//对PID参数模糊控制
-	Motor_PID();													//对电机进行增量式PID调节
-        Motor_Control();												//输出最终速度
-        LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
+	Direction_Control();
+	Speed_Control();
+    LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }

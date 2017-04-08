@@ -134,10 +134,12 @@ void DeBug_Interface()
 	{
 		OLED_CLS();
 		OLED_Print(Position(Line1), "电感调试");
-		sprintf(temp, "    FL=%d FR=%d", Road_Data[FRONT_LEFT].AD_Value, Road_Data[FRONT_RIGHT].AD_Value);
+		sprintf(temp, "    FL=%d FR=%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "L=%d M=%d R=%d", Road_Data[LEFT].AD_Value, Road_Data[MIDDLE].AD_Value, Road_Data[RIGHT].AD_Value);
+		sprintf(temp, "L=%d R=%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "M    %d", Road_Data[MIDDLE].AD_Value_fixed);
+		OLED_Print(Position(Line4), temp);
 	}
 	else if (Service.flag == Speed_Interface)
 	{
@@ -149,6 +151,16 @@ void DeBug_Interface()
 		sprintf(temp, "aim=L%d R%d", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);					//目标速度
 		OLED_Print(Position(Line3), temp);
 		sprintf(temp, "set=L%d R%d", Left_Speed.Go_Speed, Right_Speed.Go_Speed);						//设定速度
+		OLED_Print(Position(Line4), temp);
+	}
+	else if (Service.flag == PID_Interface)
+	{
+		OLED_CLS();
+		sprintf(temp, "P %.2f %.2f", Left_Speed.P, Right_Speed.P);
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "I %.2f %.2f", Left_Speed.I, Right_Speed.I);
+		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "D %.1f %.1f", Left_Speed.D, Right_Speed.D);
 		OLED_Print(Position(Line4), temp);
 	}
 
@@ -214,6 +226,6 @@ void System_Error(error Error_Number)
 
 void Debug()
 {
-		//DeBug_Interface();
+		DeBug_Interface();
 		Send_Data();
 }

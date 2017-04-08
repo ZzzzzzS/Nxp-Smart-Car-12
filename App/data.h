@@ -111,6 +111,7 @@ typedef enum Debug_Interface									//定义调试模式OLED界面编号
 {
 	Inductance_Interface,
 	Speed_Interface,
+	PID_Interface,
 
 	MAX_Interface
 }Debug_Interface;

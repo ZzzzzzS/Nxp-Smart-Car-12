@@ -34,6 +34,23 @@ void ADC_Init()
 	}
 }
 
+
+/*============================================
+函数名：Direction_Control()
+作用:全局控制方向
+==========================================*/
+
+void Direction_Control()
+{
+	Get_AD_Value();
+	//Similarity_Count_Fuzzy();
+	//Direction_Control_Fuzzy();
+	//if (!Fuzzy_Direction.isMatched)
+	//{
+		Direction_Calculate();
+	//}
+}
+
 /*============================================
 函数名：Get_AD_Value()
 作用:采集ADC模数转换器传回的数据
@@ -96,13 +113,15 @@ void Direction_Calculate()
 
 	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
 
-	Left_Speed.Turn_Speed = Direction.err;					//计算差速
-	Right_Speed.Turn_Speed = -Direction.err;
+	Left_Speed.Turn_Speed = -Direction.err;					//计算差速
+	Right_Speed.Turn_Speed = Direction.err;
 
 	//差弯道是否降低Go_Speed
         
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
 	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
+       // Right_Speed.Aim_Speed=Right_Speed.Go_Speed;
+        //Left_Speed.Aim_Speed=Left_Speed.Go_Speed;
 }
 
 /*============================================
