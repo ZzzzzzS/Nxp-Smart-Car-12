@@ -46,6 +46,6 @@ void LPTMR_IRQHandler()
 	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	//FuzzyPID();														//对PID参数模糊控制
 	Motor_PID();													//对电机进行增量式PID调节
-	Motor_Control();												//输出最终速度
-	LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
+        Motor_Control();												//输出最终速度
+        LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
