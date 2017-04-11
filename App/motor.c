@@ -11,7 +11,7 @@ void Speed_Control()
 	/*****PID方案1*****/
 	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	//FuzzyPID();															//对PID参数模糊控制
-	PID_LearnSelf();														//机器学习自动调节PID
+	//PID_LearnSelf();														//机器学习自动调节PID
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Chack();														//检测速度合法性，防止堵转等
 	Motor_Control();													//输出最终速度
@@ -51,8 +51,8 @@ void Motor_Control()
 
 void Motor_PID_Init()
 {
-	Left_Speed.Go_Speed = 100;					//设置默认初始速度
-	Right_Speed.Go_Speed = 100;				//设置默认初始速度
+	Left_Speed.Go_Speed = 70;					//设置默认初始速度
+	Right_Speed.Go_Speed = 70;				//设置默认初始速度
         Left_Speed.Aim_Speed=Left_Speed.Go_Speed;
         Right_Speed.Aim_Speed=Right_Speed.Go_Speed;
 
@@ -68,11 +68,11 @@ void Motor_PID_Init()
 	Left_Speed.err_next = 0;						//电机控制相关初始化
 	Right_Speed.err_next = 0;						//电机控制相关初始化
 
-	Left_Speed.P = 0.3;								//开启模糊控制后不要调节这个值
-	Right_Speed.P = 0.3;								//开启模糊控制后不要调节这个值
+	Left_Speed.P = 0;								//开启模糊控制后不要调节这个值
+	Right_Speed.P = 0;								//开启模糊控制后不要调节这个值
 
-	Left_Speed.I = 0.015;								//开启模糊控制后不要调节这个值
-	Right_Speed.I = 0.015;							//开启模糊控制后不要调节这个值
+	Left_Speed.I = 0.1;								//开启模糊控制后不要调节这个值
+	Right_Speed.I = 0.1;							//开启模糊控制后不要调节这个值
 
 	Left_Speed.D = 0;								//开启模糊控制后不要调节这个值
 	Right_Speed.D = 0;								//开启模糊控制后不要调节这个值
@@ -104,8 +104,8 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Left_Speed.IncrementSpeed = Left_Speed.P*(Left_Speed.Error_Speed - Left_Speed.err_next);
-	Left_Speed.IncrementSpeed += I_flag*Left_Speed.I*Left_Speed.Error_Speed;
+	Left_Speed.IncrementSpeed = Left_Speed.I*(Left_Speed.Error_Speed - Left_Speed.err_next);
+	Left_Speed.IncrementSpeed += I_flag*Left_Speed.P*Left_Speed.Error_Speed;
 	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);
 
 	/****右轮控制****/
@@ -115,8 +115,8 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Right_Speed.IncrementSpeed = Right_Speed.P*(Right_Speed.Error_Speed - Right_Speed.err_next);
-	Right_Speed.IncrementSpeed += I_flag*Right_Speed.I*Right_Speed.Error_Speed;
+	Right_Speed.IncrementSpeed = Right_Speed.I*(Right_Speed.Error_Speed - Right_Speed.err_next);
+	Right_Speed.IncrementSpeed += I_flag*Right_Speed.P*Right_Speed.Error_Speed;
 	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);
 
 	Left_Speed.err_last = Left_Speed.err_next;
