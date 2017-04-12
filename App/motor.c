@@ -104,9 +104,9 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Left_Speed.IncrementSpeed = Left_Speed.I*(Left_Speed.Error_Speed - Left_Speed.err_next);
-	Left_Speed.IncrementSpeed += I_flag*Left_Speed.P*Left_Speed.Error_Speed;
-	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);
+	Left_Speed.IncrementSpeed += Left_Speed.P*Left_Speed.Error_Speed;																				//P
+	Left_Speed.IncrementSpeed = I_flag*Left_Speed.I*(Left_Speed.Error_Speed + Left_Speed.err_next);									//I
+	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);	//D
 
 	/****右轮控制****/
 	Right_Speed.Error_Speed = Right_Speed.Aim_Speed - Right_Speed.Now_Speed;			//取得误差速度
@@ -115,9 +115,9 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Right_Speed.IncrementSpeed = Right_Speed.I*(Right_Speed.Error_Speed - Right_Speed.err_next);
-	Right_Speed.IncrementSpeed += I_flag*Right_Speed.P*Right_Speed.Error_Speed;
-	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);
+	Right_Speed.IncrementSpeed += Right_Speed.P*Right_Speed.Error_Speed;																					//P
+	Right_Speed.IncrementSpeed = I_flag*Right_Speed.I*(Right_Speed.Error_Speed + Right_Speed.err_next);										//I
+	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);	//D
 
 	Left_Speed.err_last = Left_Speed.err_next;
 	Right_Speed.err_last = Right_Speed.err_next;
