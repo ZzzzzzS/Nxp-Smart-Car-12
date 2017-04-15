@@ -68,11 +68,11 @@ void Motor_PID_Init()
 	Left_Speed.err_next = 0;						//电机控制相关初始化
 	Right_Speed.err_next = 0;						//电机控制相关初始化
 
-	Left_Speed.P = 0;								//开启模糊控制后不要调节这个值
-	Right_Speed.P = 0;								//开启模糊控制后不要调节这个值
+	Left_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
+	Right_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
 
-	Left_Speed.I = 0.1;								//开启模糊控制后不要调节这个值
-	Right_Speed.I = 0.1;							//开启模糊控制后不要调节这个值
+	Left_Speed.I = 0;								//开启模糊控制后不要调节这个值
+	Right_Speed.I = 0;							//开启模糊控制后不要调节这个值
 
 	Left_Speed.D = 0;								//开启模糊控制后不要调节这个值
 	Right_Speed.D = 0;								//开启模糊控制后不要调节这个值
@@ -104,8 +104,8 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Left_Speed.IncrementSpeed += Left_Speed.P*Left_Speed.Error_Speed;																				//P
-	Left_Speed.IncrementSpeed = I_flag*Left_Speed.I*(Left_Speed.Error_Speed + Left_Speed.err_next);									//I
+	Left_Speed.IncrementSpeed = Left_Speed.P*Left_Speed.Error_Speed;																				//P
+	Left_Speed.IncrementSpeed += I_flag*Left_Speed.I*(Left_Speed.Error_Speed + Left_Speed.err_next);									//I
 	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);	//D
 
 	/****右轮控制****/
@@ -115,8 +115,8 @@ void Motor_PID()
 	else
 		I_flag = 1;
 
-	Right_Speed.IncrementSpeed += Right_Speed.P*Right_Speed.Error_Speed;																					//P
-	Right_Speed.IncrementSpeed = I_flag*Right_Speed.I*(Right_Speed.Error_Speed + Right_Speed.err_next);										//I
+	Right_Speed.IncrementSpeed = Right_Speed.P*Right_Speed.Error_Speed;																					//P
+	Right_Speed.IncrementSpeed += I_flag*Right_Speed.I*(Right_Speed.Error_Speed + Right_Speed.err_next);										//I
 	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);	//D
 
 	Left_Speed.err_last = Left_Speed.err_next;
@@ -127,6 +127,19 @@ void Motor_PID()
 
 	Left_Speed.PID_Out_Speed += Left_Speed.IncrementSpeed;
 	Right_Speed.PID_Out_Speed += Right_Speed.IncrementSpeed;
+
+	if (Left_Speed.PID_Out_Speed >= 99)
+		Left_Speed.PID_Out_Speed = 99;
+	else if (Right_Speed.PID_Out_Speed >= 99)
+		Right_Speed.PID_Out_Speed = 99;
+
+	if (Left_Speed.PID_Out_Speed <= 0)
+		Left_Speed.PID_Out_Speed = 0;
+	else if (Right_Speed.PID_Out_Speed <= 0)
+		Right_Speed.PID_Out_Speed = 0;
+
+
+
 
 
 	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;													//左右轮最终输出速度暂时等于pid处理后的当前速度

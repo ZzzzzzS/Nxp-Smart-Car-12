@@ -113,8 +113,20 @@ void Direction_Calculate()
 
 	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
 
-	Left_Speed.Turn_Speed = -Direction.err;					//计算差速
-	Right_Speed.Turn_Speed = Direction.err;
+	char flag = 0;
+
+	if (Direction.err < 0)		//方向判断，防止平方后正负项消失
+	{
+		flag = -1;
+	}
+	else
+	{
+		flag = 1;
+	}
+		
+
+	Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
+	Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
 
 	//差弯道是否降低Go_Speed
         

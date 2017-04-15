@@ -95,7 +95,7 @@ void OLED_Interface()
 							  Debug_Init();
 						  }
 			}
-			break;
+			break; 
 		}
 
 		if (gpio_get(Key4) != 0)						//选择按钮
@@ -215,7 +215,6 @@ void System_Error(error Error_Number)
 		OLED_Init();
 		OLED_Print(0, 0, "电机堵转");
 	}
-
         while(1);
 }
 
@@ -228,4 +227,16 @@ void Debug()
 {
 		DeBug_Interface();
 		Send_Data();
+}
+
+/*============================================
+函数名：abs(char a)
+作用：abs取绝对值函数
+==========================================*/
+
+char CharAbs(char a)
+{
+	if (a < 0)
+		a = -a;
+	return a;
 }
