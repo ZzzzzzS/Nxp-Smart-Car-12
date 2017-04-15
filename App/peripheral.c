@@ -156,6 +156,8 @@ void DeBug_Interface()
 	else if (Service.flag == PID_Interface)
 	{
 		OLED_CLS();
+		sprintf(temp, "%d", Direction.err);
+		OLED_Print(Position(Line1), temp);
 		sprintf(temp, "P %.2f %.2f", Left_Speed.P, Right_Speed.P);
 		OLED_Print(Position(Line2), temp);
 		sprintf(temp, "I %.2f %.2f", Left_Speed.I, Right_Speed.I);

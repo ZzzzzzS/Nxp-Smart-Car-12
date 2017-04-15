@@ -130,17 +130,13 @@ void Motor_PID()
 
 	if (Left_Speed.PID_Out_Speed >= 99)
 		Left_Speed.PID_Out_Speed = 99;
-	else if (Right_Speed.PID_Out_Speed >= 99)
-		Right_Speed.PID_Out_Speed = 99;
-
-	if (Left_Speed.PID_Out_Speed <= 0)
+	else if (Left_Speed.PID_Out_Speed <= 0)
 		Left_Speed.PID_Out_Speed = 0;
+
+	if (Right_Speed.PID_Out_Speed >= 99)
+		Right_Speed.PID_Out_Speed = 99;
 	else if (Right_Speed.PID_Out_Speed <= 0)
 		Right_Speed.PID_Out_Speed = 0;
-
-
-
-
 
 	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;													//左右轮最终输出速度暂时等于pid处理后的当前速度
 	Right_Speed.Out_Speed = Right_Speed.PID_Out_Speed;												//左右轮最终输出速度暂时等于pid处理后的当前速度

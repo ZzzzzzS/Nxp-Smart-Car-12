@@ -49,8 +49,8 @@ typedef enum Inductance_Position				//枚举定义电感位置
 方向计算相关宏定义
 ==========================================*/
 
-#define LEFT_WEIGHT				2						//定义转向权重
-#define RIGHT_WEIGHT	        2						//定义转向权重
+#define LEFT_WEIGHT				7						//定义转向权重
+#define RIGHT_WEIGHT	        7						//定义转向权重
 
 #define MAX_FUZZY_RULE		6				//模糊论域大小
 
@@ -72,7 +72,7 @@ typedef enum Inductance_Position				//枚举定义电感位置
 #define DC		 PTC16_OUT						//OLED相关宏定义
 #define D1		 PTC12_OUT						//OLED相关宏定义
 #define D0		 PTC10_OUT						//OLED相关宏定义
-#define Bluetooth		UART4						//宏定义Bluetooth®发送端口
+#define Bluetooth		UART1						//宏定义Bluetooth®发送端口
 #define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 //#define CAR_STOP		PTE8						//定义停车检测管脚
 //#define CAR_STOP_NUM	8					//定义停车管脚号

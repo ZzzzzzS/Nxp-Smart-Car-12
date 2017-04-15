@@ -1,6 +1,9 @@
 #include "include.h"
 #include "data.h"
 
+#define LEFT_WEIGHT				15						//定义转向权重
+#define RIGHT_WEIGHT	        15						//定义转向权重
+
 /*============================================
 电感顺序：
 	左 中 上左 上右 右
@@ -127,6 +130,9 @@ void Direction_Calculate()
 
 	Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
 	Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
+
+	//Left_Speed.Turn_Speed = -Direction.err*Direction.err*flag;
+	//Right_Speed.Turn_Speed = Direction.err*Direction.err*flag;
 
 	//差弯道是否降低Go_Speed
         
