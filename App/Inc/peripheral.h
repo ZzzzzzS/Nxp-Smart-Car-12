@@ -9,5 +9,6 @@ void OLED_Interface();
 void DeBug_Interface();
 void Debug_Init();
 void Debug();
+char CharAbs(char a);
 
 #endif // __PERIPHERAL_H__
