@@ -71,7 +71,7 @@ void Motor_PID_Init()
 	Left_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
 	Right_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
 
-	Left_Speed.I = 0;								//开启模糊控制后不要调节这个值
+	Left_Speed.I = 0 ;								//开启模糊控制后不要调节这个值
 	Right_Speed.I = 0;							//开启模糊控制后不要调节这个值
 
 	Left_Speed.D = 0;								//开启模糊控制后不要调节这个值

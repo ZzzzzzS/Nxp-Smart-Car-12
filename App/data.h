@@ -54,10 +54,12 @@ typedef enum Inductance_Position				//枚举定义电感位置
 
 #define MAX_FUZZY_RULE		6				//模糊论域大小
 
-#define k1				1.2497									//定义拟合曲线K值
-#define k2			-1.3511									//定义拟合曲线K值
-#define b1				-0.3874									//定义拟合曲线b值
-#define b2			0.3968									//定义拟合曲线b值
+#define a1				0.9976									//定义拟合曲线K值
+#define a2			-1.1262									//定义拟合曲线K值
+#define b1				1.0406									//定义拟合曲线b值
+#define b2			-1.0226									//定义拟合曲线b值
+#define c1				-0.7316
+#define c2			0.7425
 
 /*============================================
 其它宏定义和typedef
@@ -157,8 +159,8 @@ typedef struct
 
 typedef struct direction							//差比和法方向控制
 {
-	char err;											//偏差误差
-	float sum[3];										//差比和相关定义
+	int err;											//偏差误差
+	double sum[3];										//差比和相关定义
 }direction;
 
 /*============================================

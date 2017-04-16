@@ -1,8 +1,8 @@
 #include "include.h"
 #include "data.h"
 
-#define LEFT_WEIGHT				15						//定义转向权重
-#define RIGHT_WEIGHT	        15						//定义转向权重
+#define LEFT_WEIGHT				1						//定义转向权重
+#define RIGHT_WEIGHT	        1						//定义转向权重
 
 /*============================================
 电感顺序：
@@ -107,12 +107,25 @@ void Get_AD_Value()
 
 void Direction_Calculate()
 {
-	Direction.sum[0] = 100*(Road_Data[LEFT].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
-	Direction.sum[1] = 100*(Road_Data[LEFT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
-	Direction.sum[2] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
+	Direction.sum[0] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
+	Direction.sum[1] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
+	Direction.sum[2] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
 
-	Direction.sum[1] = k1*Direction.sum[1] + b1;
-	Direction.sum[2] = k2*Direction.sum[1] + b2;
+	//Direction.sum[1] = k1*Direction.sum[1] + b1;
+	//Direction.sum[2] = k2*Direction.sum[1] + b2;
+
+	char a = 1, b = 1;
+	if (Direction.sum[1] < 0)
+		a = -1;
+	if (Direction.sum[2] < 0)
+		b = -1;
+
+
+	Direction.sum[2] = a1*Direction.sum[2] * Direction.sum[2] + b1*Direction.sum[2] + c1;
+	Direction.sum[1] = a2*Direction.sum[1] * Direction.sum[1] + b1*Direction.sum[1] + c2;
+
+	Direction.sum[1] *= a;
+	Direction.sum[2] *= b;
 
 	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
 
@@ -128,18 +141,19 @@ void Direction_Calculate()
 	}
 		
 
-	Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
-	Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
+	//Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
+	//Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
 
-	//Left_Speed.Turn_Speed = -Direction.err*Direction.err*flag;
-	//Right_Speed.Turn_Speed = Direction.err*Direction.err*flag;
+
+	Left_Speed.Turn_Speed = -Direction.err*0.01;
+	Right_Speed.Turn_Speed = Direction.err*0.01 ;
+
 
 	//差弯道是否降低Go_Speed
         
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
 	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
-       // Right_Speed.Aim_Speed=Right_Speed.Go_Speed;
-        //Left_Speed.Aim_Speed=Left_Speed.Go_Speed;
+
 }
 
 /*============================================
