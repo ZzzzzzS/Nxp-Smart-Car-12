@@ -37,9 +37,11 @@ void Motor_Init()
 void Motor_Control()
 {
 
-	ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);	//电机输出
+	//ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);	//电机输出
+  ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 50);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);						//电机输出
-	ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Left_Speed.Out_Speed);	//电机输出
+	//ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Left_Speed.Out_Speed);	//电机输出
+        ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 50);
 	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);						//电机输出
 
 }
@@ -51,8 +53,8 @@ void Motor_Control()
 
 void Motor_PID_Init()
 {
-	Left_Speed.Go_Speed = 70;					//设置默认初始速度
-	Right_Speed.Go_Speed = 70;				//设置默认初始速度
+	Left_Speed.Go_Speed = 60;					//设置默认初始速度
+	Right_Speed.Go_Speed = 60;				//设置默认初始速度
         Left_Speed.Aim_Speed=Left_Speed.Go_Speed;
         Right_Speed.Aim_Speed=Right_Speed.Go_Speed;
 
@@ -71,8 +73,8 @@ void Motor_PID_Init()
 	Left_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
 	Right_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
 
-	Left_Speed.I = 0 ;								//开启模糊控制后不要调节这个值
-	Right_Speed.I = 0;							//开启模糊控制后不要调节这个值
+	Left_Speed.I = 0.1 ;								//开启模糊控制后不要调节这个值
+	Right_Speed.I = 0.1;							//开启模糊控制后不要调节这个值
 
 	Left_Speed.D = 0;								//开启模糊控制后不要调节这个值
 	Right_Speed.D = 0;								//开启模糊控制后不要调节这个值
@@ -202,9 +204,9 @@ void Speed_Chack()
 	}
 
 
-	if ((Right_Speed.Now_Speed < 10) && (Right_Speed.Out_Speed > 70))	//检测系统错误
+	if ((Right_Speed.Now_Speed < 3) && (Right_Speed.Out_Speed > 90))	//检测系统错误
 	{
-		if ((Left_Speed.Now_Speed < 10) && (Left_Speed.Out_Speed > 70))	//检测系统错误
+		if ((Left_Speed.Now_Speed < 3) && (Left_Speed.Out_Speed > 90))	//检测系统错误
 		{
 			//System_Error(0);
 		}

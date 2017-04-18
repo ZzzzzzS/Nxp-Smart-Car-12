@@ -128,9 +128,9 @@ void Direction_Calculate()
 	Direction.sum[2] *= b;
 
 	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
+	Direction.err *= 0.006;
 
 	char flag = 0;
-
 	if (Direction.err < 0)		//方向判断，防止平方后正负项消失
 	{
 		flag = -1;
@@ -139,14 +139,25 @@ void Direction_Calculate()
 	{
 		flag = 1;
 	}
-		
+	
 
+        if(Direction.err<5&&Direction.err>-5)
+          Direction.err=0;
+        else if(Direction.err>30)
+          Direction.err*=1.2;
+        else if(Direction.err<-30)
+          Direction.err*=1.2;
+
+
+
+
+	
 	//Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
 	//Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
 
 
-	Left_Speed.Turn_Speed = -Direction.err*0.01;
-	Right_Speed.Turn_Speed = Direction.err*0.01 ;
+	Left_Speed.Turn_Speed = -Direction.err;
+	Right_Speed.Turn_Speed = Direction.err;
 
 
 	//差弯道是否降低Go_Speed

@@ -36,22 +36,32 @@
 
 /*============================================
 函数名：Send_Data()
-作用：蓝牙串口发送
+作用：nrf24l01发送
 ==========================================*/
 
 void Send_Data()
 {
-	char var[AMP_MAX];
-	for (counter i = 0; i < AMP_MAX; i++)
+	counter i = 0;
+	char var[DATA_PACKET];
+	var[0] = 0x03;
+	var[1] = ~0x03;
+	for (i=2; i < AMP_MAX; i++)
 	{
-		var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
+		var[i] = Road_Data[i-2].AD_Value_fixed;
 	}
-	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
-	printf("Out_Speed %d %d\n ", Left_Speed.Out_Speed, Right_Speed.Out_Speed);
-	printf("NowSpeed %d %d\n", Left_Speed.Now_Speed, Right_Speed.Now_Speed);
-	printf("AimSpeed %d %d\n", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);
-	printf("p=%f %f\n", Left_Speed.P, Right_Speed.P);
-	printf("I=%f %f\n", Left_Speed.I, Right_Speed.I);
+	var[2 + AMP_MAX] = ~0x03;
+	var[3 + AMP_MAX] = 0x03;
+
+	if (nrf_tx(var, DATA_PACKET))
+	{
+		while (nrf_tx_state() == NRF_TXING);
+		if (!(NRF_TX_OK == nrf_tx_state()))
+		{
+			OLED_CLS();
+			OLED_Print(Position(Line1), "nrf24l01 send error");
+			DELAY_MS(100);
+		}
+	}
 }
 
 /*============================================
@@ -199,6 +209,11 @@ void Debug_Init()
 {
 	Service.isDebug = true;
 	Service.flag = 0;
+	OLED_CLS();
+	while (!nrf_init())
+	{
+		OLED_Print(Position(Line1), "nrf24l01 Loading......");
+	}
 }
 
 /*============================================
