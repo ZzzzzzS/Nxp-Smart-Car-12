@@ -35,6 +35,11 @@ void ADC_Init()
 		Road_Data[i].AD_Weight[2] = 3;
 		Road_Data[i].AD_Weight[3] = 4;
 	}
+
+	Direction.P = 0.006;
+	Direction.D = 0;
+	Direction.I = 0;
+
 }
 
 
@@ -107,64 +112,50 @@ void Get_AD_Value()
 
 void Direction_Calculate()
 {
-	Direction.sum[0] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
-	Direction.sum[1] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);
-	Direction.sum[2] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);
+	Direction.sum[0] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);				//差比和计算
+	Direction.sum[1] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);			//差比和计算
+	Direction.sum[2] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);		//差比和计算
 
-	//Direction.sum[1] = k1*Direction.sum[1] + b1;
-	//Direction.sum[2] = k2*Direction.sum[1] + b2;
-
-	char a = 1, b = 1;
-	if (Direction.sum[1] < 0)
+	char a = 1, b = 1;																												//记录正负，防止二次函数拟合后正负错误
+	if (Direction.sum[1] < 0)																										//记录正负，防止二次函数拟合后正负错误									
 		a = -1;
-	if (Direction.sum[2] < 0)
+	if (Direction.sum[2] < 0)																										//记录正负，防止二次函数拟合后正负错误
 		b = -1;
 
+	Direction.sum[2] = a1*Direction.sum[2] * Direction.sum[2] + b1*Direction.sum[2] + c1;		//差比和拟合过程
+	Direction.sum[1] = a2*Direction.sum[1] * Direction.sum[1] + b1*Direction.sum[1] + c2;			//差比和拟合过程
 
-	Direction.sum[2] = a1*Direction.sum[2] * Direction.sum[2] + b1*Direction.sum[2] + c1;
-	Direction.sum[1] = a2*Direction.sum[1] * Direction.sum[1] + b1*Direction.sum[1] + c2;
+	Direction.sum[1] *= a;																										//处理拟合正负
+	Direction.sum[2] *= b;																										//处理拟合正负
 
-	Direction.sum[1] *= a;
-	Direction.sum[2] *= b;
+	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;						//计算出最终误差
 
-	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;
-	Direction.err *= 0.006;
+    if(Direction.err<5&&Direction.err>-5)
+		Direction.err=0;
+	else if(Direction.err>30)
+	   Direction.err*=1.2;
+	else if(Direction.err<-30)
+		Direction.err*=1.2;
+}
 
-	char flag = 0;
-	if (Direction.err < 0)		//方向判断，防止平方后正负项消失
-	{
-		flag = -1;
-	}
-	else
-	{
-		flag = 1;
-	}
-	
+/*============================================
+函数名：Direction_PID()
+作用:方向PID控制
+==========================================*/
 
-        if(Direction.err<5&&Direction.err>-5)
-          Direction.err=0;
-        else if(Direction.err>30)
-          Direction.err*=1.2;
-        else if(Direction.err<-30)
-          Direction.err*=1.2;
+void Direction_PID()
+{
+	char err_Delta = Direction.err - Direction.Error_Last;
+	Direction.Error_Last = Direction.err;
 
+	Direction.PID_Out_Speed = Direction.P*Direction.err;
+	Direction.PID_Out_Speed += Direction.D*err_Delta;
 
+	Left_Speed.Turn_Speed = -Direction.PID_Out_Speed;
+	Right_Speed.Turn_Speed = Direction.PID_Out_Speed;
 
-
-	
-	//Left_Speed.Turn_Speed = -sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;									//计算差速
-	//Right_Speed.Turn_Speed = sqrt(CharAbs(Direction.err*Direction.err*Direction.err))*flag;
-
-
-	Left_Speed.Turn_Speed = -Direction.err;
-	Right_Speed.Turn_Speed = Direction.err;
-
-
-	//差弯道是否降低Go_Speed
-        
 	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
-	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
-
+	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;		//计算最终目标速度
 }
 
 /*============================================

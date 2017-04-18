@@ -159,8 +159,14 @@ typedef struct
 
 typedef struct direction							//差比和法方向控制
 {
-	int err;											//偏差误差
-	double sum[3];										//差比和相关定义
+	int err;												//偏差误差
+	double sum[3];									//差比和相关定义
+
+	float P;												//方向P控制
+	float I;												//方向I控制
+	float D;												//方向D控制
+	char Error_Last;									//上一次误差
+	char PID_Out_Speed;						//PID输出偏差
 }direction;
 
 /*============================================
