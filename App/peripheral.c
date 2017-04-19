@@ -42,17 +42,17 @@
 void Send_Data()
 {
 	counter i = 0;
-	char var[DATA_PACKET];
+	unsigned char var[DATA_PACKET];
 	var[0] = 0x03;
-	var[1] = ~0x03;
-	for (i=2; i < AMP_MAX; i++)
+        var[1] = 0xfc;
+	for (i=2; i < 30; i++)
 	{
-		var[i] = Road_Data[i-2].AD_Value_fixed;
+          var[i] = Road_Data[i-2].AD_Value_fixed;
 	}
-	var[2 + AMP_MAX] = ~0x03;
+	var[2 + AMP_MAX] = 0xfc;
 	var[3 + AMP_MAX] = 0x03;
 
-	if (nrf_tx(var, DATA_PACKET))
+	if (nrf_tx(var, DATA_PACKET)==1)
 	{
 		while (nrf_tx_state() == NRF_TXING);
 		if (!(NRF_TX_OK == nrf_tx_state()))
@@ -214,6 +214,8 @@ void Debug_Init()
 	{
 		OLED_Print(Position(Line1), "nrf24l01 Loading......");
 	}
+        set_vector_handler(PORTE_VECTORn ,PORTE_IRQHandler);    			//设置 PORTE 的中断服务函数为 PORTE_VECTORn
+        enable_irq(PORTE_IRQn);
 }
 
 /*============================================
@@ -256,4 +258,9 @@ char CharAbs(char a)
 	if (a < 0)
 		a = -a;
 	return a;
+}
+
+void PORTE_IRQHandler()
+{
+    PORT_FUNC(E,27,nrf_handler);    //PTE27触发中断,执行 nrf_handler函数
 }

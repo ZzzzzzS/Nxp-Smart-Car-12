@@ -10,5 +10,6 @@ void DeBug_Interface();
 void Debug_Init();
 void Debug();
 char CharAbs(char a);
+void PORTE_IRQHandler();
 
 #endif // __PERIPHERAL_H__

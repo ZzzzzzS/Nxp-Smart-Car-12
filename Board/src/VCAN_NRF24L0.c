@@ -49,7 +49,7 @@ typedef enum
 uint8 TX_ADDRESS[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF};   // ∂®“Â“ª∏ˆæ≤Ã¨∑¢ÀÕµÿ÷∑
 uint8 RX_ADDRESS[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-#define CHANAL          0                              //∆µµ¿—°‘Ò
+#define CHANAL          40                              //∆µµ¿—°‘Ò
 
 
 // ƒ⁄≤ø≈‰÷√≤Œ¡ø
@@ -146,7 +146,7 @@ volatile uint8      nrf_irq_tx_flag  = 0;                     //0 ±Ì æ≥…π¶ £¨1 ±
 
                         printf("\n      NRF”ÎMCU¡¨Ω”≥…π¶£°\n");
  */
-/*uint8 nrf_init(void)
+uint8 nrf_init(void)
 {
     //≈‰÷√NRFπ‹Ω≈∏¥”√
     spi_init(NRF_SPI, NRF_CS, MASTER,12500*1000);                     //≥ı ºªØSPI,÷˜ª˙ƒ£ Ω
@@ -312,7 +312,7 @@ uint8 nrf_link_check(void)
 *  @brief      NRF24L01+Ω¯»ÎΩ” ’ƒ£ Ω
 *  @since      v5.0
 */
-/*void nrf_rx_mode(void)
+void nrf_rx_mode(void)
 {
     NRF_CE_LOW();
 
@@ -326,12 +326,12 @@ uint8 nrf_link_check(void)
     nrf_writereg(NRF_WRITE_REG + CONFIG, 0x0B | (IS_CRC16 << 2));       //≈‰÷√ª˘±æπ§◊˜ƒ£ Ωµƒ≤Œ ˝;PWR_UP,EN_CRC,16BIT_CRC,Ω” ’ƒ£ Ω
 
     /* «Â≥˝÷–∂œ±Í÷æ*/
-    /*nrf_writereg(NRF_WRITE_REG + STATUS, 0xff);
+    nrf_writereg(NRF_WRITE_REG + STATUS, 0xff);
 
     nrf_writereg(FLUSH_RX, NOP);                    //«Â≥˝RX FIFOºƒ¥Ê∆˜
 
     /*CE¿≠∏ﬂ£¨Ω¯»ÎΩ” ’ƒ£ Ω*/
-    /*NRF_CE_HIGH();
+    NRF_CE_HIGH();
 
     nrf_mode = RX_MODE;
 }
@@ -340,7 +340,7 @@ uint8 nrf_link_check(void)
 *  @brief      NRF24L01+Ω¯»Î∑¢ÀÕƒ£ Ω
 *  @since      v5.0
 */
-/*void nrf_tx_mode(void)
+void nrf_tx_mode(void)
 {
     volatile uint32 i;
 
@@ -355,7 +355,7 @@ uint8 nrf_link_check(void)
 
 
     /*CE¿≠∏ﬂ£¨Ω¯»Î∑¢ÀÕƒ£ Ω*/
-   /* NRF_CE_HIGH();
+    NRF_CE_HIGH();
 
     nrf_mode = TX_MODE;
 
@@ -381,7 +381,7 @@ uint8 nrf_link_check(void)
 
  *  @since      v5.0
  */
-/*uint32  nrf_rx(uint8 *rxbuf, uint32 len)
+uint32  nrf_rx(uint8 *rxbuf, uint32 len)
 {
     uint32 tmplen = 0;
     uint8 tmp;
@@ -468,7 +468,7 @@ uint8 nrf_link_check(void)
 
  *  @since      v5.0
  */
-/*uint8    nrf_tx(uint8 *txbuf, uint32 len)
+uint8    nrf_tx(uint8 *txbuf, uint32 len)
 {
     nrf_irq_tx_flag = 0;        //∏¥Œª±Í÷æŒª
 
@@ -491,15 +491,15 @@ uint8 nrf_link_check(void)
         //–Ë“™ œ»∑¢ÀÕ“ª¥Œ ˝æ›∞¸∫Û≤≈ƒ‹ ÷–∂œ∑¢ÀÕ
 
         /*ceŒ™µÕ£¨Ω¯»Î¥˝ª˙ƒ£ Ω1*/
-        //NRF_CE_LOW();
+        NRF_CE_LOW();
 
         /*–¥ ˝æ›µΩTX BUF ◊Ó¥Û 32∏ˆ◊÷Ω⁄*/
-        //nrf_writebuf(WR_TX_PLOAD, txbuf, DATA_PACKET);
+        nrf_writebuf(WR_TX_PLOAD, txbuf, DATA_PACKET);
 
         /*CEŒ™∏ﬂ£¨txbuf∑«ø’£¨∑¢ÀÕ ˝æ›∞¸ */
-       // NRF_CE_HIGH();
+        NRF_CE_HIGH();
 
-    /*    return 1;
+        return 1;
     }
     else
     {
@@ -562,15 +562,15 @@ nrf_tx_state_e nrf_tx_state ()
     }
 }
 
-/*void nrf_handler(void)
+void nrf_handler(void)
 {
     uint8 state;
     uint8 tmp;
     /*∂¡»°statusºƒ¥Ê∆˜µƒ÷µ  */
-   /* nrf_readreg(STATUS, &state);
+    nrf_readreg(STATUS, &state);
 
     /* «Â≥˝÷–∂œ±Í÷æ*/
-   /* nrf_writereg(NRF_WRITE_REG + STATUS, state);
+    nrf_writereg(NRF_WRITE_REG + STATUS, state);
 
     if(state & RX_DR) //Ω” ’µΩ ˝æ›
     {
@@ -636,17 +636,17 @@ nrf_tx_state_e nrf_tx_state ()
             nrf_irq_tx_pnum --;                 //∞¸ ˝ƒøºı…Ÿ
 
             /*ceŒ™µÕ£¨Ω¯»Î¥˝ª˙ƒ£ Ω1*/
-          //  NRF_CE_LOW();
+            NRF_CE_LOW();
 
             /*–¥ ˝æ›µΩTX BUF ◊Ó¥Û 32∏ˆ◊÷Ω⁄*/
-           // nrf_writebuf(WR_TX_PLOAD, (uint8 *)nrf_irq_tx_addr, DATA_PACKET);
+            nrf_writebuf(WR_TX_PLOAD, (uint8 *)nrf_irq_tx_addr, DATA_PACKET);
 
             /*CEŒ™∏ﬂ£¨txbuf∑«ø’£¨∑¢ÀÕ ˝æ›∞¸ */
-           // NRF_CE_HIGH();
-   /*     }*/
-   // }
+            NRF_CE_HIGH();
+        }
+    }
 
-  /*  if(state & MAX_RT)      //∑¢ÀÕ≥¨ ±
+    if(state & MAX_RT)      //∑¢ÀÕ≥¨ ±
     {
         nrf_irq_tx_flag = 1;                            //±Íº«∑¢ÀÕ ß∞‹
         nrf_writereg(FLUSH_TX, NOP);                    //«Â≥˝TX FIFOºƒ¥Ê∆˜
@@ -719,5 +719,5 @@ uint8  nrf_rx_fifo_check(uint32 offset,uint16 * val)
     return 1;
 
 }
-*/
+
 
