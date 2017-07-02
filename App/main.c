@@ -6,7 +6,7 @@ void main()
 	Get_System_Ready();			//准备发车
 	while (Service.isDebug)
 	{
-		DELAY_MS(100);
+		DELAY_MS(100); 
 			Debug();								//调试模式
 	}
 }
