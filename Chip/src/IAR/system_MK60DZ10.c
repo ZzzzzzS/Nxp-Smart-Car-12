@@ -19,7 +19,7 @@
 #include "MK60_uart.h"
 #include "MK60_wdog.h"
 #include "MK60_gpio.h"
-
+#include "include.h"
 
 
 int core_clk_khz;
@@ -47,9 +47,12 @@ void start(void)
 
     gpio_init(PTA4,GPO,1);  //初始化为输出1，即 禁用了 NMI 中断
 
-    main();             // 执行用户主函数
+	Init_System();						//系统初始化
 
-    while(1);           // 死循环
+	Get_System_Ready();			//准备发车
+
+	while (1)
+		system_RunTime_Update();//执行系统运行时程序
 }
 
 /*!

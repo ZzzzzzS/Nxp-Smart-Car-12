@@ -1,16 +1,15 @@
 #include "include.h"
 #include "peripheral.h"
-
+#include "stdlib.h"
+#include "string.h"
 /*============================================
 函数名：Stop_Car_Init()
 作用：停车检测初始化
 ==========================================*/
 
 void Stop_Car_Init()
-{//不清楚上升沿还是下降沿
-	port_init(CAR_STOP, ALT1 | IRQ_FALLING | PULLUP);			//初始化停车干簧管，下降沿中断
-	set_vector_handler(PORTE_VECTORn, Stop_Car);				//设置停车中断向量
-	enable_irq(PORTE_IRQn);										//使能向量
+{
+	gpio_init(REED, GPI, 0);                       //干簧管初始化
 }
 
 /*============================================
@@ -20,15 +19,9 @@ void Stop_Car_Init()
 
 void Stop_Car()
 {
-	if (PORTA_ISFR & (1 << CAR_STOP_NUM))						//确定中断管脚号
+	if (gpio_get(REED) != 0)
 	{
-		PORTA_ISFR = (1 << CAR_STOP_NUM);						//清除中断标志位
-
-		disable_irq(LPTMR_IRQn);								//禁止低功耗定时计数器中断
-		Right_Speed.Out_Speed = 0;								//调整速度为0
-		Left_Speed.Out_Speed = 0;								//调整速度为0
-		ftm_pwm_duty(FTM0, FTM_CH1, Right_Speed.Out_Speed);		//控制左轮转动
-		ftm_pwm_duty(FTM0, FTM_CH2, Left_Speed.Out_Speed);		//控制右轮转动
+		System_Error(Car_Stop);
 	}
 }
 
@@ -39,67 +32,40 @@ void Stop_Car()
 
 void Send_Data()
 {
-	char var[4];
-	for (char i = 0; i < 4; i++)
+	if (Service.BlueToothBase.AllowedSendData)
 	{
-		var[i] = Road_Data[i].Normalized_Value;					//向上位机发送电感归一化后的值
-	}
-	vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
-}
-
-/*============================================
-函数名：Save_Inductance()
-作用：flash储存电感数值
-==========================================*/
-/*============================================
-flash储存位置: L=最大值 S=最小值
-偏移量:0  1  2  3  4  5  6  7
-	   L0 L1 L2 L3 S0 S1 S2 S3
-==========================================*/
-
-void Save_Inductance()
-{
-	char i;
-	flash_erase_sector(SECTOR_NUM);								//擦除flash扇区，准备写入
-
-	for (i = 0; i < 4; i++)										//储存电感归一化的分母
-	{
-		do
+		char var[AMP_MAX];
+		for (counter i = 0; i < AMP_MAX; i++)
 		{
-			flash_write(SECTOR_NUM, i * 4, Road_Data[i].normalization);
-		} while (flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i].normalization);	//储存后验证是否储存正确
-	}
-
-	for (i = 4; i < 8; i++)										//储存电感最小值
-	{
-		do
-		{
-			flash_write(SECTOR_NUM, i * 4, Road_Data[i-4].Min_AD_Value);
-		} while (flash_read(SECTOR_NUM, i * 4, int16) != Road_Data[i - 4].Min_AD_Value);//储存后验证是否储存正确
+			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
+		}
+		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}
 }
 
 /*============================================
-函数名：Save_Inductance()
-作用：flash储存电感数值
+函数名：Receive_Data()
+作用：蓝牙串口接收
 ==========================================*/
 
-void load_Inductance()
+void Receive_Data()
 {
-	char i;
-	for (i = 0; i < 4; i++)
+	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
 	{
-		Road_Data[i].Max_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
-	}
-	for (i = 4; i < 8; i++)
-	{
-		Road_Data[i - 4].Min_AD_Value = flash_read(SECTOR_NUM, i * 4, int16);
-	}
+		led(LED1, LED_ON);
+		printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
+		if (hasData("S"))
+		{
+			System_Error(user_Stop);
+		}
+		else if (hasData("..."))
+		{
 
-	for (i = 0; i < 4; i++)										//计算归一化的分母
-	{
-		Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
+		}
+		memset(Service.BlueToothBase.ReceiveArea, 0, 20);		//清零数组防止一些奇怪的情况
 	}
+	else
+		led(LED1, LED_OFF);
 }
 
 /*============================================
@@ -109,12 +75,11 @@ void load_Inductance()
 
 void Init_Key()
 {
-	key_init(KEY_U);
-	key_init(KEY_D);
-	key_init(KEY_R);
-	key_init(KEY_L);
-	key_init(KEY_A);
-	key_init(KEY_B);
+	gpio_init(Key1, GPI, 0);                       //按键初始化
+	gpio_init(Key2, GPI, 0);						//按键初始化
+	gpio_init(Key3, GPI, 0);                      //按键初始化
+	gpio_init(Key4, GPI, 0);                      //按键初始化
+	//gpio_init(key5, GPI, 0);					    //按键初始化
 }
 
 /*============================================
@@ -124,40 +89,269 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	OLED_Print(15, 0, "哈尔滨工业大学");
-	OLED_Print(35, 2, "威海校区");
-	OLED_Print(15, 4, "718创新实验室");
-	OLED_Print(27, 6, "牛逼车神组");
-	while (key_check(KEY_A) == KEY_UP);								//等待继续操作
-	OLED_CLS();														//清屏OLED
-	OLED_Print(0, 0, "选择模式");
-	OLED_Print(0, 2, "A调试模式");
-	OLED_Print(0, 4, "B比赛模式");
-	while (key_check(KEY_B) == KEY_UP&&key_check(KEY_D) == KEY_UP);//等待继续操作
-	if (key_check(KEY_B) == KEY_DOWN)								//定义KEY_B按下为调试模式
+	OLED_Print(Position(Line1), "Energy Star");
+	OLED_Print(Position(Line2), "inductance");
+	OLED_Print(Position(Line3), "debug");
+	OLED_Print(Position(Line4), "relese");
+	Service.RunMode = Debug_Mode;							//模式判断标志位
+	OLED_Print(100, 2 * Service.RunMode, "<-");
+	while (1)
 	{
-		Service.Debug = true;
-	}
-	else if (key_check(KEY_D) == KEY_DOWN)
-	{
-		Service.Debug = false;
+		OLED_Print(100, 2 * Service.RunMode, "<-");
+		DELAY_MS(100);										//刷新指针位置
+		if (gpio_get(Key1) != 0)
+		{
+			DELAY_MS(10);
+			if (gpio_get(Key1) != 0)
+			{
+				OLED_CLS();
+
+				switch (Service.RunMode)
+				{
+				case inductance_Mode:
+					Debug_Init();
+					Service.MotorBase.AllowRun = false;
+					break;
+
+				case Debug_Mode:
+					Debug_Init();
+					Service.MotorBase.AllowRun = true;
+					break;
+
+				case Release_Mode:
+					Service.MotorBase.AllowRun = true;
+					OLED_CLS();
+					break;
+
+				default:
+					System_Error(No_Mode);
+					break;
+				}
+				break;
+			}
+		}
+
+		if (gpio_get(Key4) != 0)
+		{
+			DELAY_MS(10);
+			if (gpio_get(Key4) != 0)
+			{
+				OLED_CLS();
+				OLED_Print(Position(Line1), "Energy Star");
+				OLED_Print(Position(Line2), "inductance");
+				OLED_Print(Position(Line3), "debug");
+				OLED_Print(Position(Line4), "relese");
+				Service.RunMode++;
+				if (Service.RunMode >= Max_Mode)
+					Service.RunMode = inductance_Mode;
+			}
+		}
 	}
 }
 
 /*============================================
-函数名：OLED_Normalization_Interface()
-作用：OLED显示电感归一化中的界面
+函数名：DeBug_Interface()
+作用：OLED显示调试时界面
 ==========================================*/
 
-void OLED_Normalization_Interface()
+void DeBug_Interface()
 {
-	char OLED_Temp[30];												//OLED显示使用的临时数组
-	OLED_CLS();														//输出前先清理屏幕，防止乱码出现
-	OLED_Print(0, 0, "正在获取最大最小值");
-	sprintf(OLED_Temp, "最大%d %d %d %d", Road_Data[0].Max_AD_Value, Road_Data[1].Max_AD_Value, Road_Data[2].Max_AD_Value, Road_Data[3].Max_AD_Value);
-	OLED_Print(0, 2, OLED_Temp);									//输出采集的最大电感值
-	sprintf(OLED_Temp, "最小%d %d %d %d", Road_Data[0].Min_AD_Value, Road_Data[1].Min_AD_Value, Road_Data[2].Min_AD_Value, Road_Data[3].Min_AD_Value);
-	OLED_Print(0, 4, OLED_Temp);									//输出采集的最小电感值
-	sprintf(OLED_Temp, "当前%d %d %d %d", Road_Data[0].AD_Value, Road_Data[1].AD_Value, Road_Data[2].AD_Value, Road_Data[3].AD_Value);
-	OLED_Print(0, 6, OLED_Temp);									//输出当前电感值
+	char temp[10];
+	switch (Service.OLEDbase.OLED_Interface)
+	{
+	case Inductance_Interface:
+		OLED_CLS();
+		OLED_Print(Position(Line1), "inductance");
+		sprintf(temp, "FL%dFR%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
+		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "M=%d", Road_Data[MIDDLE].AD_Value_fixed);
+		OLED_Print(Position(Line4), temp);
+		break;
+
+	case Speed_Interface:
+		OLED_CLS();																														//先清屏
+		sprintf(temp, "out L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);					//电机输出功率
+		OLED_Print(Position(Line1), temp);
+		sprintf(temp, "now L%dR%d", Speed.Left.Now_Speed, Speed.Right.Now_Speed);				//当前速度
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
+		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "%d %d", Speed.Base.Aim_Speed, Speed.Base.Now_Speed);																//设定速度
+		OLED_Print(Position(Line4), temp);
+
+		if (gpio_get(Key2) != 0)
+		{
+			Speed.Base.Aim_Speed += 2;
+		}
+		if (gpio_get(Key4) != 0)
+		{
+			if (Speed.Base.Aim_Speed<5)
+				Speed.Base.Aim_Speed = 1;
+			else
+				Speed.Base.Aim_Speed -= 2;
+		}
+		break;
+
+	case Direction_Interface:
+		OLED_CLS();
+		sprintf(temp, "out%d", Direction.PIDbase.PID_Out_Speed);
+		OLED_Print(Position(Line1), temp);
+		sprintf(temp, "err%d", Direction.err);
+		OLED_Print(Position(Line2), temp);
+		sprintf(temp, "Fix%d", Direction.PIDbase.Error_Speed[Now_Error]);
+		OLED_Print(Position(Line3), temp);
+		sprintf(temp, "%d %d %d", Direction.sum[0], Direction.sum[1], Direction.sum[2]);
+		OLED_Print(Position(Line4), temp);
+		break;
+
+	case Fuzzy_interface:
+		OLED_CLS();
+		sprintf(temp, "Fuzzy%d", (int)Fuzzy_Direction.Position.eAngle * 100);
+		OLED_Print(Position(Line1), temp);
+		break;
+
+	default:
+		sprintf(temp, "No Interface");
+		OLED_Print(Position(Line1), temp);
+		break;
+	}
+
+	if (gpio_get(Key1) != 0)
+	{
+		DELAY_MS(10);
+		if (gpio_get(Key1) != 0)
+		{
+			Service.OLEDbase.OLED_Interface++;
+			if (Service.OLEDbase.OLED_Interface >= MAX_Interface)
+				Service.OLEDbase.OLED_Interface = Inductance_Interface;
+		}
+	}
+
+	for (i = 0; i < 4; i++)										//计算归一化的分母
+	{
+		Road_Data[i].normalization = Road_Data[i].Max_AD_Value - Road_Data[i].Min_AD_Value;
+	}
+}
+
+/*============================================
+函数名：Debug_Init()
+作用：调试模式时初始化调试组件
+==========================================*/
+
+void Debug_Init()
+{
+	Service.OLEDbase.OLED_Renew = 0;
+	Service.OLEDbase.OLED_Interface = Speed_Interface;
+	Service.BlueToothBase.AllowedReceiveData = true;
+	Service.BlueToothBase.AllowedSendData = true;
+	init_LED();
+	OLED_CLS();
+}
+
+/*============================================
+函数名：System_Error(error Error_Number)
+作用：调试模式系统错误紧急停车
+==========================================*/
+
+void System_Error(error Error_Number)
+{
+	disable_irq(LPTMR_IRQn);									//禁止低功耗定时计数器中断
+	Speed.Right.Out_Speed = 0;								//调整速度为0
+	Speed.Left.Out_Speed = 0;								//调整速度为0
+	Motor_Control();												//控制电机
+
+	switch (Error_Number)
+	{
+	case Motor_Stop:
+		OLED_Init();
+		OLED_Print(Position(Line1), "motor error");
+		break;
+
+	case Taget_Lost:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Taget Lost");
+		Service.InductanceBase.InductanceLost = 0;
+		break;
+
+	case Car_Stop:
+		OLED_Init();
+		OLED_Print(Position(Line1), "terminal point");
+		break;
+
+	case No_Mode:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Mode Error");
+		break;
+
+	case user_Stop:
+		OLED_Init();
+		OLED_Print(Position(Line1), "user stop");
+		OLED_Print(Position(Line2), "the Car");
+		break;
+
+	default:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Unknown Error");
+		break;
+	}
+
+	while (!gpio_get(Key1));
+	DELAY_MS(10);
+	while (!gpio_get(Key1));
+	enable_irq(LPTMR_IRQn);									//开启低功耗定时计数器中断
+}
+
+/*============================================
+函数名：abs(char a)
+作用：abs取绝对值函数
+==========================================*/
+
+char CharAbs(char a)
+{
+	if (a < 0)
+		a = -a;
+	return a;
+}
+
+/*============================================
+函数名：init_LED()
+作用：LED初始化函数
+==========================================*/
+
+void init_LED()
+{
+	led_init(LED0);
+	led_init(LED1);
+	led_init(LED2);
+	led_init(LED3);
+}
+
+/*============================================
+函数名：LED_Interface()
+作用：LED显示函数
+==========================================*/
+
+void LED_Interface()
+{
+	if (Speed.Left.Out_Speed > Speed.Right.Out_Speed)
+	{
+		led(LED3, LED_ON);
+		led(LED0, LED_OFF);
+	}
+	else if (Speed.Right.Out_Speed > Speed.Left.Out_Speed)
+	{
+		led(LED3, LED_OFF);
+		led(LED0, LED_ON);
+	}
+
+	if (Fuzzy_Direction.isMatched)
+	{
+		led(LED2, LED_ON);
+	}
+	else
+	{
+		led(LED2, LED_OFF);
+	}
 }

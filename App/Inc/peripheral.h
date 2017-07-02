@@ -1,13 +1,17 @@
 #ifndef __PERIPHERAL_H__
 #define __PERIPHERAL_H__
 
-void Stop_Car_Init();
-void Stop_Car();
-void Send_Data();
-void Save_Inductance();
-void load_Inductance();
-void Init_Key();
-void OLED_Interface();
-void OLED_Normalization_Interface();
+extern void Stop_Car_Init();
+extern void Stop_Car();
+extern void Send_Data();
+extern void Receive_Data();
+extern void Init_Key();
+extern void OLED_Interface();
+extern void DeBug_Interface();
+extern void Debug_Init();
+extern char CharAbs(char a);
+extern void init_LED();
+extern void LED_Interface();
+
 
 #endif // __PERIPHERAL_H__

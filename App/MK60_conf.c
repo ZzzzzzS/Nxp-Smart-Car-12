@@ -18,7 +18,7 @@
 #include    "MK60_uart.h"
 #include    "VCAN_KEY.h"
 #include    "VCAN_LED.h"
-
+#include    "OLED.h"
 
 
 
@@ -34,12 +34,23 @@ const char ASSERT_FAILED_STR[] = "断言失败，在%s的第%d行。请检查改行的代码，传递
 void assert_failed(char *file, int line)
 {
     led_init(LED0);
+	OLED_Init();
+	char temp[10];
+	char flag = 0;
+	sprintf(temp, "%d", line);
     while (1)
     {
 
         if(enter_init())
         {
             DEBUG_PRINTF(ASSERT_FAILED_STR, file, line);      //通过串口提示断言失败
+			if (flag == 0)
+			{
+				OLED_Print(0, 0, "ASSERT!");
+				OLED_Print(0, 2, file+20);
+				OLED_Print(0, 4, temp);
+				flag = 1;
+			}
         }
 
         //死循环等待程序员检测为何断言失败

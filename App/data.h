@@ -3,114 +3,246 @@
 #include "common.h"
 
 /*============================================
-电机控制相关宏定义
+PID相关数据结构体
 ==========================================*/
+typedef enum PID_Error						//PID误差枚举
+{
+	Now_Error,
+	last_Error,
+	lastest_Error
+}PID_Error;
 
-#define MAX_SPEED			1000				//定义最大速度
-#define MIN_SPEED			0					//定义最小速度
-				
-#define LEFT_MOTOR			PTA24				//定义电机控制管脚
-#define RIGHT_MOTOR			PTA27
+typedef struct pidbasespeed
+{
+	float P;												//pid常量
+	float I;												//pid常量
+	float D;												//pid常量;
+	int16 Aim_Speed;								//pid目标速度
+	int16 Now_Speed;								//pid当前速度
+	int16 Error_Speed[3];							//pid误差速度
+	int16 Intergate_Speed;						//定义积分速度
+	int16 IncrementSpeed;						//速度增量
+	int16 PID_Out_Speed;						//最终输出速度
+}pidbasespeed;
+
+/*============================================
+电机控制相关定义
+==========================================*/
+#define Stable_Times		2					//定义电机滤波速度
+#define MAX_SPEED			99					//定义最大速度
+#define MIN_SPEED			-99				//定义最小速度
+
+#define MOTOR_FTM   FTM0
+#define RIGHT_PWM			FTM_CH3
+#define RIGHT_PWM_BACK  FTM_CH4
+#define LEFT_PWM_BACK		FTM_CH1
+#define LEFT_PWM				FTM_CH2
+
+#define MOTOR_HZ    20*1000				//定义电机工作频率
+
+typedef struct
+{
+	int16 Out_Speed;								//最终输出到电机的速度
+	int16 Turn_Speed;								//转向差速度
+	int16 Now_Speed;								//正交解码得出的当前速度
+	int16 Speed_Old[Stable_Times];			//电机功率滤波
+}wheel;
+
+typedef struct
+{
+	wheel Left;
+	wheel Right;
+	pidbasespeed Base;
+}speed;
 
 /*============================================
 电感数据采集相关宏定义
 ==========================================*/
 
-#define AMP1     ADC0_SE8						//PTB0
-#define AMP2     ADC0_SE9						//PTB1
-#define AMP3     ADC0_SE12						//PTB2
-#define AMP4     ADC0_SE13						//PTB3
+#define AD1			ADC0_SE8						//PTB0
+#define AD2			ADC0_SE9						//PTB1
+#define AD3			ADC0_SE12					//PTB2
+#define AD4			ADC0_SE13					//PTB3
+#define AD5			ADC1_SE10					//PTB4
+#define AMP_MAX	5									//定义最大ADC端口数
 
-enum Inductance_Direction
+typedef enum Inductance_Position				//枚举定义电感位置
 {
-	LEFT_OUTSIDE = 0,
-	LEFT_INSIDE  = 1,
-	RIGHT_INSIDE = 2,
-	RIGHT_OUTSIDE= 3
-};
+	LEFT,
+	RIGHT,
+	MIDDLE,
+	FRONT_LEFT,
+	FRONT_RIGHT,
+}Inductance_Position;
 
-
-#define DEFAULT_MAX_VALUE 0
-#define DEFAULT_MIN_VALUE 300
+typedef struct
+{
+	int16 AD_Value;									//ADC数模转换器采集到的值,8bit
+	int16 AD_Value_fixed;						//滤波后的值
+	int16 Normalized_Value;					//差比和的电感值
+	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+}inductance;
 
 /*============================================
-方向计算相关宏定义
+方向计算相关定义
 ==========================================*/
 
-#define LEFT_OUTSIDE_WEIGHT  10
-#define LEFT_INSIDE_WEIGHT   1
-#define RIGHT_INSIDE_WEIGHT  1
-#define RIGHT_OUTSIDE_WEIGHT 10
+#define MAX_FUZZY_RULE		6						//模糊论域大小
 
-#define DIRECTION_WEIGHT 10
+#define Lk				0.5723
+#define Lb			-0.2530
+#define Rk			-0.5703
+#define Rb			0.2424
+
+typedef struct direction							//差比和法方向控制
+{
+	int16 err;											//偏差误差
+	int16 sum[3];										//差比和相关定义
+	pidbasespeed PIDbase;						//PID计算类型
+}direction;
+
+typedef struct position
+{
+	float eAngle;									//夹角信息
+	float eLength;								//长度信息
+}position;
+
+typedef struct fuzzy_direction							//模糊控制法方向控制
+{
+	position Position;											//临时储存隶属度
+	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
+	position eGrade[MAX_FUZZY_RULE];				//储存隶属度
+	char		isMatched;										//判断是否匹配到
+}fuzzy_direction;
+
+/*============================================
+OLED显示相关定义
+==========================================*/
+#define RESET	 PTC14_OUT						//OLED相关宏定义
+#define DC		 PTC16_OUT						//OLED相关宏定义
+#define D1		 PTC12_OUT						//OLED相关宏定义
+#define D0		 PTC10_OUT						//OLED相关宏定义
+
+#define Position(OLED_Line)				0,(OLED_Line)	//坐标定义
+
+typedef enum OLED_Line											//定义OLED显示位置
+{
+	Line1 = 0,
+	Line2 = 2,
+	Line3 = 4,
+	Line4 = 6,
+
+	MAX_Line
+}OLED_Line;
+
+typedef enum Debug_Interface									//定义调试模式OLED界面编号
+{
+	Inductance_Interface = 1,
+	Speed_Interface,
+	Direction_Interface,
+	Fuzzy_interface,
+
+	MAX_Interface
+}Debug_Interface;
+
+typedef struct OLED
+{
+	char OLED_Interface;
+	char OLED_Renew;
+}OLED;
+
+/*============================================
+调试模式定义
+==========================================*/
+
+#define   hasData(x)	strstr(Service.BlueToothBase.ReceiveArea,(x))!=NULL
+
+typedef enum									//定义系统错误编号
+{
+	Motor_Stop,
+	Taget_Lost,
+	Car_Stop,
+	No_Mode,
+	user_Stop,
+
+	MAX_error
+}Error_Num;
+
+typedef enum Run_Mode											//定义调试模式编号
+{
+	inductance_Mode = 1,
+	Debug_Mode,
+	Release_Mode,
+
+	Max_Mode
+}Run_Mode;
+
+typedef struct BlueTooth
+{
+	char AllowedSendData;					//发送允许位
+	char AllowedReceiveData;				//接收允许位
+	unsigned char ReceiveArea[20];		//接收区临时缓存
+	union convert_data						//浮点数转换共用体
+	{
+		float Float_Base;
+		unsigned char Receive_Base[4];
+	};
+}BlueTooth;
+
+typedef struct Inductance
+{
+	char InductanceLost;
+}Inductance;
+
+typedef struct Motor
+{
+	char AllowRun;
+}Motor;
+
+typedef struct service
+{
+	char RunMode;									//运行模式
+	OLED OLEDbase;								//OLED相关配置
+	BlueTooth BlueToothBase;					//Bluetooth®相关配置
+	Inductance InductanceBase;				//电感丢线相关信息
+	Motor MotorBase;								//电机转动相关信息
+}service;
 
 /*============================================
 其它宏定义和typedef
 ==========================================*/
+#define true		1
+#define false		0
+#define ture		1
+#define flase		0
+typedef char		bool;
 
-#define RESET  PTC12_OUT						//OLED相关宏定义
-#define DC     PTC10_OUT						//OLED相关宏定义
-#define D1     PTC14_OUT						//OLED相关宏定义
-#define D0     PTC16_OUT						//OLED相关宏定义
-#define Bluetooth		UART0					//宏定义Bluetooth®发送端口
-#define SECTOR_NUM		(FLASH_SECTOR_NUM-1)	//flash扇区宏定义，尽量用最后面的扇区，确保安全
-#define CAR_STOP		PTE8					//定义停车检测管脚
-#define CAR_STOP_NUM	8						//定义停车管脚号
-#define true			1						//定义逻辑真
-#define false			0						//定义逻辑假
-typedef char			bool;					//定义bool类型
+#define Key1   PTC13									//按键管脚定义
+#define Key2   PTC11									//按键管脚定义
+#define Key3   PTC9									//按键管脚定义,这个按钮有问题
+#define Key4   PTC7									//按键管脚定义
+#define key5	   PTC5									//按键管脚定义
 
-/*============================================
-速度相关数据结构体
-==========================================*/
+#define Bluetooth		UART1						//宏定义Bluetooth®发送端口
+#define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 
-typedef struct speed
-{
-	int16 Out_Speed;							//最终输出到电机的速度
-	int16 PID_Out_Speed;						//PID处理后的速度
-	float P;									//pid常量
-	float I;									//pid常量
-	float D;									//pid常量
-	int16 Aim_Speed;							//目标速度
-	int16 Turn_Speed;							//转向差速度
-	int16 Go_Speed;								//正常前进速度
-	int16 Now_Speed;							//正交解码得出的当前速度
-	int16 Error_Speed;							//目标速度与当前速度的差值
-	float err_next;								//定义上一个偏差值    
-	float err_last;								//定义最上前的偏差值
-}speed;
+#define REED		PTE8						//定义停车检测管脚
+
+typedef unsigned char		counter;			//定义累加器类型
+typedef unsigned char		error;				//定义错误类型
 
 /*============================================
-电感相关数据结构体
+"对象""实例化"
 ==========================================*/
 
-typedef struct
-{
-	char AD_Value;								//ADC数模转换器采集到的值,8bit
-	char Max_AD_Value;							//ADC数模转换器采集到的最大值
-	char Min_AD_Value;							//ADC数模转换器采集到的最小值
-	char Normalized_Value;						//归一化的电感值
-	char normalization;							//归一化的分母值
-	char AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
-	char AD_Weight[4];							//权重向前滤波算法权重值
-}inductance;
+extern speed Speed;											//声明一个"speed类"的"对象"，全局储存速度信息
 
-typedef struct direction
-{
-	int16 err;
-}direction;
+extern inductance Road_Data[AMP_MAX];			//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
 
-typedef struct service
-{
-	bool Debug;
-}service;
+extern direction Direction;									//声明一个"Direction类"的"对象"，方向信息
 
-extern speed Left_Speed;						//声明一个"Speed类"的"对象"，左轮数据
-extern speed Right_Speed;						//声明一个"Speed类"的"对象"，右轮数据
+extern fuzzy_direction Fuzzy_Direction;				//声明一个"Fuzzy_Direction类"的"对象"，模糊控制方向信息
 
-extern inductance Road_Data[4];					//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
+extern service Service;										//声明一个"service类"的"对象"，串口发送等服务信息
 
-extern direction Direction;						//声明一个"Direction类"的"对象"，方向信息
-
-extern service Service;							//声明一个"service类"的"对象"，串口发送等服务信息
 #endif  //__DATA_H__

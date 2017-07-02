@@ -39,7 +39,7 @@ typedef volatile uint8      vuint8;  /*  8 bits */
 typedef volatile uint16     vuint16; /* 16 bits */
 typedef volatile uint32     vuint32; /* 32 bits */
 typedef volatile uint64     vuint64; /* 64 bits */
-//**********************************牛逼车神组自定义组件*************************************
+//**********************************节能之星组自定义组件*************************************
 
 
 
