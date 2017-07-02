@@ -8,11 +8,11 @@
 
 void Speed_Control()
 {
-	/*****PID方案1*****/
 	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	//FuzzyPID();															//对PID参数模糊控制
-	//PID_LearnSelf();														//机器学习自动调节PID
 	Motor_PID();															//对电机进行增量式PID调节
+	Speed_Comput();													//加入方向环控制
+	//Speed_Stable();														//速度滤波使系统稳定
 	Speed_Chack();														//检测速度合法性，防止堵转等
 	Motor_Control();													//输出最终速度
 }
@@ -23,10 +23,10 @@ void Speed_Control()
 ==========================================*/
 void Motor_Init()
 {
-	ftm_pwm_init(MOTOR_FTM, MOTOR1_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
-	ftm_pwm_init(MOTOR_FTM, MOTOR2_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
-	ftm_pwm_init(MOTOR_FTM, MOTOR3_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
-	ftm_pwm_init(MOTOR_FTM, MOTOR4_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, LEFT_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, LEFT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
 }
 
 /*============================================
@@ -36,14 +36,30 @@ void Motor_Init()
 
 void Motor_Control()
 {
+	if (Service.MotorBase.AllowRun)																			//判断是否允许电机转动
+	{
+		if (Speed.Right.Out_Speed >= 0)
+		{
+			ftm_pwm_duty(MOTOR_FTM, RIGHT_PWM, Speed.Right.Out_Speed);		//电机正转
+			ftm_pwm_duty(MOTOR_FTM, RIGHT_PWM_BACK, 0);
+		}
+		else if (Speed.Right.Out_Speed < 0)																//电机反转
+		{
+			ftm_pwm_duty(MOTOR_FTM, RIGHT_PWM, 0);
+			ftm_pwm_duty(MOTOR_FTM, RIGHT_PWM_BACK, -Speed.Right.Out_Speed);
+		}
 
-	//ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, Right_Speed.Out_Speed);	//电机输出
-  ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 50);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);						//电机输出
-	//ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, Left_Speed.Out_Speed);	//电机输出
-        ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 50);
-	ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);						//电机输出
-
+		if (Speed.Left.Out_Speed >= 0)																		//电机正转
+		{
+			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM, Speed.Left.Out_Speed);
+			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM_BACK, 0);
+		}
+		else if (Speed.Left.Out_Speed < 0)																//电机反转
+		{
+			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM, 0);
+			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM_BACK, -Speed.Left.Out_Speed);
+		}
+	}
 }
 
 /*============================================
@@ -53,32 +69,18 @@ void Motor_Control()
 
 void Motor_PID_Init()
 {
-	Left_Speed.Go_Speed = 60;					//设置默认初始速度
-	Right_Speed.Go_Speed = 60;				//设置默认初始速度
-        Left_Speed.Aim_Speed=Left_Speed.Go_Speed;
-        Right_Speed.Aim_Speed=Right_Speed.Go_Speed;
+	Speed.Base.Aim_Speed = 18;						//设置默认初始速度,在此处改速度无效
 
-	Left_Speed.Now_Speed = Left_Speed.Go_Speed;		//设置初始当前速度，防止电机未上电时PID工作异常
-	Right_Speed.Now_Speed = Left_Speed.Go_Speed;	//设置初始当前速度，防止电机未上电时PID工作异常
+	Speed.Left.Now_Speed = Speed.Base.Aim_Speed;		//设置初始当前速度，防止电机未上电时PID工作异常
+	Speed.Right.Now_Speed = Speed.Base.Aim_Speed;	//设置初始当前速度，防止电机未上电时PID工作异常
 
-	Left_Speed.Error_Speed = 0;					//电机控制相关初始化
-	Right_Speed.Error_Speed = 0;				//电机控制相关初始化
+	Speed.Base.Error_Speed[0] = 0;					//电机控制相关初始化
+	Speed.Base.Error_Speed[1] = 0;					//电机控制相关初始化
+	Speed.Base.Error_Speed[2] = 0;					//电机控制相关初始化				
 
-	Left_Speed.err_last = 0;							//电机控制相关初始化
-	Right_Speed.err_last = 0;						//电机控制相关初始化
-
-	Left_Speed.err_next = 0;						//电机控制相关初始化
-	Right_Speed.err_next = 0;						//电机控制相关初始化
-
-	Left_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
-	Right_Speed.P = 0.2;								//开启模糊控制后不要调节这个值
-
-	Left_Speed.I = 0.1 ;								//开启模糊控制后不要调节这个值
-	Right_Speed.I = 0.1;							//开启模糊控制后不要调节这个值
-
-	Left_Speed.D = 0;								//开启模糊控制后不要调节这个值
-	Right_Speed.D = 0;								//开启模糊控制后不要调节这个值
-
+	Speed.Base.P = 1;
+	Speed.Base.I = 0.1;
+	Speed.Base.D = 3;
 }
 
 /*============================================
@@ -88,61 +90,40 @@ void Motor_PID_Init()
 
 void Motor_PID()
 {
-	flag I_flag = 1;										//积分变量分离标志位
+	char I_flag = 1;										//积分变量分离标志位4
+					/*****PID调节核心部分*****/
+	Speed.Base.Error_Speed[Now_Error] = Speed.Base.Aim_Speed - Speed.Base.Now_Speed;
 
-	if (Left_Speed.Aim_Speed < 0)			//判断速度合法性
-	{
-		Left_Speed.Aim_Speed = 0;
-	}
-	if (Right_Speed.Aim_Speed < 0)			//判断速度合法性
-	{
-		Right_Speed.Aim_Speed = 0;
-	}
-	/*****PID调节核心部分*****/
-	/****左轮控制****/
-	Left_Speed.Error_Speed = Left_Speed.Aim_Speed - Left_Speed.Now_Speed;					//取得误差速度
-	if (Left_Speed.Error_Speed > 100)																					//积分变量分离
+	if (Speed.Base.Error_Speed[Now_Error] > 20)																					//积分变量分离
 		I_flag = 0;
 	else
 		I_flag = 1;
 
-	Left_Speed.IncrementSpeed = Left_Speed.P*Left_Speed.Error_Speed;																				//P
-	Left_Speed.IncrementSpeed += I_flag*Left_Speed.I*(Left_Speed.Error_Speed + Left_Speed.err_next);									//I
-	Left_Speed.IncrementSpeed += Left_Speed.D*(Left_Speed.Error_Speed - 2 * Left_Speed.err_next + Left_Speed.err_last);	//D
+	Speed.Base.IncrementSpeed = Speed.Base.P * Speed.Base.Error_Speed[Now_Error];																							//P
+	Speed.Base.IncrementSpeed += I_flag*Speed.Base.I*(Speed.Base.Error_Speed[Now_Error] + Speed.Base.Error_Speed[last_Error]);							//I
+	Speed.Base.IncrementSpeed += Speed.Base.D*(Speed.Base.Error_Speed[Now_Error] - 2 * Speed.Base.Error_Speed[last_Error] + Speed.Base.Error_Speed[lastest_Error]);	//D
 
-	/****右轮控制****/
-	Right_Speed.Error_Speed = Right_Speed.Aim_Speed - Right_Speed.Now_Speed;			//取得误差速度
-	if (Right_Speed.Error_Speed > 100)																				//积分变量分离
-		I_flag = 0;
-	else
-		I_flag = 1;
+	Speed.Base.Error_Speed[lastest_Error] = Speed.Base.Error_Speed[last_Error];
+	Speed.Base.Error_Speed[last_Error] = Speed.Base.Error_Speed[Now_Error];
 
-	Right_Speed.IncrementSpeed = Right_Speed.P*Right_Speed.Error_Speed;																					//P
-	Right_Speed.IncrementSpeed += I_flag*Right_Speed.I*(Right_Speed.Error_Speed + Right_Speed.err_next);										//I
-	Right_Speed.IncrementSpeed += Right_Speed.D*(Right_Speed.Error_Speed - 2 * Right_Speed.err_next + Right_Speed.err_last);	//D
+	Speed.Base.PID_Out_Speed += Speed.Base.IncrementSpeed;
 
-	Left_Speed.err_last = Left_Speed.err_next;
-	Right_Speed.err_last = Right_Speed.err_next;
+	if (Speed.Base.PID_Out_Speed >= MAX_SPEED)
+		Speed.Base.PID_Out_Speed = MAX_SPEED;
+	else if (Speed.Base.PID_Out_Speed <= MIN_SPEED)
+		Speed.Base.PID_Out_Speed = MIN_SPEED;
 
-	Left_Speed.err_next = Left_Speed.Error_Speed;
-	Right_Speed.err_next = Right_Speed.Error_Speed;
+}
 
-	Left_Speed.PID_Out_Speed += Left_Speed.IncrementSpeed;
-	Right_Speed.PID_Out_Speed += Right_Speed.IncrementSpeed;
+/*============================================
+函数名：Speed_Comput()
+作用:计算出方向环和速度环的合速度
+==========================================*/
 
-	if (Left_Speed.PID_Out_Speed >= 99)
-		Left_Speed.PID_Out_Speed = 99;
-	else if (Left_Speed.PID_Out_Speed <= 0)
-		Left_Speed.PID_Out_Speed = 0;
-
-	if (Right_Speed.PID_Out_Speed >= 99)
-		Right_Speed.PID_Out_Speed = 99;
-	else if (Right_Speed.PID_Out_Speed <= 0)
-		Right_Speed.PID_Out_Speed = 0;
-
-	Left_Speed.Out_Speed = Left_Speed.PID_Out_Speed;													//左右轮最终输出速度暂时等于pid处理后的当前速度
-	Right_Speed.Out_Speed = Right_Speed.PID_Out_Speed;												//左右轮最终输出速度暂时等于pid处理后的当前速度
-
+void Speed_Comput()
+{
+	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed;
+	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed;
 }
 
 /*============================================
@@ -157,23 +138,50 @@ void Get_Motor_Speed_Init()
 }
 
 /*============================================
+函数名：Speed_Stable()
+作用：将速度控制周期平均到X个控制周期内完成，增加车模稳定性
+==========================================*/
+/*============================================
+滤波说明：
+[0][1][2][3]
+旧数据        新数据
+低权值        高权值
+==========================================*/
+
+void Speed_Stable()
+{
+	for (counter i = 0; i < Stable_Times - 1; i++)
+	{
+		Speed.Left.Speed_Old[i] = Speed.Left.Speed_Old[i + 1];
+		Speed.Right.Speed_Old[i] = Speed.Right.Speed_Old[i + 1];
+	}
+	Speed.Left.Speed_Old[Stable_Times - 1] = Speed.Left.Out_Speed;
+	Speed.Right.Speed_Old[Stable_Times - 1] = Speed.Right.Out_Speed;
+
+	char sum = 0;
+	Speed.Left.Out_Speed = 0;
+	Speed.Right.Out_Speed = 0;
+	for (counter i = 0; i < Stable_Times; i++)
+	{
+		sum += i;
+		Speed.Left.Out_Speed += Speed.Left.Speed_Old[i] * i;
+		Speed.Right.Out_Speed += Speed.Right.Speed_Old[i] * i;
+	}
+	Speed.Left.Out_Speed /= sum;
+	Speed.Right.Out_Speed /= sum;
+}
+
+/*============================================
 函数名： Get_Motor_Speed()
 作用:FTM正交解码获取当前速度
 ==========================================*/
 
 void Get_Motor_Speed()
 {
-	Left_Speed.Now_Speed = ftm_quad_get(FTM2);				//获取正交解码脉冲数
-	Right_Speed.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
+	Speed.Left.Now_Speed = ftm_quad_get(FTM2);				//获取正交解码脉冲数
+	Speed.Right.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
 
-	if (Right_Speed.Now_Speed < 0)										//取绝对值
-	{
-		Right_Speed.Now_Speed = -Right_Speed.Now_Speed;
-	}
-	if (Left_Speed.Now_Speed < 0)											//取绝对值
-	{
-		Left_Speed.Now_Speed = -Left_Speed.Now_Speed;
-	}
+	Speed.Base.Now_Speed = (Speed.Left.Now_Speed + Speed.Right.Now_Speed) / 2;//计算平均速度
 
 	ftm_quad_clean(FTM1);														//清正交解码脉冲数
 	ftm_quad_clean(FTM2);														//清正交解码脉冲数
@@ -186,29 +194,28 @@ void Get_Motor_Speed()
 
 void Speed_Chack()
 {
-	if (Left_Speed.Out_Speed >= MAX_SPEED)					//判断速度是否会超过边界
+	if (Speed.Left.Out_Speed >= MAX_SPEED)					//判断速度是否会超过边界
 	{
-		Left_Speed.Out_Speed = MAX_SPEED;
+		Speed.Left.Out_Speed = MAX_SPEED;
 	}
-	else if (Left_Speed.Out_Speed <= MIN_SPEED)				//判断速度是否会超过边界
+	else if (Speed.Left.Out_Speed <= MIN_SPEED)				//判断速度是否会超过边界
 	{
-		Left_Speed.Out_Speed = MIN_SPEED;
+		Speed.Left.Out_Speed = MIN_SPEED;
 	}
-	if (Right_Speed.Out_Speed >= MAX_SPEED)					//判断速度是否会超过边界
+	if (Speed.Right.Out_Speed >= MAX_SPEED)					//判断速度是否会超过边界
 	{
-		Right_Speed.Out_Speed = MAX_SPEED;
+		Speed.Right.Out_Speed = MAX_SPEED;
 	}
-	else if (Right_Speed.Out_Speed <= MIN_SPEED)			//判断速度是否会超过边界
+	else if (Speed.Right.Out_Speed <= MIN_SPEED)			//判断速度是否会超过边界
 	{
-		Right_Speed.Out_Speed = MIN_SPEED;
+		Speed.Right.Out_Speed = MIN_SPEED;
 	}
 
-
-	if ((Right_Speed.Now_Speed < 3) && (Right_Speed.Out_Speed > 90))	//检测系统错误
+	if ((Speed.Right.Now_Speed < 3) && (Speed.Right.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
 	{
-		if ((Left_Speed.Now_Speed < 3) && (Left_Speed.Out_Speed > 90))	//检测系统错误
+		if ((Speed.Left.Now_Speed < 3) && (Speed.Left.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
 		{
-			//System_Error(0);
+			//System_Error(Motor_Stop);
 		}
 	}
 }
@@ -220,14 +227,11 @@ void Speed_Chack()
 
 void FuzzyPID()
 {
-	Left_Speed.P = FuzzyKp(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);			//计算模糊控制的P
-	Right_Speed.P = FuzzyKp(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);	//计算模糊控制的P
+	Speed.Base.P = FuzzyKp(Speed.Base.Error_Speed[Now_Error], Speed.Base.IncrementSpeed);			//计算模糊控制的P
 
-	Left_Speed.I = FuzzyKi(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);			//计算模糊控制的I
-	Right_Speed.I = FuzzyKi(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);	//计算模糊控制的I
+	Speed.Base.I = FuzzyKi(Speed.Base.Error_Speed[Now_Error], Speed.Base.IncrementSpeed);			//计算模糊控制的I
 
-	Left_Speed.D = FuzzyKd(Left_Speed.Error_Speed, Left_Speed.IncrementSpeed);		//计算模糊控制的D
-	Right_Speed.D = FuzzyKd(Right_Speed.Error_Speed, Right_Speed.IncrementSpeed);	//计算模糊控制的D
+	Speed.Base.D = FuzzyKd(Speed.Base.Error_Speed[Now_Error], Speed.Base.IncrementSpeed);		//计算模糊控制的D
 }
 
 /*============================================
@@ -605,85 +609,4 @@ double FuzzyKd(int e, double ec)
 	/********加权平均法解模糊********/
 	Kd_calcu = KdFuzzy[0] * kdRule[0] + KdFuzzy[1] * kdRule[1] + KdFuzzy[2] * kdRule[2] + KdFuzzy[3] * kdRule[3];
 	return Kd_calcu;
-}
-
-/*============================================
-函数名：PID_LearnSelf()
-作用:机器学习修正PID值
-==========================================*/
-/*============================================
-功能说明： 电机PI调节    反馈200，输出2000
-智能型PI调节器(采用位置式，学习型)
-积分分离+分段PI
-根据单片机及编码器特性，积分量化误差可以不计，具体根据Err_speed-Err_speed_old看
-原理根据电力拖动第3版，数字PI调节器
-==========================================*/
-void PID_LearnSelf()
-{
-	int16 x1, x2, x3;
-	x1 = Left_Speed.Error_Speed;
-	Left_Speed.Intergate_Speed += Left_Speed.Error_Speed;
-	x2 = Left_Speed.Intergate_Speed;
-	x3 = Left_Speed.err_last - Left_Speed.Error_Speed;
-
-	if (x2 >= 300)
-		x2 = 300;
-	else if (x2 <= -300)
-		x2 = -300;
-
-	if (x1*x3<0)
-	{
-		Left_Speed.P -= 0.001;
-		if (x1*x2>0)
-			Left_Speed.I += 0.001;
-		else if (x1*x2 < 0)
-			Left_Speed.I -= 0.001;
-	}
-	else if (x1*x3>0)
-	{
-		Left_Speed.P += 0.001;
-		if (x1*x2>0)
-			Left_Speed.I += 0.001;
-		else if (x1*x2 < 0)
-			Left_Speed.I -= 0.001;
-	}
-
-	if (Left_Speed.P < 0)
-		Left_Speed.P = 0;
-	if (Left_Speed.I < 0)
-		Left_Speed.I = 0;
-
-
-	x1 = Right_Speed.Error_Speed;
-	Right_Speed.Intergate_Speed += Right_Speed.Error_Speed;
-	x2 = Right_Speed.Intergate_Speed;
-	x3 = Right_Speed.err_last - Right_Speed.Error_Speed;
-
-	if (x2 >= 300)
-		x2 = 300;
-	else if (x2 <= -300)
-		x2 = -300;
-
-	if (x1*x3<0)
-	{
-		Right_Speed.P -= 0.001;
-		if (x1*x2>0)
-			Right_Speed.I += 0.001;
-		else if (x1*x2 < 0)
-			Right_Speed.I -= 0.001;
-	}
-	else if (x1*x3>0)
-	{
-		Right_Speed.P += 0.001;
-		if (x1*x2>0)
-			Right_Speed.I += 0.001;
-		else if (x1*x2 < 0)
-			Right_Speed.I -= 0.001;
-	}
-
-	if (Right_Speed.P < 0)
-		Right_Speed.P = 0;
-	if (Right_Speed.I < 0)
-		Right_Speed.I = 0;
-
 }

@@ -1,6 +1,5 @@
 #include "data.h"
-speed Left_Speed;										//声明一个"speed类"的"对象"，左轮数据
-speed Right_Speed;									//声明一个"speed类"的"对象"，右轮数据
+speed Speed;											//声明一个"speed类"的"对象"，全局储存速度信息
 
 inductance Road_Data[AMP_MAX];			//声明一个"inductance类"的"对象"数组，电感信息
 

@@ -1,67 +1,71 @@
 #include "include.h"
 #include "peripheral.h"
-
+#include "stdlib.h"
+#include "string.h"
 /*============================================
 函数名：Stop_Car_Init()
 作用：停车检测初始化
 ==========================================*/
 
-/*void Stop_Car_Init()
-{//不清楚上升沿还是下降沿
-	port_init(CAR_STOP, ALT1 | IRQ_FALLING | PULLUP);			//初始化停车干簧管，下降沿中断
-	set_vector_handler(PORTE_VECTORn, Stop_Car);				//设置停车中断向量
-	enable_irq(PORTE_IRQn);										//使能向量
-}*/
+void Stop_Car_Init()
+{
+	gpio_init(REED, GPI, 0);                       //干簧管初始化
+}
 
 /*============================================
 函数名：Stop_Car()
 作用：停车检测
 ==========================================*/
 
-/*void Stop_Car()
+void Stop_Car()
 {
-	if (PORTA_ISFR & (1 << CAR_STOP_NUM))						//确定中断管脚号
+	if (gpio_get(REED) != 0)
 	{
-		PORTA_ISFR = (1 << CAR_STOP_NUM);						//清除中断标志位
-
-		disable_irq(LPTMR_IRQn);								//禁止低功耗定时计数器中断
-		Right_Speed.Out_Speed = 0;								//调整速度为0
-		Left_Speed.Out_Speed = 0;								//调整速度为0
-		ftm_pwm_duty(MOTOR_FTM, MOTOR1_PWM, 0);					//电机输出
-		ftm_pwm_duty(MOTOR_FTM, MOTOR2_PWM, 0);					//电机输出
-		ftm_pwm_duty(MOTOR_FTM, MOTOR3_PWM, 0);					//电机输出
-		ftm_pwm_duty(MOTOR_FTM, MOTOR4_PWM, 0);					//电机输出
+		System_Error(Car_Stop);
 	}
-}*/
+}
 
 /*============================================
 函数名：Send_Data()
-作用：nrf24l01发送
+作用：蓝牙串口发送
 ==========================================*/
 
 void Send_Data()
 {
-	counter i = 0;
-	unsigned char var[DATA_PACKET];
-	var[0] = 0x03;
-        var[1] = 0xfc;
-	for (i=2; i < 30; i++)
+	if (Service.BlueToothBase.AllowedSendData)
 	{
-          var[i] = Road_Data[i-2].AD_Value_fixed;
-	}
-	var[2 + AMP_MAX] = 0xfc;
-	var[3 + AMP_MAX] = 0x03;
-
-	if (nrf_tx(var, DATA_PACKET)==1)
-	{
-		while (nrf_tx_state() == NRF_TXING);
-		if (!(NRF_TX_OK == nrf_tx_state()))
+		char var[AMP_MAX];
+		for (counter i = 0; i < AMP_MAX; i++)
 		{
-			OLED_CLS();
-			OLED_Print(Position(Line1), "nrf24l01 send error");
-			DELAY_MS(100);
+			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
 		}
+		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}
+}
+
+/*============================================
+函数名：Receive_Data()
+作用：蓝牙串口接收
+==========================================*/
+
+void Receive_Data()
+{
+	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
+	{
+		led(LED1, LED_ON);
+		printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
+		if (hasData("S"))
+		{
+			System_Error(user_Stop);
+		}
+		else if (hasData("..."))
+		{
+
+		}
+		memset(Service.BlueToothBase.ReceiveArea, 0, 20);		//清零数组防止一些奇怪的情况
+	}
+	else
+		led(LED1, LED_OFF);
 }
 
 /*============================================
@@ -85,48 +89,61 @@ void Init_Key()
 
 void OLED_Interface()
 {
-	OLED_Print(15, 0, "718创新实验室");
-	OLED_Print(27, 2, "untitled组");
-	OLED_Print(Position(Line3), "调试模式   <-");
-	OLED_Print(Position(Line4), "发布模式");
-	mode flag = 0;											//模式判断标志位
-
-	while (true)
+	OLED_Print(Position(Line1), "Energy Star");
+	OLED_Print(Position(Line2), "inductance");
+	OLED_Print(Position(Line3), "debug");
+	OLED_Print(Position(Line4), "relese");
+	Service.RunMode = Debug_Mode;							//模式判断标志位
+	OLED_Print(100, 2 * Service.RunMode, "<-");
+	while (1)
 	{
-          DELAY_MS(100);
-		if (gpio_get(Key1) != 0)							//确认按钮
+		OLED_Print(100, 2 * Service.RunMode, "<-");
+		DELAY_MS(100);										//刷新指针位置
+		if (gpio_get(Key1) != 0)
 		{
-			DELAY_MS(10);									//消抖延时
+			DELAY_MS(10);
 			if (gpio_get(Key1) != 0)
 			{
-                          OLED_CLS();
-						  if (0 == flag % 2)
-						  {
-							  Debug_Init();
-						  }
+				OLED_CLS();
+
+				switch (Service.RunMode)
+				{
+				case inductance_Mode:
+					Debug_Init();
+					Service.MotorBase.AllowRun = false;
+					break;
+
+				case Debug_Mode:
+					Debug_Init();
+					Service.MotorBase.AllowRun = true;
+					break;
+
+				case Release_Mode:
+					Service.MotorBase.AllowRun = true;
+					OLED_CLS();
+					break;
+
+				default:
+					System_Error(No_Mode);
+					break;
+				}
+				break;
 			}
-			break; 
 		}
 
-		if (gpio_get(Key4) != 0)						//选择按钮
+		if (gpio_get(Key4) != 0)
 		{
-			DELAY_MS(10);								//消抖延时
+			DELAY_MS(10);
 			if (gpio_get(Key4) != 0)
 			{
-				flag++;
 				OLED_CLS();
-				OLED_Print(15, 0, "718创新实验室");
-				OLED_Print(27, 2, "untitled组");
-				if (0 == flag % 2)
-				{
-					OLED_Print(Position(Line3), "调试模式   <-");
-					OLED_Print(Position(Line4), "发布模式");
-				}
-				else
-				{
-					OLED_Print(Position(Line3), "调试模式");
-					OLED_Print(Position(Line4), "发布模式   <-");
-				}
+				OLED_Print(Position(Line1), "Energy Star");
+				OLED_Print(Position(Line2), "inductance");
+				OLED_Print(Position(Line3), "debug");
+				OLED_Print(Position(Line4), "relese");
+				Service.RunMode++;
+				if (Service.RunMode >= Max_Mode)
+					Service.RunMode = inductance_Mode;
 			}
 		}
 	}
@@ -139,64 +156,77 @@ void OLED_Interface()
 
 void DeBug_Interface()
 {
-	data temp[10];
-	if (Service.flag == Inductance_Interface)
+	char temp[10];
+	switch (Service.OLEDbase.OLED_Interface)
 	{
+	case Inductance_Interface:
 		OLED_CLS();
-		OLED_Print(Position(Line1), "电感调试");
-		sprintf(temp, "    FL=%d FR=%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
+		OLED_Print(Position(Line1), "inductance");
+		sprintf(temp, "FL%dFR%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "L=%d R=%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
+		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
-		sprintf(temp, "M    %d", Road_Data[MIDDLE].AD_Value_fixed);
+		sprintf(temp, "M=%d", Road_Data[MIDDLE].AD_Value_fixed);
 		OLED_Print(Position(Line4), temp);
-	}
-	else if (Service.flag == Speed_Interface)
-	{
-		OLED_CLS();																															//先清屏
-		sprintf(temp, "out=L%d R%d", Left_Speed.Out_Speed, Right_Speed.Out_Speed);					//电机输出功率
+		break;
+
+	case Speed_Interface:
+		OLED_CLS();																														//先清屏
+		sprintf(temp, "out L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);					//电机输出功率
 		OLED_Print(Position(Line1), temp);
-		sprintf(temp, "now=L%d R%d", Left_Speed.Now_Speed, Right_Speed.Now_Speed);				//当前速度
+		sprintf(temp, "now L%dR%d", Speed.Left.Now_Speed, Speed.Right.Now_Speed);				//当前速度
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "aim=L%d R%d", Left_Speed.Aim_Speed, Right_Speed.Aim_Speed);					//目标速度
+		sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
 		OLED_Print(Position(Line3), temp);
-		sprintf(temp, "set=L%d R%d", Left_Speed.Go_Speed, Right_Speed.Go_Speed);						//设定速度
+		sprintf(temp, "%d %d", Speed.Base.Aim_Speed, Speed.Base.Now_Speed);																//设定速度
 		OLED_Print(Position(Line4), temp);
-	}
-	else if (Service.flag == PID_Interface)
-	{
+
+		if (gpio_get(Key2) != 0)
+		{
+			Speed.Base.Aim_Speed += 2;
+		}
+		if (gpio_get(Key4) != 0)
+		{
+			if (Speed.Base.Aim_Speed<5)
+				Speed.Base.Aim_Speed = 1;
+			else
+				Speed.Base.Aim_Speed -= 2;
+		}
+		break;
+
+	case Direction_Interface:
 		OLED_CLS();
-		sprintf(temp, "%d", Direction.err);
+		sprintf(temp, "out%d", Direction.PIDbase.PID_Out_Speed);
 		OLED_Print(Position(Line1), temp);
-		sprintf(temp, "P %.2f %.2f", Left_Speed.P, Right_Speed.P);
+		sprintf(temp, "err%d", Direction.err);
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "I %.2f %.2f", Left_Speed.I, Right_Speed.I);
+		sprintf(temp, "Fix%d", Direction.PIDbase.Error_Speed[Now_Error]);
 		OLED_Print(Position(Line3), temp);
-		sprintf(temp, "D %.1f %.1f", Left_Speed.D, Right_Speed.D);
+		sprintf(temp, "%d %d %d", Direction.sum[0], Direction.sum[1], Direction.sum[2]);
 		OLED_Print(Position(Line4), temp);
+		break;
+
+	case Fuzzy_interface:
+		OLED_CLS();
+		sprintf(temp, "Fuzzy%d", (int)Fuzzy_Direction.Position.eAngle * 100);
+		OLED_Print(Position(Line1), temp);
+		break;
+
+	default:
+		sprintf(temp, "No Interface");
+		OLED_Print(Position(Line1), temp);
+		break;
 	}
 
-	if (gpio_get(Key2) != 0)
-	{
-		Left_Speed.Go_Speed += 10;
-		Right_Speed.Go_Speed += 10;
-	}
-	if (gpio_get(Key4) != 0)
-	{
-		Left_Speed.Go_Speed -= 10;
-		Right_Speed.Go_Speed -= 10;
-
-		if (Left_Speed.Go_Speed < 0)
-			Left_Speed.Go_Speed = 0;
-		if (Right_Speed.Go_Speed < 0)
-			Right_Speed.Go_Speed = 0;
-	}
-	
 	if (gpio_get(Key1) != 0)
 	{
-		Service.flag++;
-		if (Service.flag >=MAX_Interface)
-			Service.flag = 0;
+		DELAY_MS(10);
+		if (gpio_get(Key1) != 0)
+		{
+			Service.OLEDbase.OLED_Interface++;
+			if (Service.OLEDbase.OLED_Interface >= MAX_Interface)
+				Service.OLEDbase.OLED_Interface = Inductance_Interface;
+		}
 	}
 }
 
@@ -207,15 +237,12 @@ void DeBug_Interface()
 
 void Debug_Init()
 {
-	Service.isDebug = true;
-	Service.flag = 0;
+	Service.OLEDbase.OLED_Renew = 0;
+	Service.OLEDbase.OLED_Interface = Speed_Interface;
+	Service.BlueToothBase.AllowedReceiveData = true;
+	Service.BlueToothBase.AllowedSendData = true;
+	init_LED();
 	OLED_CLS();
-	while (!nrf_init())
-	{
-		OLED_Print(Position(Line1), "nrf24l01 Loading......");
-	}
-        set_vector_handler(PORTE_VECTORn ,PORTE_IRQHandler);    			//设置 PORTE 的中断服务函数为 PORTE_VECTORn
-        enable_irq(PORTE_IRQn);
 }
 
 /*============================================
@@ -226,26 +253,49 @@ void Debug_Init()
 void System_Error(error Error_Number)
 {
 	disable_irq(LPTMR_IRQn);									//禁止低功耗定时计数器中断
-	Right_Speed.Out_Speed = 0;								//调整速度为0
-	Left_Speed.Out_Speed = 0;								//调整速度为0
+	Speed.Right.Out_Speed = 0;								//调整速度为0
+	Speed.Left.Out_Speed = 0;								//调整速度为0
 	Motor_Control();												//控制电机
-	if (Error_Number == Motor_Stop)
+
+	switch (Error_Number)
 	{
+	case Motor_Stop:
 		OLED_Init();
-		OLED_Print(0, 0, "电机堵转");
+		OLED_Print(Position(Line1), "motor error");
+		break;
+
+	case Taget_Lost:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Taget Lost");
+		Service.InductanceBase.InductanceLost = 0;
+		break;
+
+	case Car_Stop:
+		OLED_Init();
+		OLED_Print(Position(Line1), "terminal point");
+		break;
+
+	case No_Mode:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Mode Error");
+		break;
+
+	case user_Stop:
+		OLED_Init();
+		OLED_Print(Position(Line1), "user stop");
+		OLED_Print(Position(Line2), "the Car");
+		break;
+
+	default:
+		OLED_Init();
+		OLED_Print(Position(Line1), "Unknown Error");
+		break;
 	}
-        while(1);
-}
 
-/*============================================
-函数名：Debug()
-作用：调试模式定时中断
-==========================================*/
-
-void Debug()
-{
-		DeBug_Interface();
-		//Send_Data();
+	while (!gpio_get(Key1));
+	DELAY_MS(10);
+	while (!gpio_get(Key1));
+	enable_irq(LPTMR_IRQn);									//开启低功耗定时计数器中断
 }
 
 /*============================================
@@ -260,7 +310,43 @@ char CharAbs(char a)
 	return a;
 }
 
-void PORTE_IRQHandler()
+/*============================================
+函数名：init_LED()
+作用：LED初始化函数
+==========================================*/
+
+void init_LED()
 {
-    PORT_FUNC(E,27,nrf_handler);    //PTE27触发中断,执行 nrf_handler函数
+	led_init(LED0);
+	led_init(LED1);
+	led_init(LED2);
+	led_init(LED3);
+}
+
+/*============================================
+函数名：LED_Interface()
+作用：LED显示函数
+==========================================*/
+
+void LED_Interface()
+{
+	if (Speed.Left.Out_Speed > Speed.Right.Out_Speed)
+	{
+		led(LED3, LED_ON);
+		led(LED0, LED_OFF);
+	}
+	else if (Speed.Right.Out_Speed > Speed.Left.Out_Speed)
+	{
+		led(LED3, LED_OFF);
+		led(LED0, LED_ON);
+	}
+
+	if (Fuzzy_Direction.isMatched)
+	{
+		led(LED2, LED_ON);
+	}
+	else
+	{
+		led(LED2, LED_OFF);
+	}
 }

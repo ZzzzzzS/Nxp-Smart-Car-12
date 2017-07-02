@@ -1,9 +1,6 @@
 #include "include.h"
 #include "data.h"
 
-#define LEFT_WEIGHT				1						//定义转向权重
-#define RIGHT_WEIGHT	        1						//定义转向权重
-
 /*============================================
 电感顺序：
 	左 中 上左 上右 右
@@ -21,24 +18,11 @@
 
 void ADC_Init()
 {
-	adc_init(AMP1);													//初始化AMP1通道，PTB0
-	adc_init(AMP2);													//初始化AMP2通道，PTB1
-	adc_init(AMP3);									 				//初始化AMP3通道，PTB2
-	adc_init(AMP4);													//初始化AMP4通道，PTB3
-	adc_init(AMP5);													//初始化AMP5通道，PTB4
-
-	for (counter i = 0; i < AMP_MAX; i++)				//滤波权重表赋初值
-	{
-		//注意:修改权重值时请修改data.h->MAX_WEIGHT!
-		Road_Data[i].AD_Weight[0] = 1;
-		Road_Data[i].AD_Weight[1] = 2;
-		Road_Data[i].AD_Weight[2] = 3;
-		Road_Data[i].AD_Weight[3] = 4;
-	}
-
-	Direction.P = 0.006;
-	Direction.D = 0;
-	Direction.I = 0;
+	adc_init(AD1);													//初始化AMP1通道，PTB0
+	adc_init(AD2);													//初始化AMP2通道，PTB1
+	adc_init(AD3);									 				//初始化AMP3通道，PTB2
+	adc_init(AD4);													//初始化AMP4通道，PTB3
+	adc_init(AD5);													//初始化AMP5通道，PTB4
 
 }
 
@@ -51,12 +35,13 @@ void ADC_Init()
 void Direction_Control()
 {
 	Get_AD_Value();
-	//Similarity_Count_Fuzzy();
-	//Direction_Control_Fuzzy();
-	//if (!Fuzzy_Direction.isMatched)
-	//{
+	Similarity_Count_Fuzzy();
+	Direction_Control_Fuzzy();
+	if (!Fuzzy_Direction.isMatched)
+	{
 		Direction_Calculate();
-	//}
+	}
+	Direction_PID();
 }
 
 /*============================================
@@ -72,30 +57,42 @@ void Direction_Control()
 
 void Get_AD_Value()
 {
-	Road_Data[0].AD_Value = adc_once(AMP1, ADC_8bit);				//采集过程
-	Road_Data[1].AD_Value = adc_once(AMP2, ADC_8bit);				//采集过程
-	Road_Data[2].AD_Value = adc_once(AMP3, ADC_8bit);				//采集过程
-	Road_Data[3].AD_Value = adc_once(AMP4, ADC_8bit);				//采集过程
-	Road_Data[4].AD_Value = adc_once(AMP5, ADC_8bit);				//采集过程
+	Road_Data[LEFT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
+	Road_Data[RIGHT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
+	Road_Data[MIDDLE].AD_Value = adc_once(AD3, ADC_8bit);				//采集过程
+	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD4, ADC_8bit);		//采集过程
+	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
+	//注意修改通道初始化
 	//注意修改通道初始化
 
 	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		for (counter j = 0; j < 3; j++)						//对电感数据队列移位操作
+		for (counter j = 0; j < 2; j++)						//对电感数据队列移位操作
 		{
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
-		Road_Data[i].AD_Value_Old[3] = Road_Data[i].AD_Value;		//更新队首数据值
+		Road_Data[i].AD_Value_Old[2] = Road_Data[i].AD_Value;		//更新队首数据值
 	}
 
 	for (counter i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
 		Road_Data[i].AD_Value = 0;
-		for (counter j = 0; j < 4; j++)
+		for (counter j = 0; j < 3; j++)
 		{
-			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * Road_Data[i].AD_Weight[j];
+			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * (j + 1);
 		}
-		Road_Data[i].AD_Value_fixed=Road_Data[i].AD_Value/MAX_WEIGHT;
+		Road_Data[i].AD_Value_fixed = Road_Data[i].AD_Value / 6;
+	}
+
+	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
+	{
+		Service.InductanceBase.InductanceLost++;
+		if (Service.InductanceBase.InductanceLost >= 50);
+		//System_Error(Taget_Lost);
+	}
+	else
+	{
+		Service.InductanceBase.InductanceLost = 0;
 	}
 }
 
@@ -112,30 +109,82 @@ void Get_AD_Value()
 
 void Direction_Calculate()
 {
-	Direction.sum[0] = 100*(Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);				//差比和计算
-	Direction.sum[1] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);			//差比和计算
-	Direction.sum[2] = 100*(Road_Data[MIDDLE].AD_Value_fixed - Road_Data[RIGHT].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);		//差比和计算
 
-	char a = 1, b = 1;																												//记录正负，防止二次函数拟合后正负错误
-	if (Direction.sum[1] < 0)																										//记录正负，防止二次函数拟合后正负错误									
-		a = -1;
-	if (Direction.sum[2] < 0)																										//记录正负，防止二次函数拟合后正负错误
-		b = -1;
+	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
+	{
+		Direction.sum[0] = 100 * ((1 * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) - (1 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / (1 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed + 1 * Road_Data[FRONT_RIGHT].AD_Value_fixed);				//差比和计算
+	}
+	else
+	{
+		Direction.sum[0] = 0;
+	}
+	if (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed != 0)
+	{
+		Direction.sum[1] = 100 * (Road_Data[LEFT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed);			//差比和计算
+	}
+	else
+	{
+		Direction.sum[1] = 0;
+	}
+	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[MIDDLE].AD_Value_fixed != 0)
+	{
+		Direction.sum[2] = 100 * (Road_Data[RIGHT].AD_Value_fixed - Road_Data[MIDDLE].AD_Value_fixed) / (Road_Data[MIDDLE].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);		//差比和计算
+	}
+	else
+	{
+		Direction.sum[2] = 0;
+	}
 
-	Direction.sum[2] = a1*Direction.sum[2] * Direction.sum[2] + b1*Direction.sum[2] + c1;		//差比和拟合过程
-	Direction.sum[1] = a2*Direction.sum[1] * Direction.sum[1] + b1*Direction.sum[1] + c2;			//差比和拟合过程
+	Direction.sum[2] = Rk*Direction.sum[2] + Rb;
+	Direction.sum[1] = Lk*Direction.sum[1] + Lb;
 
-	Direction.sum[1] *= a;																										//处理拟合正负
-	Direction.sum[2] *= b;																										//处理拟合正负
+	Direction.err = (Direction.sum[0] * 5 + Direction.sum[1] + Direction.sum[2]) / 7;						//计算出最终误差
 
-	Direction.err = (Direction.sum[0] + Direction.sum[1] + Direction.sum[2]) / 3;						//计算出最终误差
+	Direction.PIDbase.Error_Speed[Now_Error] = Direction.err;
 
-    if(Direction.err<5&&Direction.err>-5)
-		Direction.err=0;
-	else if(Direction.err>30)
-	   Direction.err*=1.2;
-	else if(Direction.err<-30)
-		Direction.err*=1.2;
+	if (Direction.sum[0] > 0)
+	{
+		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[2]) / 7;
+	}
+	if (Direction.sum[0] < 0)
+	{
+		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
+	}
+
+#define more 40
+#define less 15
+
+	Direction.PIDbase.D = 4.5;
+	Direction.PIDbase.P = 0.15;
+
+	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
+	{
+		Direction.PIDbase.P *= 0.8;
+		Direction.PIDbase.D *= 0.5;
+	}
+	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
+	{
+		Direction.PIDbase.P *= 1.35;
+		Direction.PIDbase.D *= 1.5;
+	}
+	if (Direction.PIDbase.Error_Speed[Now_Error] < -more)
+	{
+		Direction.PIDbase.P *= 1.35;
+		Direction.PIDbase.D *= 1.5;
+	}
+#undef more
+#undef less
+
+	Speed.Base.Aim_Speed = 15;
+
+	/*if (Direction.err_Fixed > 20)
+	{
+	Speed.Base.Aim_Speed-=Direction.err_Fixed*0.04;
+	}
+	else if (Direction.err_Fixed < -20)
+	{
+	Speed.Base.Aim_Speed+=Direction.err_Fixed*0.04;
+	}*/
 }
 
 /*============================================
@@ -145,17 +194,19 @@ void Direction_Calculate()
 
 void Direction_PID()
 {
-	char err_Delta = Direction.err - Direction.Error_Last;
-	Direction.Error_Last = Direction.err;
+	int16 err_Delta = Direction.PIDbase.Error_Speed[Now_Error] - Direction.PIDbase.Error_Speed[last_Error];
+	Direction.PIDbase.Error_Speed[last_Error] = Direction.PIDbase.Error_Speed[Now_Error];
 
-	Direction.PID_Out_Speed = Direction.P*Direction.err;
-	Direction.PID_Out_Speed += Direction.D*err_Delta;
+	Direction.PIDbase.PID_Out_Speed = Direction.PIDbase.P*Direction.PIDbase.Error_Speed[Now_Error];
+	Direction.PIDbase.PID_Out_Speed += Direction.PIDbase.D * err_Delta;
 
-	Left_Speed.Turn_Speed = -Direction.PID_Out_Speed;
-	Right_Speed.Turn_Speed = Direction.PID_Out_Speed;
+	if (Direction.PIDbase.PID_Out_Speed >= 10)
+		Direction.PIDbase.PID_Out_Speed = 10;
+	else if (Direction.PIDbase.PID_Out_Speed <= -10)
+		Direction.PIDbase.PID_Out_Speed = -10;
 
-	Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
-	Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;		//计算最终目标速度
+	Speed.Left.Turn_Speed = Direction.PIDbase.PID_Out_Speed;
+	Speed.Right.Turn_Speed = -Direction.PIDbase.PID_Out_Speed;
 }
 
 /*============================================
@@ -165,21 +216,21 @@ void Direction_PID()
 
 void eRule_Init_Fuzzy()
 {
-	Fuzzy_Direction.eRule[0].eAngle = 0;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[1].eAngle = 0;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[2].eAngle = 0;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[3].eAngle = 0;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[4].eAngle = 0;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[5].eAngle = 0;					//初始化角度相似规则
-	//注意修改MAX_FUZZY_RULE!
+	Fuzzy_Direction.eRule[0].eAngle = 0.887;					//初始化角度相似规则
+	Fuzzy_Direction.eRule[1].eAngle = 0;							//初始化角度相似规则
+	Fuzzy_Direction.eRule[2].eAngle = 0;							//初始化角度相似规则
+	Fuzzy_Direction.eRule[3].eAngle = 0;							//初始化角度相似规则
+	Fuzzy_Direction.eRule[4].eAngle = 0;							//初始化角度相似规则
+	Fuzzy_Direction.eRule[5].eAngle = 0;							//初始化角度相似规则
+																	//注意修改MAX_FUZZY_RULE!
 
-	Fuzzy_Direction.eRule[0].eLength = 0;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[1].eLength = 0;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[2].eLength = 0;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[3].eLength = 0;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[4].eLength = 0;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[5].eLength = 0;				//初始化长度相似规则
-	//注意修改MAX_FUZZY_RULE!
+	Fuzzy_Direction.eRule[0].eLength = 97.76;				//初始化长度相似规则
+	Fuzzy_Direction.eRule[1].eLength = 0;					//初始化长度相似规则
+	Fuzzy_Direction.eRule[2].eLength = 0;					//初始化长度相似规则
+	Fuzzy_Direction.eRule[3].eLength = 0;					//初始化长度相似规则
+	Fuzzy_Direction.eRule[4].eLength = 0;					//初始化长度相似规则
+	Fuzzy_Direction.eRule[5].eLength = 0;					//初始化长度相似规则
+															//注意修改MAX_FUZZY_RULE!
 
 }
 
@@ -200,7 +251,7 @@ void Similarity_Count_Fuzzy()
 	float eDenominator = 0;														//余弦分母/临时变量
 	float eNumerator = 0;															//余弦分子/长度计算临时变量
 
-	/*****误差角度计算*****/
+																					/*****误差角度计算*****/
 	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分子
 	{
 		eNumerator += Road_Data[j].AD_Value_fixed;
@@ -208,20 +259,22 @@ void Similarity_Count_Fuzzy()
 
 	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分母
 	{
-			eDenominator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
+		eDenominator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
 	}
-	eDenominator= sqrt(eDenominator);//需要研究更好的开方函数
+	eDenominator = sqrt(eDenominator);//需要研究更好的开方函数
+	eDenominator *= 2.236;
+
 
 	Fuzzy_Direction.Position.eAngle = eNumerator / eDenominator;	//计算与(1,1,1,1,...)的夹角余弦值
 
-	/*****误差长度计算*****/
+																	/*****误差长度计算*****/
 	for (counter j = 0; j < AMP_MAX; j++)									//计算向量长度
 	{
 		eNumerator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
 	}
 	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);			//储存计算出的长度
 
-	/*****隶属度计算*****/											
+																	/*****隶属度计算*****/
 	for (counter j = 0; j < MAX_FUZZY_RULE; j++)
 	{
 		Fuzzy_Direction.eGrade[j].eAngle = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
@@ -236,47 +289,64 @@ void Similarity_Count_Fuzzy()
 
 void Direction_Control_Fuzzy()
 {
-	int16 e=0;
-	Fuzzy_Direction.isMatched = false;													//标记为未匹配到
-
-	for (counter i = 0; i < MAX_FUZZY_RULE; i++)
+	static  int16 e;
+	led(LED2, LED_OFF);
+	Fuzzy_Direction.isMatched--;
+	if (Fuzzy_Direction.isMatched > 0)
 	{
-		if (Fuzzy_Direction.eGrade[i].eAngle < 0.1)										//匹配相似度90%
+		Fuzzy_Direction.isMatched--;
+	}
+	else if (Fuzzy_Direction.isMatched < 0)
+	{
+		Fuzzy_Direction.isMatched = 0;
+	}
+	if (Fuzzy_Direction.isMatched == 0)
+	{
+		for (counter i = 0; i < MAX_FUZZY_RULE; i++)
 		{
-			Fuzzy_Direction.isMatched = true;												//匹配成功标记
-			if (0 == i)																					//根据匹配结果执行不同操作
+			if (Fuzzy_Direction.eGrade[i].eAngle < 0.05&&Fuzzy_Direction.eGrade[i].eAngle > -0.05)										//匹配相似度90%
 			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-			}
-			else if (1 == i)																			//根据匹配结果执行不同操作
-			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-			}
-			else if (2 == i)																			//根据匹配结果执行不同操作
-			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-			}
-			else if (3 == i)																			//根据匹配结果执行不同操作
-			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-			}
-			else if (4 == i)																			//根据匹配结果执行不同操作
-			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-			}
-			else if (5 == i)																			//根据匹配结果执行不同操作
-			{
-				e += 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+
+				if (0 == i)																					//根据匹配结果执行不同操作
+				{
+					if (Fuzzy_Direction.eGrade[i].eLength < 15 && Fuzzy_Direction.eGrade[i].eLength > -15)
+					{
+						e = 250 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+						led(LED2, LED_ON);
+						Fuzzy_Direction.isMatched = 5;//匹配成功标记
+					}
+				}
+				else if (1 == i)																			//根据匹配结果执行不同操作
+				{
+					if (Fuzzy_Direction.eGrade[i].eLength < 10 && Fuzzy_Direction.eGrade[i].eLength > -10)
+					{
+						e = 250 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+						Fuzzy_Direction.isMatched = 5;												//匹配成功标记
+						led(LED2, LED_ON);
+					}
+				}
+				else if (2 == i)																			//根据匹配结果执行不同操作
+				{
+					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+				}
+				else if (3 == i)																			//根据匹配结果执行不同操作
+				{
+					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+				}
+				else if (4 == i)																			//根据匹配结果执行不同操作
+				{
+					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+				}
+				else if (5 == i)																			//根据匹配结果执行不同操作
+				{
+					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
+				}
 			}
 		}
 	}
-	
+
 	if (Fuzzy_Direction.isMatched)
 	{
-		Left_Speed.Turn_Speed = e;																					//计算差速
-		Right_Speed.Turn_Speed = -e;
-
-		Left_Speed.Aim_Speed = Left_Speed.Turn_Speed + Left_Speed.Go_Speed;			//计算最终目标速度
-		Right_Speed.Aim_Speed = Right_Speed.Turn_Speed + Right_Speed.Go_Speed;
+		Direction.PIDbase.Error_Speed[Now_Error] = e;
 	}
 }
