@@ -1,0 +1,22 @@
+diff a/App/Car_System.c b/App/Car_System.c	(rejected hunks)
+@@ -42,10 +42,20 @@
+ 
+ void LPTMR_IRQHandler()
+ {
++<<<<<<< HEAD
++	Get_AD_Value();													//��ȡADC��ģת������ֵ
++	Direction_Control();											//���Ŀ��ת��Ƕ�
++	Get_Motor_Speed();												//��ȡFTM������������ɼ�����ֵ
++	Motor_PID();													//�Ե����������ʽPID����
++	Motor_Control();												//��������ٶ�
++
++	LPTMR_Flag_Clear();												//����жϱ�־λ��׼����һ���ж�
++=======
+ 	Direction_Control();
+ 	Speed_Control();
+ 	Stop_Car();
+     LPTMR_Flag_Clear();												//����жϱ�־λ��׼����һ���ж�
++>>>>>>> 最终开发分�?
+ }
+ 
+ /*============================================

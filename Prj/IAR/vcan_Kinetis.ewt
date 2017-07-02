@@ -4650,9 +4650,6 @@
       <name>$PROJ_DIR$\..\..\App\Inc\inductance.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\App\main.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\App\MK60_conf.c</name>
     </file>
     <file>

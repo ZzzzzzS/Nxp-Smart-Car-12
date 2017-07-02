@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ELF Linker V7.80.4.12462/W32 for ARM                02/Jul/2017  23:40:19
+# IAR ELF Linker V7.80.4.12462/W32 for ARM                02/Jul/2017  23:54:46
 # Copyright 2007-2017 IAR Systems AB.
 #
 #    Output file  =  
@@ -20,8 +20,6 @@
 #        ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Obj\ff.o"
 #        "D:\m1899\Documents\单片机学习\Powered by
 #        ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Obj\inductance.o"
-#        "D:\m1899\Documents\单片机学习\Powered by
-#        ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Obj\main.o"
 #        "D:\m1899\Documents\单片机学习\Powered by
 #        ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Obj\misc.o"
 #        "D:\m1899\Documents\单片机学习\Powered by
@@ -238,8 +236,7 @@ initialize manually with packing = copy, complex ranges { section .textrw };
   .iar.init_table      const    0x0000d9ec    0x10  - Linker created -
   .text                ro code  0x0000d9fc    0x1a  cmain.o [5]
   .text                ro code  0x0000da16     0x4  low_level_init.o [3]
-  .text                ro code  0x0000da1a     0x2  main.o [1]
-  .text                ro code  0x0000da1c     0x4  exit.o [3]
+  .text                ro code  0x0000da1a     0x4  exit.o [3]
   .text                ro code  0x0000da20     0xa  cexit.o [5]
   .text                ro code  0x0000da2c     0xc  XXexit.o [5]
   .rodata              const    0x0000da38    0x10  peripheral.o [1]
@@ -353,7 +350,6 @@ D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Pr
     VCAN_computer.o          64                 4
     data.o                                             300
     inductance.o          2 644                          2
-    main.o                    2
     misc.o                   80                96
     motor.o                 960
     peripheral.o          1 764               260
@@ -361,7 +357,7 @@ D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Pr
     system_MK60DZ10.o       324                         12
     vectors.o                               1 040
     ------------------------------------------------------
-    Total:               15 414       80    6 025      519
+    Total:               15 412       80    6 025      519
 
 command line: [2]
     ------------------------------------------------------
@@ -401,7 +397,7 @@ rt7M_tl.a: [5]
     ------------------------------------------------------
     Total:                  198
 
-    Gaps                      4                 6
+    Gaps                      6                 6
     Linker created            8                19
 ----------------------------------------------------------
     Grand Total:         17 338       80    6 054      523
@@ -542,13 +538,13 @@ adc_once                0x0000907b   0x50  Code  Gb  MK60_adc.o [1]
 adc_start               0x000090cb   0x44  Code  Lc  MK60_adc.o [1]
 assert_failed           0x000096b5   0x7e  Code  Gb  MK60_conf.o [1]
 bus_clk_khz             0x1fff0664    0x4  Data  Gb  system_MK60DZ10.o [1]
-common_startup          0x0000d26b   0x98  Code  Gb  system_MK60DZ10.o [1]
+common_startup          0x0000d26d   0x98  Code  Gb  system_MK60DZ10.o [1]
 core_clk_khz            0x1fff065c    0x4  Data  Gb  system_MK60DZ10.o [1]
 core_clk_mhz            0x1fff0660    0x4  Data  Gb  system_MK60DZ10.o [1]
 default_isr             0x00009749   0x68  Code  Gb  MK60_conf.o [1]
 eRule_Init_Fuzzy        0x000089c7   0x66  Code  Gb  inductance.o [1]
 enter_fputc             0x00009735   0x14  Code  Gb  MK60_conf.o [1]
-exit                    0x0000da1d    0x4  Code  Gb  exit.o [3]
+exit                    0x0000da1b    0x4  Code  Gb  exit.o [3]
 flexbus_8080_init       0x0000ade1  0x114  Code  Gb  MK60_flexbus.o [1]
 ftm_mod                 0x1fff064c   0x10  Data  Lc  MK60_ftm.o [1]
 ftm_pwm_duty            0x0000c597  0x10e  Code  Gb  MK60_ftm.o [1]
@@ -569,7 +565,7 @@ led                     0x00009643   0x3c  Code  Gb  VCAN_LED.o [1]
 led_init                0x00009609   0x3a  Code  Gb  VCAN_LED.o [1]
 led_turn                0x0000967f   0x32  Code  Gb  VCAN_LED.o [1]
 lptmr_timing_ms         0x0000d4e9   0x2c  Code  Gb  MK60_lptmr.o [1]
-main                    0x0000da1b    0x2  Code  Gb  main.o [1]
+main                    0x0000d1fd    0x2  Code  Gb  system_MK60DZ10.o [1]
 mcg_cfg                 0x1fff043c   0x58  Data  Gb  MK60_mcg.o [1]
 mcg_div                 0x1fff0494    0x4  Data  Gb  MK60_mcg.o [1]
 mcg_div_count           0x0000ce29  0x304  Code  Gb  MK60_mcg.o [1]
@@ -579,10 +575,10 @@ set_sys_dividers        0x1fff04d1   0x50  Code  Gb  MK60_mcg.o [1]
 set_vector_handler      0x0000d4bb   0x22  Code  Gb  misc.o [1]
 sqrt                    0x00009519         Code  Gb  sqrt.o [4]
 sqrtl                   0x00009519         Code  Gb  sqrt.o [4]
-start                   0x0000d1fd   0x32  Code  Gb  system_MK60DZ10.o [1]
+start                   0x0000d1ff   0x32  Code  Gb  system_MK60DZ10.o [1]
 strchr                  0x0000c819         Code  Gb  strchr.o [5]
 strstr                  0x0000be41   0x10  Code  Gb  peripheral.o [1]
-sysinit                 0x0000d22f   0x3c  Code  Gb  system_MK60DZ10.o [1]
+sysinit                 0x0000d231   0x3c  Code  Gb  system_MK60DZ10.o [1]
 system_RunTime_Update   0x0000d41d   0x6a  Code  Gb  Car_System.o [1]
 systick_delay           0x0000a001   0x36  Code  Gb  MK60_SysTick.o [1]
 systick_delay_ms        0x0000a037   0x18  Code  Gb  MK60_SysTick.o [1]
