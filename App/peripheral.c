@@ -245,7 +245,7 @@ void System_Error(error Error_Number)
 void Debug()
 {
 		DeBug_Interface();
-		Send_Data();
+		//Send_Data();
 }
 
 /*============================================
