@@ -32,11 +32,11 @@ typedef struct pidbasespeed
 #define MAX_SPEED			99					//定义最大速度
 #define MIN_SPEED			-50				//定义最小速度
 
-#define MOTOR_FTM   FTM0
-#define RIGHT_PWM			FTM_CH3
-#define RIGHT_PWM_BACK  FTM_CH4
-#define LEFT_PWM_BACK		FTM_CH1
-#define LEFT_PWM				FTM_CH2
+#define MOTOR_FTM			FTM0
+#define RIGHT_PWM_BACK	FTM_CH3
+#define RIGHT_PWM			FTM_CH4
+#define LEFT_PWM				FTM_CH1
+#define LEFT_PWM_BACK		FTM_CH2
 
 #define MOTOR_HZ    20*1000				//定义电机工作频率
 
@@ -64,7 +64,8 @@ typedef struct
 #define AD3			ADC0_SE12					//PTB2
 #define AD4			ADC0_SE13					//PTB3
 #define AD5			ADC1_SE10					//PTB4
-#define AMP_MAX	5									//定义最大ADC端口数
+#define AD6			ADC1_SE11					//PTB5
+#define AMP_MAX	6									//定义最大ADC端口数
 
 typedef enum Inductance_Position				//枚举定义电感位置
 {
@@ -73,6 +74,7 @@ typedef enum Inductance_Position				//枚举定义电感位置
 	MIDDLE,
 	FRONT_LEFT,
 	FRONT_RIGHT,
+	test
 }Inductance_Position;
 
 typedef struct

@@ -23,7 +23,7 @@ void ADC_Init()
 	adc_init(AD3);									 				//初始化AMP3通道，PTB2
 	adc_init(AD4);													//初始化AMP4通道，PTB3
 	adc_init(AD5);													//初始化AMP5通道，PTB4
-
+        adc_init(AD6);
 }
 
 
@@ -62,6 +62,7 @@ void Get_AD_Value()
 	Road_Data[MIDDLE].AD_Value = adc_once(AD3, ADC_8bit);				//采集过程
 	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD4, ADC_8bit);		//采集过程
 	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
+	Road_Data[test].AD_Value = adc_once(AD6, ADC_8bit);	//采集过程
 	//注意修改通道初始化
 	//注意修改通道初始化
 
