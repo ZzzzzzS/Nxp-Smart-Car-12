@@ -23,7 +23,6 @@ void ADC_Init()
 	adc_init(AD3);									 				//初始化AMP3通道，PTB2
 	adc_init(AD4);													//初始化AMP4通道，PTB3
 	adc_init(AD5);													//初始化AMP5通道，PTB4
-        adc_init(AD6);
 }
 
 
@@ -62,7 +61,6 @@ void Get_AD_Value()
 	Road_Data[MIDDLE].AD_Value = adc_once(AD3, ADC_8bit);				//采集过程
 	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD4, ADC_8bit);		//采集过程
 	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
-	Road_Data[test].AD_Value = adc_once(AD6, ADC_8bit);	//采集过程
 	//注意修改通道初始化
 	//注意修改通道初始化
 
@@ -156,7 +154,7 @@ void Direction_Calculate()
 #define less 15
 
 	Direction.PIDbase.D = 4.5;
-	Direction.PIDbase.P = 0.15;
+	Direction.PIDbase.P = 2;
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
@@ -176,7 +174,7 @@ void Direction_Calculate()
 #undef more
 #undef less
 
-	Speed.Base.Aim_Speed = 15;
+	Speed.Base.Aim_Speed =7 ;
 
 	/*if (Direction.err_Fixed > 20)
 	{
@@ -200,11 +198,6 @@ void Direction_PID()
 
 	Direction.PIDbase.PID_Out_Speed = Direction.PIDbase.P*Direction.PIDbase.Error_Speed[Now_Error];
 	Direction.PIDbase.PID_Out_Speed += Direction.PIDbase.D * err_Delta;
-
-	if (Direction.PIDbase.PID_Out_Speed >= 10)
-		Direction.PIDbase.PID_Out_Speed = 10;
-	else if (Direction.PIDbase.PID_Out_Speed <= -10)
-		Direction.PIDbase.PID_Out_Speed = -10;
 
 	Speed.Left.Turn_Speed = Direction.PIDbase.PID_Out_Speed;
 	Speed.Right.Turn_Speed = -Direction.PIDbase.PID_Out_Speed;

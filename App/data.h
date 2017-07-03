@@ -64,17 +64,15 @@ typedef struct
 #define AD3			ADC0_SE12					//PTB2
 #define AD4			ADC0_SE13					//PTB3
 #define AD5			ADC1_SE10					//PTB4
-#define AD6			ADC1_SE11					//PTB5
-#define AMP_MAX	6									//定义最大ADC端口数
+#define AMP_MAX	5									//定义最大ADC端口数
 
 typedef enum Inductance_Position				//枚举定义电感位置
 {
 	LEFT,
 	RIGHT,
-	MIDDLE,
 	FRONT_LEFT,
-	FRONT_RIGHT,
-	test
+        MIDDLE,
+	FRONT_RIGHT
 }Inductance_Position;
 
 typedef struct
@@ -199,6 +197,7 @@ typedef struct Inductance
 typedef struct Motor
 {
 	char AllowRun;
+	char GetSpeedAbs;
 }Motor;
 
 typedef struct service

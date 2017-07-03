@@ -2,7 +2,7 @@
 
 "D:\ProgramFiles\iar\arm\bin\armjlink2.dll" 
 
-"D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Exe\vcan_Kinetis.out" 
+"D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\FN15_Debug\Exe\vcan_Kinetis.out" 
 
 --plugin "D:\ProgramFiles\iar\arm\bin\armbat.dll" 
 
@@ -10,7 +10,7 @@
 
 --device_macro "D:\ProgramFiles\iar\arm\config\debugger\NXP\Kxx_Trace.dmac" 
 
---flash_loader "D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\config files\FlashK60Fxxx128K.board" 
+--flash_loader "D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\config files\FlashK60Fxxx128K.board" 
 
 
 

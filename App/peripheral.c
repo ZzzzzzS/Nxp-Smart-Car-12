@@ -111,15 +111,18 @@ void OLED_Interface()
 				case inductance_Mode:
 					Debug_Init();
 					Service.MotorBase.AllowRun = false;
+					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
 				case Debug_Mode:
 					Debug_Init();
 					Service.MotorBase.AllowRun = true;
+					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
 				case Release_Mode:
 					Service.MotorBase.AllowRun = true;
+					Service.MotorBase.GetSpeedAbs = true;
 					OLED_CLS();
 					break;
 
@@ -167,7 +170,7 @@ void DeBug_Interface()
 		OLED_Print(Position(Line2), temp);
 		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
-		sprintf(temp, "M%dT%d", Road_Data[MIDDLE].AD_Value_fixed,Road_Data[test].AD_Value_fixed);
+		sprintf(temp, "M%d", Road_Data[MIDDLE].AD_Value_fixed);
 		OLED_Print(Position(Line4), temp);
 		break;
 

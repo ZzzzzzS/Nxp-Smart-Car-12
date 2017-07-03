@@ -181,8 +181,16 @@ void Get_Motor_Speed()
 	Speed.Left.Now_Speed = ftm_quad_get(FTM2);				//获取正交解码脉冲数
 	Speed.Right.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
         
-        Speed.Left.Now_Speed=-Speed.Left.Now_Speed;                             //接线反向
+    Speed.Left.Now_Speed=-Speed.Left.Now_Speed;                             //接线反向
 
+	if (Service.MotorBase.GetSpeedAbs)
+	{
+		if (Speed.Left.Now_Speed < 0)
+			Speed.Left.Now_Speed = -Speed.Left.Now_Speed;
+		if (Speed.Right.Now_Speed < 0)
+			Speed.Right.Now_Speed = -Speed.Right.Now_Speed;
+	}
+		
 	Speed.Base.Now_Speed = (Speed.Left.Now_Speed + Speed.Right.Now_Speed) / 2;//计算平均速度
 
 	ftm_quad_clean(FTM1);														//清正交解码脉冲数
