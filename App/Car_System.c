@@ -62,7 +62,7 @@ void system_RunTime_Update()
 	case Debug_Mode:
 		if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
 		{
-			OLED_Init();
+			//OLED_Init();
 			Service.OLEDbase.OLED_Renew = 0;
 		}
 		else

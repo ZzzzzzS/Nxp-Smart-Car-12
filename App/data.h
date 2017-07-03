@@ -221,7 +221,7 @@ typedef char		bool;
 #define Key2   PTC11									//按键管脚定义
 #define Key3   PTC9									//按键管脚定义,这个按钮有问题
 #define Key4   PTC7									//按键管脚定义
-#define key5	   PTC5									//按键管脚定义
+#define key5   PTC5									//按键管脚定义
 
 #define Bluetooth		UART1						//宏定义Bluetooth®发送端口
 #define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率

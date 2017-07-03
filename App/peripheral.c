@@ -19,7 +19,7 @@ void Stop_Car_Init()
 
 void Stop_Car()
 {
-	if (gpio_get(REED) != 0)
+	if (gpio_get(REED) == 0)
 	{
 		System_Error(Car_Stop);
 	}
@@ -156,6 +156,7 @@ void OLED_Interface()
 
 void DeBug_Interface()
 {
+  OLED_CLS();
 	char temp[10];
 	switch (Service.OLEDbase.OLED_Interface)
 	{
