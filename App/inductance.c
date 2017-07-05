@@ -153,8 +153,8 @@ void Direction_Calculate()
 #define more 40
 #define less 15
 
-	Direction.PIDbase.D = 4.5;
-	Direction.PIDbase.P = 0.2;
+	Direction.PIDbase.D = 5;
+	Direction.PIDbase.P = 0.3;
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
@@ -176,8 +176,8 @@ void Direction_Calculate()
 
 	Speed.Base.Aim_Speed =7 ;
 
-	Speed.Left.Base.Aim_Speed = 7;
-	Speed.Right.Base.Aim_Speed = 7;
+	Speed.Left.Base.Aim_Speed = 5;
+	Speed.Right.Base.Aim_Speed = 5;
 
 	/*if (Direction.err_Fixed > 20)
 	{

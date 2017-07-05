@@ -85,11 +85,11 @@ void Motor_PID_Init()
 	Speed.Base.I = 0.1;
 	Speed.Base.D = 3;
 
-	Speed.Left.Base.P = 1;
+	Speed.Left.Base.P = 0.5;
 	Speed.Left.Base.I = 0.1;
 	Speed.Left.Base.D = 3;
 
-	Speed.Right.Base.P = 1;
+	Speed.Right.Base.P = 0.5;
 	Speed.Right.Base.I = 0.1;
 	Speed.Right.Base.D = 3;
 }
@@ -157,8 +157,17 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
+  
+  /*if(Speed.Left.Turn_Speed>15)
+    Speed.Left.Turn_Speed=15;
+  
+  if(Speed.Right.Turn_Speed>15)
+    Speed.Right.Turn_Speed=15;*/
+  
+  //Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
+  Speed.Left.Out_Speed = Speed.Left.Turn_Speed + 30;
+  //Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
+  Speed.Right.Out_Speed = Speed.Right.Turn_Speed + 30;
 }
 
 /*============================================
