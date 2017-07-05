@@ -71,6 +71,9 @@ void Motor_PID_Init()
 {
 	Speed.Base.Aim_Speed = 18;						//设置默认初始速度,在此处改速度无效
 
+	Speed.Left.Base.Aim_Speed = 18;
+	Speed.Right.Base.Aim_Speed = 18;
+
 	Speed.Left.Now_Speed = Speed.Base.Aim_Speed;		//设置初始当前速度，防止电机未上电时PID工作异常
 	Speed.Right.Now_Speed = Speed.Base.Aim_Speed;	//设置初始当前速度，防止电机未上电时PID工作异常
 
@@ -81,6 +84,14 @@ void Motor_PID_Init()
 	Speed.Base.P = 1;
 	Speed.Base.I = 0.1;
 	Speed.Base.D = 3;
+
+	Speed.Left.Base.P = 1;
+	Speed.Left.Base.I = 0.1;
+	Speed.Left.Base.D = 3;
+
+	Speed.Right.Base.P = 1;
+	Speed.Right.Base.I = 0.1;
+	Speed.Right.Base.D = 3;
 }
 
 /*============================================
@@ -92,26 +103,50 @@ void Motor_PID()
 {
 	char I_flag = 1;										//积分变量分离标志位4
 					/*****PID调节核心部分*****/
-	Speed.Base.Error_Speed[Now_Error] = Speed.Base.Aim_Speed - Speed.Base.Now_Speed;
+	Speed.Left.Base.Error_Speed[Now_Error] = Speed.Left.Base.Aim_Speed - Speed.Left.Now_Speed;
 
-	if (Speed.Base.Error_Speed[Now_Error] > 20)																					//积分变量分离
+	if (Speed.Left.Base.Error_Speed[Now_Error] > 20)																					//积分变量分离
 		I_flag = 0;
 	else
 		I_flag = 1;
 
-	Speed.Base.IncrementSpeed = Speed.Base.P * Speed.Base.Error_Speed[Now_Error];																							//P
-	Speed.Base.IncrementSpeed += I_flag*Speed.Base.I*(Speed.Base.Error_Speed[Now_Error] + Speed.Base.Error_Speed[last_Error]);							//I
-	Speed.Base.IncrementSpeed += Speed.Base.D*(Speed.Base.Error_Speed[Now_Error] - 2 * Speed.Base.Error_Speed[last_Error] + Speed.Base.Error_Speed[lastest_Error]);	//D
+	Speed.Left.Base.IncrementSpeed = Speed.Left.Base.P * Speed.Left.Base.Error_Speed[Now_Error];																							//P
+	Speed.Left.Base.IncrementSpeed += I_flag*Speed.Left.Base.I*(Speed.Left.Base.Error_Speed[Now_Error] + Speed.Left.Base.Error_Speed[last_Error]);							//I
+	Speed.Left.Base.IncrementSpeed += Speed.Left.Base.D*(Speed.Left.Base.Error_Speed[Now_Error] - 2 * Speed.Left.Base.Error_Speed[last_Error] + Speed.Left.Base.Error_Speed[lastest_Error]);	//D
 
-	Speed.Base.Error_Speed[lastest_Error] = Speed.Base.Error_Speed[last_Error];
-	Speed.Base.Error_Speed[last_Error] = Speed.Base.Error_Speed[Now_Error];
+	Speed.Left.Base.Error_Speed[lastest_Error] = Speed.Left.Base.Error_Speed[last_Error];
+	Speed.Left.Base.Error_Speed[last_Error] = Speed.Left.Base.Error_Speed[Now_Error];
 
-	Speed.Base.PID_Out_Speed += Speed.Base.IncrementSpeed;
+	Speed.Left.Base.PID_Out_Speed += Speed.Left.Base.IncrementSpeed;
 
-	if (Speed.Base.PID_Out_Speed >= MAX_SPEED)
-		Speed.Base.PID_Out_Speed = MAX_SPEED;
-	else if (Speed.Base.PID_Out_Speed <= MIN_SPEED)
-		Speed.Base.PID_Out_Speed = MIN_SPEED;
+	if (Speed.Left.Base.PID_Out_Speed >= MAX_SPEED)
+		Speed.Left.Base.PID_Out_Speed = MAX_SPEED;
+	else if (Speed.Left.Base.PID_Out_Speed <= MIN_SPEED)
+		Speed.Left.Base.PID_Out_Speed = MIN_SPEED;
+
+
+	I_flag = 1;										//积分变量分离标志位4
+															/*****PID调节核心部分*****/
+	Speed.Right.Base.Error_Speed[Now_Error] = Speed.Right.Base.Aim_Speed - Speed.Right.Now_Speed;
+
+	if (Speed.Right.Base.Error_Speed[Now_Error] > 20)																					//积分变量分离
+		I_flag = 0;
+	else
+		I_flag = 1;
+
+	Speed.Right.Base.IncrementSpeed = Speed.Right.Base.P * Speed.Right.Base.Error_Speed[Now_Error];																							//P
+	Speed.Right.Base.IncrementSpeed += I_flag*Speed.Right.Base.I*(Speed.Right.Base.Error_Speed[Now_Error] + Speed.Right.Base.Error_Speed[last_Error]);							//I
+	Speed.Right.Base.IncrementSpeed += Speed.Right.Base.D*(Speed.Right.Base.Error_Speed[Now_Error] - 2 * Speed.Right.Base.Error_Speed[last_Error] + Speed.Right.Base.Error_Speed[lastest_Error]);	//D
+
+	Speed.Right.Base.Error_Speed[lastest_Error] = Speed.Right.Base.Error_Speed[last_Error];
+	Speed.Right.Base.Error_Speed[last_Error] = Speed.Right.Base.Error_Speed[Now_Error];
+
+	Speed.Right.Base.PID_Out_Speed += Speed.Right.Base.IncrementSpeed;
+
+	if (Speed.Right.Base.PID_Out_Speed >= MAX_SPEED)
+		Speed.Right.Base.PID_Out_Speed = MAX_SPEED;
+	else if (Speed.Right.Base.PID_Out_Speed <= MIN_SPEED)
+		Speed.Right.Base.PID_Out_Speed = MIN_SPEED;
 
 }
 
@@ -122,8 +157,8 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed;
+	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
+	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
 }
 
 /*============================================

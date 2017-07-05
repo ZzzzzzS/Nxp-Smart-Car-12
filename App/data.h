@@ -46,6 +46,7 @@ typedef struct
 	int16 Turn_Speed;								//转向差速度
 	int16 Now_Speed;								//正交解码得出的当前速度
 	int16 Speed_Old[Stable_Times];			//电机功率滤波
+	pidbasespeed Base;
 }wheel;
 
 typedef struct

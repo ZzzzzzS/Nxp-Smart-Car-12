@@ -9,3 +9,4 @@ Prj/IAR/FN15_debug/
 *.dep
 *.sfr
 settings/
+*.ink

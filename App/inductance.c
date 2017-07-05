@@ -176,6 +176,9 @@ void Direction_Calculate()
 
 	Speed.Base.Aim_Speed =7 ;
 
+	Speed.Left.Base.Aim_Speed = 7;
+	Speed.Right.Base.Aim_Speed = 7;
+
 	/*if (Direction.err_Fixed > 20)
 	{
 	Speed.Base.Aim_Speed-=Direction.err_Fixed*0.04;
