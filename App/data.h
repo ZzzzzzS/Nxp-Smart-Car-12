@@ -71,7 +71,7 @@ typedef enum Inductance_Position				//枚举定义电感位置
 	LEFT,
 	RIGHT,
 	FRONT_LEFT,
-        MIDDLE,
+    MIDDLE,
 	FRONT_RIGHT
 }Inductance_Position;
 
