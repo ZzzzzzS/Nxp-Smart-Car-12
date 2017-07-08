@@ -61,6 +61,7 @@ void Get_AD_Value()
 	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
 	Road_Data[MIDDLE].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
 	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
+
 	//注意修改通道初始化
 	//注意修改通道初始化
 

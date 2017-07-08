@@ -53,7 +53,7 @@ void Receive_Data()
 	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
 	{
 		led(LED1, LED_ON);
-		printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
+		//printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
 		if (hasData("S"))
 		{
 			System_Error(user_Stop);

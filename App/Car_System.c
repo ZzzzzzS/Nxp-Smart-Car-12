@@ -78,7 +78,7 @@ void system_RunTime_Update()
 	case inductance_Mode:
 		DeBug_Interface();
 		LED_Interface();
-		//Send_Data();
+		Send_Data();
 		Receive_Data();
 		break;
 
