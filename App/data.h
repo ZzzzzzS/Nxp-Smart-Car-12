@@ -91,10 +91,10 @@ typedef struct
 
 #define MAX_FUZZY_RULE		6						//模糊论域大小
 
-#define Lk				0.5723
-#define Lb			-0.2530
-#define Rk			-0.5703
-#define Rb			0.2424
+#define Lk				0.7507
+#define Lb			-0.2793
+#define Rk			-0.7098
+#define Rb			-0.2622
 
 typedef struct direction							//差比和法方向控制
 {
