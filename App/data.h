@@ -30,7 +30,7 @@ typedef struct pidbasespeed
 ==========================================*/
 #define Stable_Times		2					//定义电机滤波速度
 #define MAX_SPEED			99					//定义最大速度
-#define MIN_SPEED			0					//定义最小速度
+#define MIN_SPEED			-20					//定义最小速度
 
 #define MOTOR_FTM			FTM0
 #define RIGHT_PWM_BACK	FTM_CH3
@@ -60,21 +60,22 @@ typedef struct
 电感数据采集相关宏定义
 ==========================================*/
 
-#define AD1			ADC0_SE8						//PTB0
-#define AD2			ADC0_SE9						//PTB1
+#define AD1			ADC0_SE8					//PTB0
+#define AD2			ADC0_SE9					//PTB1
 #define AD3			ADC0_SE12					//PTB2
-#define AD4			ADC1_SE11					//PTB5
-#define AD5			ADC1_SE10					//PTB4
+#define AD4			ADC1_SE10					//PTB4
+#define AD5			ADC1_SE11					//PTB5
+
 
 #define AMP_MAX	5									//定义最大ADC端口数
 
 typedef enum Inductance_Position				//枚举定义电感位置
 {
 	LEFT,
-	RIGHT,
-	FRONT_LEFT,
+        FRONT_LEFT,
         MIDDLE,
-	FRONT_RIGHT
+        FRONT_RIGHT,
+	RIGHT
 }Inductance_Position;
 
 typedef struct

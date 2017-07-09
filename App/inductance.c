@@ -56,11 +56,11 @@ void Direction_Control()
 
 void Get_AD_Value()
 {
-	Road_Data[LEFT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
-	Road_Data[RIGHT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
-	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
-	Road_Data[MIDDLE].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
-	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
+	Road_Data[RIGHT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
+	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
+	Road_Data[MIDDLE].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
+	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
+	Road_Data[LEFT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
 
 	//注意修改通道初始化
 	//注意修改通道初始化
@@ -87,8 +87,8 @@ void Get_AD_Value()
 	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
 	{
 		Service.InductanceBase.InductanceLost++;
-		if (Service.InductanceBase.InductanceLost >= 50);
-		//System_Error(Taget_Lost);
+		if (Service.InductanceBase.InductanceLost >= 100);
+                  System_Error(Taget_Lost);
 	}
 	else
 	{
@@ -151,11 +151,11 @@ void Direction_Calculate()
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
 	}
 
-#define more 40
+#define more 70
 #define less 15
 
-	Direction.PIDbase.D = 5;
-	Direction.PIDbase.P = 0.3;
+	Direction.PIDbase.D = 45;
+	Direction.PIDbase.P = 3.5;
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
@@ -164,21 +164,21 @@ void Direction_Calculate()
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
 	{
-		Direction.PIDbase.P *= 1.35;
-		Direction.PIDbase.D *= 1.5;
+		Direction.PIDbase.P *= 0.8;
+		//Direction.PIDbase.D *= 0.9;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] < -more)
 	{
-		Direction.PIDbase.P *= 1.35;
-		Direction.PIDbase.D *= 1.5;
+		Direction.PIDbase.P *= 0.8;
+		//Direction.PIDbase.D *= 1.2;
 	}
 #undef more
 #undef less
 
 	Speed.Base.Aim_Speed =7 ;
 
-	Speed.Left.Base.Aim_Speed = 60;
-	Speed.Right.Base.Aim_Speed = 60;
+	Speed.Left.Base.Aim_Speed = 40;
+	Speed.Right.Base.Aim_Speed = 40;
 
 	/*if (Direction.err_Fixed > 20)
 	{
