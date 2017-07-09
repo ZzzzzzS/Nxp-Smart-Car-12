@@ -85,13 +85,13 @@ void Motor_PID_Init()
 	Speed.Base.I = 0.1;
 	Speed.Base.D = 3;
 
-	Speed.Left.Base.P = 0.5;
-	Speed.Left.Base.I = 0.1;
-	Speed.Left.Base.D = 3;
+	Speed.Left.Base.P = 0.20;
+	Speed.Left.Base.I = 0.04;
+	Speed.Left.Base.D = 0;
 
-	Speed.Right.Base.P = 0.5;
-	Speed.Right.Base.I = 0.1;
-	Speed.Right.Base.D = 3;
+	Speed.Right.Base.P = 0.3;
+	Speed.Right.Base.I = 0.06;
+	Speed.Right.Base.D = 0;
 }
 
 /*============================================
@@ -165,9 +165,12 @@ void Speed_Comput()
     Speed.Right.Turn_Speed=15;*/
   
   //Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
-  Speed.Left.Out_Speed = Speed.Left.Turn_Speed + 30;
   //Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
-  Speed.Right.Out_Speed = Speed.Right.Turn_Speed + 30;
+  
+  Speed.Left.Out_Speed = Speed.Left.Base.PID_Out_Speed;
+  Speed.Right.Out_Speed = Speed.Right.Base.PID_Out_Speed;
+  
+  
 }
 
 /*============================================
@@ -225,7 +228,7 @@ void Get_Motor_Speed()
 	Speed.Left.Now_Speed = ftm_quad_get(FTM1);				//获取正交解码脉冲数
 	Speed.Right.Now_Speed = ftm_quad_get(FTM2);				//获取正交解码脉冲数
 	
-	Speed.Right.Now_Speed = -Speed.Right.Now_Speed;
+	Speed.Left.Now_Speed = -Speed.Left.Now_Speed;
 	Speed.Base.Now_Speed = (Speed.Left.Now_Speed + Speed.Right.Now_Speed) / 2;//计算平均速度
 
 	ftm_quad_clean(FTM1);														//清正交解码脉冲数

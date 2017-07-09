@@ -34,11 +34,15 @@ void Send_Data()
 {
 	if (Service.BlueToothBase.AllowedSendData)
 	{
-		char var[AMP_MAX];
+		char var[AMP_MAX+2];
 		for (counter i = 0; i < AMP_MAX; i++)
 		{
 			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
 		}
+                
+                var[AMP_MAX]=Speed.Left.Now_Speed;
+                var[AMP_MAX+1]=Speed.Right.Now_Speed;
+                
 		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}
 }
@@ -180,8 +184,8 @@ void DeBug_Interface()
 		OLED_Print(Position(Line1), temp);
 		sprintf(temp, "now L%dR%d", Speed.Left.Now_Speed, Speed.Right.Now_Speed);				//当前速度
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
-		OLED_Print(Position(Line3), temp);
+		/*sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
+		OLED_Print(Position(Line3), temp);*/
 		sprintf(temp, "%d %d", Speed.Base.Aim_Speed, Speed.Base.Now_Speed);																//设定速度
 		OLED_Print(Position(Line4), temp);
 
