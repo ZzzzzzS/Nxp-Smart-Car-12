@@ -12,7 +12,7 @@ void Speed_Control()
 	//FuzzyPID();															//对PID参数模糊控制
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Comput();													//加入方向环控制
-	//Speed_Stable();														//速度滤波使系统稳定
+	Speed_Stable();														//速度滤波使系统稳定
 	Speed_Chack();														//检测速度合法性，防止堵转等
 	Motor_Control();													//输出最终速度
 }
@@ -85,7 +85,7 @@ void Motor_PID_Init()
 	Speed.Base.I = 0.1;
 	Speed.Base.D = 3;
 
-	Speed.Left.Base.P = 1;
+	Speed.Left.Base.P = 0.8;
 	Speed.Left.Base.I = 0.06;
 	Speed.Left.Base.D = 0;
 
