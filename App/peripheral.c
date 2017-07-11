@@ -246,7 +246,7 @@ void DeBug_Interface()
 void Debug_Init()
 {
 	Service.OLEDbase.OLED_Renew = 0;
-	Service.OLEDbase.OLED_Interface = Speed_Interface;
+	Service.OLEDbase.OLED_Interface = Inductance_Interface;
 	Service.BlueToothBase.AllowedReceiveData = true;
 	Service.BlueToothBase.AllowedSendData = true;
 	init_LED();

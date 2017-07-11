@@ -34,12 +34,12 @@ void ADC_Init()
 void Direction_Control()
 {
 	Get_AD_Value();
-	Similarity_Count_Fuzzy();
-	Direction_Control_Fuzzy();
-	if (!Fuzzy_Direction.isMatched)
-	{
+	//Similarity_Count_Fuzzy();
+	//Direction_Control_Fuzzy();
+	//if (!Fuzzy_Direction.isMatched)
+	//{
 		Direction_Calculate();
-	}
+	//}
 	Direction_PID();
 }
 
@@ -88,7 +88,7 @@ void Get_AD_Value()
 	{
 		Service.InductanceBase.InductanceLost++;
 		if (Service.InductanceBase.InductanceLost >= 50);
-                  //System_Error(Taget_Lost);
+                  System_Error(Taget_Lost);
 	}
 	else
 	{
@@ -112,7 +112,7 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-		Direction.sum[0] = 100 * ((1 * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) - (1 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / (1 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed + 1 * Road_Data[FRONT_RIGHT].AD_Value_fixed);				//差比和计算
+		Direction.sum[0] = 100 * ((0 * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) - (0* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / (0 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed + 0* Road_Data[FRONT_RIGHT].AD_Value_fixed);				//差比和计算
 	}
 	else
 	{
@@ -154,13 +154,13 @@ void Direction_Calculate()
 #define more 70
 #define less 15
 
-	Direction.PIDbase.D = 60;
-	Direction.PIDbase.P = 3.5;
+	Direction.PIDbase.D = 20;
+	Direction.PIDbase.P = 0.5;
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
-		Direction.PIDbase.P *= 0.8;
-		Direction.PIDbase.D *= 0.5;
+		//Direction.PIDbase.P *= 0.8;
+		//Direction.PIDbase.D *= 0.5;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
 	{
@@ -175,7 +175,7 @@ void Direction_Calculate()
 #undef more
 #undef less
 
-	Speed.Base.Aim_Speed =30 ;
+	Speed.Base.Aim_Speed = 40;
 	Speed.Left.Base.Aim_Speed =30;
 	Speed.Right.Base.Aim_Speed = 30;
 
