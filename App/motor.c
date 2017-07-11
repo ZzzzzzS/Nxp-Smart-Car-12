@@ -12,7 +12,7 @@ void Speed_Control()
 	//FuzzyPID();															//对PID参数模糊控制
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Comput();													//加入方向环控制
-	Speed_Stable();														//速度滤波使系统稳定
+	//Speed_Stable();														//速度滤波使系统稳定
 	Speed_Chack();														//检测速度合法性，防止堵转等
 	Motor_Control();													//输出最终速度
 }
@@ -81,9 +81,9 @@ void Motor_PID_Init()
 	Speed.Base.Error_Speed[1] = 0;					//电机控制相关初始化
 	Speed.Base.Error_Speed[2] = 0;					//电机控制相关初始化				
 
-	Speed.Base.P = 1;
-	Speed.Base.I = 0.1;
-	Speed.Base.D = 3;
+	Speed.Base.P = 0.4;
+	Speed.Base.I = 0.02;
+	Speed.Base.D = 4;
 
 	Speed.Left.Base.P = 0.8;
 	Speed.Left.Base.I = 0.06;
@@ -148,6 +148,30 @@ void Motor_PID()
 	else if (Speed.Right.Base.PID_Out_Speed <= MIN_SPEED)
 		Speed.Right.Base.PID_Out_Speed = MIN_SPEED;
 
+
+	I_flag = 1;										//积分变量分离标志位
+															/*****PID调节核心部分*****/
+	Speed.Base.Error_Speed[Now_Error] = Speed.Base.Aim_Speed - Speed.Base.Now_Speed;
+
+	if (Speed.Base.Error_Speed[Now_Error] > 20)																					//积分变量分离
+		I_flag = 0;
+	else
+		I_flag = 1;
+
+	Speed.Base.IncrementSpeed = Speed.Base.P * Speed.Base.Error_Speed[Now_Error];																							//P
+	Speed.Base.IncrementSpeed += I_flag*Speed.Base.I*(Speed.Base.Error_Speed[Now_Error] + Speed.Base.Error_Speed[last_Error]);							//I
+	Speed.Base.IncrementSpeed += Speed.Base.D*(Speed.Base.Error_Speed[Now_Error] - 2 * Speed.Base.Error_Speed[last_Error] + Speed.Base.Error_Speed[lastest_Error]);	//D
+
+	Speed.Base.Error_Speed[lastest_Error] = Speed.Base.Error_Speed[last_Error];
+	Speed.Base.Error_Speed[last_Error] = Speed.Base.Error_Speed[Now_Error];
+
+	Speed.Base.PID_Out_Speed += Speed.Base.IncrementSpeed;
+
+	if (Speed.Base.PID_Out_Speed >= MAX_SPEED)
+		Speed.Base.PID_Out_Speed = MAX_SPEED;
+	else if (Speed.Base.PID_Out_Speed <= MIN_SPEED)
+		Speed.Base.PID_Out_Speed = MIN_SPEED;
+
 }
 
 /*============================================
@@ -157,18 +181,11 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-  
-  /*if(Speed.Left.Turn_Speed>15)
-    Speed.Left.Turn_Speed=15;
-  
-  if(Speed.Right.Turn_Speed>15)
-    Speed.Right.Turn_Speed=15;*/
-  
-  Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
-  Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
-  
-  
-  
+	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.15;
+	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed;
+ // Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Left.Base.PID_Out_Speed;
+  //Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Right.Base.PID_Out_Speed;
+ 
 }
 
 /*============================================

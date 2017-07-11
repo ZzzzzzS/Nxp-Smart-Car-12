@@ -63,7 +63,7 @@ typedef struct
 #define AD1			ADC0_SE8					//PTB0
 #define AD2			ADC0_SE9					//PTB1
 #define AD3			ADC0_SE12					//PTB2
-#define AD4			ADC1_SE10					//PTB4
+#define AD4			ADC0_SE13      // PTB3		
 #define AD5			ADC1_SE11					//PTB5
 
 

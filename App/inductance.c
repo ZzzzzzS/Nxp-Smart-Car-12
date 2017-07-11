@@ -87,8 +87,8 @@ void Get_AD_Value()
 	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
 	{
 		Service.InductanceBase.InductanceLost++;
-		if (Service.InductanceBase.InductanceLost >= 100);
-                  System_Error(Taget_Lost);
+		if (Service.InductanceBase.InductanceLost >= 50);
+                  //System_Error(Taget_Lost);
 	}
 	else
 	{
@@ -164,29 +164,30 @@ void Direction_Calculate()
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
 	{
-		Direction.PIDbase.P *= 0.8;
+		//Direction.PIDbase.P *= 0.8;
 		//Direction.PIDbase.D *= 0.9;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] < -more)
 	{
-		Direction.PIDbase.P *= 0.8;
+		//Direction.PIDbase.P *= 0.8;
 		//Direction.PIDbase.D *= 1.2;
 	}
 #undef more
 #undef less
 
-	Speed.Base.Aim_Speed =7 ;
+	Speed.Base.Aim_Speed =30 ;
+	Speed.Left.Base.Aim_Speed =30;
+	Speed.Right.Base.Aim_Speed = 30;
 
-	Speed.Left.Base.Aim_Speed = 45;
-	Speed.Right.Base.Aim_Speed = 45;
-
-	/*if (Direction.err_Fixed > 20)
+	/*if (Direction.PIDbase.Error_Speed[Now_Error] > 20)
 	{
-	Speed.Base.Aim_Speed-=Direction.err_Fixed*0.04;
+	//Speed.Left.Base.Aim_Speed-=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
+        Speed.Right.Base.Aim_Speed-=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
 	}
-	else if (Direction.err_Fixed < -20)
+	else if (Direction.PIDbase.Error_Speed[Now_Error] < -20)
 	{
-	Speed.Base.Aim_Speed+=Direction.err_Fixed*0.04;
+	Speed.Left.Base.Aim_Speed+=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
+        //Speed.Right.Base.Aim_Speed+=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
 	}*/
 }
 
