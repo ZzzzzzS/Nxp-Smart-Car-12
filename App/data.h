@@ -180,11 +180,20 @@ typedef enum Run_Mode											//定义调试模式编号
 	Max_Mode
 }Run_Mode;
 
+typedef struct UserInformation
+{
+	unsigned char speed;
+	float P;
+	float I;
+	float D;
+}UserInformation;
+
 typedef struct BlueTooth
 {
 	char AllowedSendData;					//发送允许位
 	char AllowedReceiveData;				//接收允许位
 	unsigned char ReceiveArea[20];		//接收区临时缓存
+	UserInformation Information;		//储存用户数据
 	union convert_data						//浮点数转换共用体
 	{
 		float Float_Base;

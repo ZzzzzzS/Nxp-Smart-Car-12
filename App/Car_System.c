@@ -25,12 +25,25 @@ void Init_System()
 }
 
 /*============================================
+函数名：Set_User_Information()
+作用：设置用户参数
+==========================================*/
+
+void Set_User_Information()
+{
+	Service.BlueToothBase.Information.speed = 40;
+	Service.BlueToothBase.Information.P = 0.5;
+	Service.BlueToothBase.Information.D = 40;
+}
+
+/*============================================
 函数名：Get_System_Ready()
 作用：跑前准备
 ==========================================*/
 
 void Get_System_Ready()
 {
+	Set_User_Information();												//设置用户参数
 	OLED_Interface();														//初始参数设置界面
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }

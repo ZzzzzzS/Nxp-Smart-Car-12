@@ -52,20 +52,69 @@ void Send_Data()
 作用：蓝牙串口接收
 ==========================================*/
 
+
 void Receive_Data()
 {
 	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
 	{
 		led(LED1, LED_ON);
+                char *s;
 		//printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
-		if (hasData("S"))
+		if (hasData("STOP"))
 		{
 			System_Error(user_Stop);
 		}
-		else if (hasData("..."))
+		else if (hasData("SPEEDADD"))
 		{
-
+			Service.BlueToothBase.Information.speed += 5;
+			printf("Current Speed:%d\n", Service.BlueToothBase.Information.speed);
 		}
+		else if (hasData("SPEEDCUT"))
+		{
+			Service.BlueToothBase.Information.speed -= 5;
+			if (Service.BlueToothBase.Information.speed <= 0)
+				Service.BlueToothBase.Information.speed = 0;
+
+			printf("Current Speed:%d\n", Service.BlueToothBase.Information.speed);
+		}
+		else if (hasData("SENDDATA"))
+		{
+			if (Service.BlueToothBase.AllowedSendData == 1)
+			{
+				Service.BlueToothBase.AllowedSendData = 0;
+				printf("AllowedSendData=false\n");
+			}
+			else if (Service.BlueToothBase.AllowedSendData == 0)
+			{
+				Service.BlueToothBase.AllowedSendData = 1;
+				printf("AllowedSendData=true\n");
+			}
+		}
+                else if(hasData("DADD"))
+                {
+                  Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D+1;
+                  printf("current D:%f\n",Service.BlueToothBase.Information.D);
+                }
+                else if(hasData("DCUT"))
+                {
+                  Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D-1;
+                  printf("current D:%f\n",Service.BlueToothBase.Information.D);
+                }
+		else if(hasData("PADD"))
+                {
+                  Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P+0.2;
+                  printf("current P:%f\n",Service.BlueToothBase.Information.P);
+                }
+                else if(hasData("PCUT"))
+                {
+                  Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P-0.2;
+                  printf("current P:%f\n",Service.BlueToothBase.Information.P);
+                }
+                else
+                {
+                  printf("ERROR COMMAND\n");
+                }
+                
 		memset(Service.BlueToothBase.ReceiveArea, 0, 20);		//清零数组防止一些奇怪的情况
 	}
 	else
@@ -248,7 +297,7 @@ void Debug_Init()
 	Service.OLEDbase.OLED_Renew = 0;
 	Service.OLEDbase.OLED_Interface = Inductance_Interface;
 	Service.BlueToothBase.AllowedReceiveData = true;
-	Service.BlueToothBase.AllowedSendData = true;
+	Service.BlueToothBase.AllowedSendData = false;
 	init_LED();
 	OLED_CLS();
 }

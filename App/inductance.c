@@ -154,8 +154,8 @@ void Direction_Calculate()
 #define more 70
 #define less 15
 
-	Direction.PIDbase.D = 20;
-	Direction.PIDbase.P = 0.5;
+	Direction.PIDbase.D = Service.BlueToothBase.Information.D;//20
+	Direction.PIDbase.P = Service.BlueToothBase.Information.P;//0.5
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
@@ -175,9 +175,9 @@ void Direction_Calculate()
 #undef more
 #undef less
 
-	Speed.Base.Aim_Speed = 40;
-	Speed.Left.Base.Aim_Speed =30;
-	Speed.Right.Base.Aim_Speed = 30;
+	Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
+	Speed.Left.Base.Aim_Speed =Service.BlueToothBase.Information.speed;
+	Speed.Right.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
 
 	/*if (Direction.PIDbase.Error_Speed[Now_Error] > 20)
 	{
