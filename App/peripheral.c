@@ -58,8 +58,6 @@ void Receive_Data()
 	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
 	{
 		led(LED1, LED_ON);
-                char *s;
-		//printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
 		if (hasData("STOP"))
 		{
 			System_Error(user_Stop);
@@ -90,30 +88,30 @@ void Receive_Data()
 				printf("AllowedSendData=true\n");
 			}
 		}
-                else if(hasData("DADD"))
-                {
-                  Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D+1;
-                  printf("current D:%f\n",Service.BlueToothBase.Information.D);
-                }
-                else if(hasData("DCUT"))
-                {
-                  Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D-1;
-                  printf("current D:%f\n",Service.BlueToothBase.Information.D);
-                }
+       else if(hasData("DADD"))
+       {
+         Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D+1;
+         printf("current D:%f\n",Service.BlueToothBase.Information.D);
+       }
+       else if(hasData("DCUT"))
+       {
+         Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D-1;
+         printf("current D:%f\n",Service.BlueToothBase.Information.D);
+       }
 		else if(hasData("PADD"))
-                {
-                  Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P+0.2;
-                  printf("current P:%f\n",Service.BlueToothBase.Information.P);
-                }
-                else if(hasData("PCUT"))
-                {
-                  Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P-0.2;
-                  printf("current P:%f\n",Service.BlueToothBase.Information.P);
-                }
-                else
-                {
-                  printf("ERROR COMMAND\n");
-                }
+       {
+         Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P+0.2;
+         printf("current P:%f\n",Service.BlueToothBase.Information.P);
+       }
+       else if(hasData("PCUT"))
+       {
+         Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P-0.2;
+         printf("current P:%f\n",Service.BlueToothBase.Information.P);
+       }
+       else
+       {
+         printf("ERROR COMMAND\n");
+       }
                 
 		memset(Service.BlueToothBase.ReceiveArea, 0, 20);		//清零数组防止一些奇怪的情况
 	}
@@ -263,12 +261,6 @@ void DeBug_Interface()
 		OLED_Print(Position(Line4), temp);
 		break;
 
-	case Fuzzy_interface:
-		OLED_CLS();
-		sprintf(temp, "Fuzzy%d", (int)Fuzzy_Direction.Position.eAngle * 100);
-		OLED_Print(Position(Line1), temp);
-		break;
-
 	default:
 		sprintf(temp, "No Interface");
 		OLED_Print(Position(Line1), temp);
@@ -343,6 +335,13 @@ void System_Error(error Error_Number)
 		OLED_Print(Position(Line2), "the Car");
 		break;
 
+	case hardfault:
+		OLED_Init();
+		OLED_Print(Position(Line1), "hardfault");
+		OLED_Print(Position(Line2), "error");
+		OLED_Print(Position(Line3), "restart system");
+		break;
+
 	default:
 		OLED_Init();
 		OLED_Print(Position(Line1), "Unknown Error");
@@ -396,14 +395,5 @@ void LED_Interface()
 	{
 		led(LED3, LED_OFF);
 		led(LED0, LED_ON);
-	}
-
-	if (Fuzzy_Direction.isMatched)
-	{
-		led(LED2, LED_ON);
-	}
-	else
-	{
-		led(LED2, LED_OFF);
 	}
 }

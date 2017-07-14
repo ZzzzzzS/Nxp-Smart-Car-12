@@ -6,8 +6,6 @@ extern void Direction_Control();
 extern void Get_AD_Value();
 extern void Direction_Calculate();
 extern void Direction_PID();
-extern void Direction_Control_Fuzzy();
-extern void Similarity_Count_Fuzzy();
-extern void eRule_Init_Fuzzy();
+extern bool hasToroid();
 
 #endif //__INDUCTANCE_H__

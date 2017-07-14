@@ -30,7 +30,7 @@ typedef struct pidbasespeed
 ==========================================*/
 #define Stable_Times		5					//定义电机滤波速度
 #define MAX_SPEED			99					//定义最大速度
-#define MIN_SPEED			-20					//定义最小速度
+#define MIN_SPEED			-20				//定义最小速度
 
 #define MOTOR_FTM			FTM0
 #define RIGHT_PWM_BACK	FTM_CH3
@@ -46,7 +46,6 @@ typedef struct
 	int16 Turn_Speed;								//转向差速度
 	int16 Now_Speed;								//正交解码得出的当前速度
 	int16 Speed_Old[Stable_Times];			//电机功率滤波
-	pidbasespeed Base;
 }wheel;
 
 typedef struct
@@ -62,9 +61,9 @@ typedef struct
 
 #define AD1			ADC0_SE8					//PTB0
 #define AD2			ADC0_SE9					//PTB1
-#define AD3			ADC0_SE12					//PTB2
-#define AD4			ADC0_SE13      // PTB3		
-#define AD5			ADC1_SE11					//PTB5
+#define AD3			ADC0_SE12				//PTB2
+#define AD4			ADC0_SE13				// PTB3		
+#define AD5			ADC1_SE11				//PTB5
 
 
 #define AMP_MAX	5									//定义最大ADC端口数
@@ -72,9 +71,9 @@ typedef struct
 typedef enum Inductance_Position				//枚举定义电感位置
 {
 	LEFT,
-        FRONT_LEFT,
-        MIDDLE,
-        FRONT_RIGHT,
+    FRONT_LEFT,
+    MIDDLE,
+    FRONT_RIGHT,
 	RIGHT
 }Inductance_Position;
 
@@ -83,7 +82,7 @@ typedef struct
 	int16 AD_Value;									//ADC数模转换器采集到的值,8bit
 	int16 AD_Value_fixed;						//滤波后的值
 	int16 Normalized_Value;					//差比和的电感值
-	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+	int16 AD_Value_Old[10];						//权重向前滤波算法储存的前几次采集到的值
 }inductance;
 
 /*============================================
@@ -103,20 +102,6 @@ typedef struct direction							//差比和法方向控制
 	int16 sum[3];										//差比和相关定义
 	pidbasespeed PIDbase;						//PID计算类型
 }direction;
-
-typedef struct position
-{
-	float eAngle;									//夹角信息
-	float eLength;								//长度信息
-}position;
-
-typedef struct fuzzy_direction							//模糊控制法方向控制
-{
-	position Position;											//临时储存隶属度
-	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
-	position eGrade[MAX_FUZZY_RULE];				//储存隶属度
-	char		isMatched;										//判断是否匹配到
-}fuzzy_direction;
 
 /*============================================
 OLED显示相关定义
@@ -143,7 +128,6 @@ typedef enum Debug_Interface									//定义调试模式OLED界面编号
 	Inductance_Interface = 1,
 	Speed_Interface,
 	Direction_Interface,
-	Fuzzy_interface,
 
 	MAX_Interface
 }Debug_Interface;
@@ -167,6 +151,7 @@ typedef enum									//定义系统错误编号
 	Car_Stop,
 	No_Mode,
 	user_Stop,
+	hardfault,
 
 	MAX_error
 }Error_Num;
@@ -253,8 +238,6 @@ extern speed Speed;											//声明一个"speed类"的"对象"，全局储存
 extern inductance Road_Data[AMP_MAX];			//声明一个"Inductance类"的"对象"数组，电感信息,修改时记得修改蓝牙发送
 
 extern direction Direction;									//声明一个"Direction类"的"对象"，方向信息
-
-extern fuzzy_direction Fuzzy_Direction;				//声明一个"Fuzzy_Direction类"的"对象"，模糊控制方向信息
 
 extern service Service;										//声明一个"service类"的"对象"，串口发送等服务信息
 

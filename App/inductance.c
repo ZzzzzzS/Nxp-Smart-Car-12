@@ -34,12 +34,10 @@ void ADC_Init()
 void Direction_Control()
 {
 	Get_AD_Value();
-	//Similarity_Count_Fuzzy();
-	//Direction_Control_Fuzzy();
-	//if (!Fuzzy_Direction.isMatched)
-	//{
+	if (!hasToroid())
+	{
 		Direction_Calculate();
-	//}
+	}
 	Direction_PID();
 }
 
@@ -49,7 +47,7 @@ void Direction_Control()
 ==========================================*/
 /*============================================
 权重向前滤波法队列说明：
-    [0][1][2][3]
+    [0][1][2][3][4][5][6][7][8][9][10]
 旧数据        新数据
 低权值        高权值
 ==========================================*/
@@ -67,21 +65,23 @@ void Get_AD_Value()
 
 	for (counter i = 0; i < AMP_MAX; i++)
 	{
-		for (counter j = 0; j < 2; j++)						//对电感数据队列移位操作
+		for (counter j = 0; j < 9; j++)						//对电感数据队列移位操作
 		{
 			Road_Data[i].AD_Value_Old[j] = Road_Data[i].AD_Value_Old[j + 1];
 		}
-		Road_Data[i].AD_Value_Old[2] = Road_Data[i].AD_Value;		//更新队首数据值
+		Road_Data[i].AD_Value_Old[9] = Road_Data[i].AD_Value;		//更新队首数据值
 	}
 
 	for (counter i = 0; i < AMP_MAX; i++)						//装入权重向前滤波法处理后的值
 	{
 		Road_Data[i].AD_Value = 0;
-		for (counter j = 0; j < 3; j++)
+		int sum = 0;
+		for (counter j = 0; j < 10; j++)
 		{
 			Road_Data[i].AD_Value += Road_Data[i].AD_Value_Old[j] * (j + 1);
+			sum += (j+1);
 		}
-		Road_Data[i].AD_Value_fixed = Road_Data[i].AD_Value / 6;
+		Road_Data[i].AD_Value_fixed = Road_Data[i].AD_Value / sum;
 	}
 
 	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
@@ -176,8 +176,6 @@ void Direction_Calculate()
 #undef less
 
 	Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
-	Speed.Left.Base.Aim_Speed =Service.BlueToothBase.Information.speed;
-	Speed.Right.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
 
 	/*if (Direction.PIDbase.Error_Speed[Now_Error] > 20)
 	{
@@ -208,144 +206,15 @@ void Direction_PID()
 	Speed.Right.Turn_Speed = -Direction.PIDbase.PID_Out_Speed;
 }
 
-/*============================================
-函数名：eRule_Init_Fuzzy()
-作用:模糊控制论域eRule初始化
-==========================================*/
-
-void eRule_Init_Fuzzy()
+bool hasToroid()
 {
-	Fuzzy_Direction.eRule[0].eAngle = 0.887;					//初始化角度相似规则
-	Fuzzy_Direction.eRule[1].eAngle = 0;							//初始化角度相似规则
-	Fuzzy_Direction.eRule[2].eAngle = 0;							//初始化角度相似规则
-	Fuzzy_Direction.eRule[3].eAngle = 0;							//初始化角度相似规则
-	Fuzzy_Direction.eRule[4].eAngle = 0;							//初始化角度相似规则
-	Fuzzy_Direction.eRule[5].eAngle = 0;							//初始化角度相似规则
-																	//注意修改MAX_FUZZY_RULE!
-
-	Fuzzy_Direction.eRule[0].eLength = 97.76;				//初始化长度相似规则
-	Fuzzy_Direction.eRule[1].eLength = 0;					//初始化长度相似规则
-	Fuzzy_Direction.eRule[2].eLength = 0;					//初始化长度相似规则
-	Fuzzy_Direction.eRule[3].eLength = 0;					//初始化长度相似规则
-	Fuzzy_Direction.eRule[4].eLength = 0;					//初始化长度相似规则
-	Fuzzy_Direction.eRule[5].eLength = 0;					//初始化长度相似规则
-															//注意修改MAX_FUZZY_RULE!
-
-}
-
-/*============================================
-函数名：Similarity_Count_Fuzzy()
-作用:模糊控制计算模糊隶属度
-==========================================*/
-/*============================================
-方法：余弦相似性
-计算隶属度：设有一个N维空间
-取AMP_MAX个电感值构成一个N维列向量
-计算这个N维向量与已知N维向量的COS值
-来表示采集到的值与模糊论域中的值隶属程度
-==========================================*/
-
-void Similarity_Count_Fuzzy()
-{
-	float eDenominator = 0;														//余弦分母/临时变量
-	float eNumerator = 0;															//余弦分子/长度计算临时变量
-
-																					/*****误差角度计算*****/
-	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分子
+	if (false)
 	{
-		eNumerator += Road_Data[j].AD_Value_fixed;
+		//检测到圆环
+		return true;
 	}
-
-	for (counter j = 0; j < AMP_MAX; j++)									//计算余弦分母
+	else
 	{
-		eDenominator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
-	}
-	eDenominator = sqrt(eDenominator);//需要研究更好的开方函数
-	eDenominator *= 2.236;
-
-
-	Fuzzy_Direction.Position.eAngle = eNumerator / eDenominator;	//计算与(1,1,1,1,...)的夹角余弦值
-
-																	/*****误差长度计算*****/
-	for (counter j = 0; j < AMP_MAX; j++)									//计算向量长度
-	{
-		eNumerator += Road_Data[j].AD_Value_fixed * Road_Data[j].AD_Value_fixed;
-	}
-	Fuzzy_Direction.Position.eLength = sqrt(eNumerator);			//储存计算出的长度
-
-																	/*****隶属度计算*****/
-	for (counter j = 0; j < MAX_FUZZY_RULE; j++)
-	{
-		Fuzzy_Direction.eGrade[j].eAngle = Fuzzy_Direction.Position.eAngle - Fuzzy_Direction.eRule[j].eAngle;
-		Fuzzy_Direction.eGrade[j].eLength = Fuzzy_Direction.Position.eLength - Fuzzy_Direction.eRule[j].eLength;
-	}
-}
-
-/*============================================
-函数名：Direction_Control_Fuzzy()
-作用:模糊控制计算方向,速度等
-==========================================*/
-
-void Direction_Control_Fuzzy()
-{
-	static  int16 e;
-	led(LED2, LED_OFF);
-	Fuzzy_Direction.isMatched--;
-	if (Fuzzy_Direction.isMatched > 0)
-	{
-		Fuzzy_Direction.isMatched--;
-	}
-	else if (Fuzzy_Direction.isMatched < 0)
-	{
-		Fuzzy_Direction.isMatched = 0;
-	}
-	if (Fuzzy_Direction.isMatched == 0)
-	{
-		for (counter i = 0; i < MAX_FUZZY_RULE; i++)
-		{
-			if (Fuzzy_Direction.eGrade[i].eAngle < 0.05&&Fuzzy_Direction.eGrade[i].eAngle > -0.05)										//匹配相似度90%
-			{
-
-				if (0 == i)																					//根据匹配结果执行不同操作
-				{
-					if (Fuzzy_Direction.eGrade[i].eLength < 15 && Fuzzy_Direction.eGrade[i].eLength > -15)
-					{
-						e = 250 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-						led(LED2, LED_ON);
-						Fuzzy_Direction.isMatched = 5;//匹配成功标记
-					}
-				}
-				else if (1 == i)																			//根据匹配结果执行不同操作
-				{
-					if (Fuzzy_Direction.eGrade[i].eLength < 10 && Fuzzy_Direction.eGrade[i].eLength > -10)
-					{
-						e = 250 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-						Fuzzy_Direction.isMatched = 5;												//匹配成功标记
-						led(LED2, LED_ON);
-					}
-				}
-				else if (2 == i)																			//根据匹配结果执行不同操作
-				{
-					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-				}
-				else if (3 == i)																			//根据匹配结果执行不同操作
-				{
-					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-				}
-				else if (4 == i)																			//根据匹配结果执行不同操作
-				{
-					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-				}
-				else if (5 == i)																			//根据匹配结果执行不同操作
-				{
-					e = 0 * (1 - Fuzzy_Direction.eGrade[i].eAngle);
-				}
-			}
-		}
-	}
-
-	if (Fuzzy_Direction.isMatched)
-	{
-		Direction.PIDbase.Error_Speed[Now_Error] = e;
+		return false;
 	}
 }

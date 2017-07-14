@@ -11,7 +11,6 @@ void Init_System()
 	DisableInterrupts;																			//宏定义，禁止中断
 	uart_init(Bluetooth, Bluetooth_Band);												//串口初始化
 	ADC_Init();																					//ADC模数转换器初始化
-	eRule_Init_Fuzzy();																			//方向模糊控制论域初始化
 	Init_Key();																						//初始化按键	
 	Motor_Init();																					//电机初始化
 	Motor_PID_Init();																			//电机PID控制初始化

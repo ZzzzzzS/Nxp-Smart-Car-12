@@ -77,6 +77,8 @@ int enter_fputc(char ch)
 
 
 #include "VCAN_LCD.h"
+#include "peripheral.h"
+#include "data.h"
 
 /*!
  *  @brief      默认中断服务函数
@@ -103,13 +105,13 @@ void default_isr(void)
     site.y=10;
     LCD_Str_ENCH(site,tip_str , FCOLOUR,BCOLOUR);
 
-    while(1)
-    {
-        led_turn(LED1);
+    led_turn(LED1);
 
-        DEBUG_PRINTF("%s", tip_str);
-        DELAY_MS(1000);
-    }
+    DEBUG_PRINTF("%s", tip_str);
+    DELAY_MS(1000);
+    
+	System_Error(hardfault);
+
 }
 
 /* hard fault interrupt handler */
