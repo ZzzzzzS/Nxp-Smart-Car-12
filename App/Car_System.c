@@ -31,9 +31,9 @@ void Init_System()
 
 void Set_User_Information()
 {
-	Service.BlueToothBase.Information.speed = 40;
-	Service.BlueToothBase.Information.P = 0.5;
-	Service.BlueToothBase.Information.D = 40;
+	Service.BlueToothBase.Information.speed = 30;
+	Service.BlueToothBase.Information.P = 0.6;
+	Service.BlueToothBase.Information.D = 10;
 }
 
 /*============================================
