@@ -35,7 +35,7 @@ void Motor_Init()
 
 void Motor_Control()
 {
-	if (Service.MotorBase.AllowRun)																			//判断是否允许电机转动
+	/*if (Service.MotorBase.AllowRun)																			//判断是否允许电机转动
 	{
 		if (Speed.Right.Out_Speed >= 0)
 		{
@@ -58,7 +58,11 @@ void Motor_Control()
 			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM, 0);
 			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM_BACK, -Speed.Left.Out_Speed);
 		}
-	}
+	}*/
+  ftm_pwm_init(MOTOR_FTM, LEFT_PWM, MOTOR_HZ, 100);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, LEFT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM, MOTOR_HZ, 100);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
 }
 
 /*============================================

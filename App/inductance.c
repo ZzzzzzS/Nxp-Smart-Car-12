@@ -54,11 +54,11 @@ void Direction_Control()
 
 void Get_AD_Value()
 {
-	Road_Data[RIGHT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
-	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
-	Road_Data[MIDDLE].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
-	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
-	Road_Data[LEFT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
+	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
+	Road_Data[LEFT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
+	Road_Data[RIGHT].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
+	Road_Data[MIDDLE].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
+	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
 
 	//注意修改通道初始化
 	//注意修改通道初始化
@@ -88,7 +88,7 @@ void Get_AD_Value()
 	{
 		Service.InductanceBase.InductanceLost++;
 		if (Service.InductanceBase.InductanceLost >= 50);
-                  System_Error(Taget_Lost);
+                 // System_Error(Taget_Lost);
 	}
 	else
 	{
