@@ -159,8 +159,8 @@ typedef enum									//定义系统错误编号
 typedef enum Run_Mode											//定义调试模式编号
 {
 	inductance_Mode = 1,
-	Debug_Mode,
-	Release_Mode,
+	FastMode,
+	SlowMode,
 
 	Max_Mode
 }Run_Mode;

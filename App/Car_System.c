@@ -30,9 +30,19 @@ void Init_System()
 
 void Set_User_Information()
 {
-	Service.BlueToothBase.Information.speed = 30;
-	Service.BlueToothBase.Information.P = 0.6;
-	Service.BlueToothBase.Information.D = 10;
+	if (Service.RunMode == FastMode)
+	{
+		Service.BlueToothBase.Information.speed = 30;
+		Service.BlueToothBase.Information.P = 0.6;
+		Service.BlueToothBase.Information.D = 10;
+	}
+	else if (Service.RunMode == SlowMode)
+	{
+		Service.BlueToothBase.Information.speed = 30;
+		Service.BlueToothBase.Information.P = 0.6;
+		Service.BlueToothBase.Information.D = 10;
+	}
+	
 }
 
 /*============================================
@@ -42,8 +52,8 @@ void Set_User_Information()
 
 void Get_System_Ready()
 {
-	Set_User_Information();												//设置用户参数
 	OLED_Interface();														//初始参数设置界面
+	Set_User_Information();												//设置用户参数
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -71,7 +81,7 @@ void system_RunTime_Update()
 
 	switch (Service.RunMode)										//判断不同模式执行不同操作
 	{
-	case Debug_Mode:
+	case FastMode:
 		if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
 		{
 			//OLED_Init();
@@ -94,11 +104,15 @@ void system_RunTime_Update()
 		Receive_Data();
 		break;
 
-	case Release_Mode:
+	case SlowMode:
+		DeBug_Interface();
+		LED_Interface();
+		Send_Data();
+		Receive_Data();
 		break;
 
 	default:
-		Service.RunMode = Debug_Mode;
+		Service.RunMode = inductance_Mode;
 		System_Error(No_Mode);
 		break;
 	}

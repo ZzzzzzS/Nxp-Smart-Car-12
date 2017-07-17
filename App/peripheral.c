@@ -142,9 +142,9 @@ void OLED_Interface()
 {
 	OLED_Print(Position(Line1), "Energy Star");
 	OLED_Print(Position(Line2), "inductance");
-	OLED_Print(Position(Line3), "debug");
-	OLED_Print(Position(Line4), "relese");
-	Service.RunMode = Debug_Mode;							//模式判断标志位
+	OLED_Print(Position(Line3), "fast");
+	OLED_Print(Position(Line4), "slow");
+	Service.RunMode = inductance_Mode;							//模式判断标志位
 	OLED_Print(100, 2 * Service.RunMode, "<-");
 	while (1)
 	{
@@ -165,16 +165,16 @@ void OLED_Interface()
 					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
-				case Debug_Mode:
+				case FastMode:
 					Debug_Init();
 					Service.MotorBase.AllowRun = true;
 					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
-				case Release_Mode:
+				case SlowMode:
+					Debug_Init();
 					Service.MotorBase.AllowRun = true;
 					Service.MotorBase.GetSpeedAbs = true;
-					OLED_CLS();
 					break;
 
 				default:
@@ -193,8 +193,8 @@ void OLED_Interface()
 				OLED_CLS();
 				OLED_Print(Position(Line1), "Energy Star");
 				OLED_Print(Position(Line2), "inductance");
-				OLED_Print(Position(Line3), "debug");
-				OLED_Print(Position(Line4), "relese");
+				OLED_Print(Position(Line3), "fast");
+				OLED_Print(Position(Line4), "slow");
 				Service.RunMode++;
 				if (Service.RunMode >= Max_Mode)
 					Service.RunMode = inductance_Mode;
