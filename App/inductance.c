@@ -112,7 +112,7 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-#define FrontValue 0.5
+#define FrontValue 0
 		Direction.sum[0] = 100 * ((FrontValue * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) 
 			- (FrontValue* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / 
 			((FrontValue * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed) 
@@ -156,7 +156,7 @@ void Direction_Calculate()
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
 	}
 
-#define more 32
+/*#define more 32
 #define less 20
 
 	Direction.PIDbase.D = Service.BlueToothBase.Information.D;
@@ -164,7 +164,7 @@ void Direction_Calculate()
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
-		Direction.PIDbase.P *= 0.3;
+		Direction.PIDbase.P *= Direction.PIDbase.Error_Speed[Now_error]*;
 		Direction.PIDbase.D *= 0.3;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
@@ -178,7 +178,18 @@ void Direction_Calculate()
 		Direction.PIDbase.D *= 1.3;
 	}
 #undef more
-#undef less
+#undef less*/
+        Direction.PIDbase.D = Service.BlueToothBase.Information.D;
+	Direction.PIDbase.P = Service.BlueToothBase.Information.P;
+        if(Direction.PIDbase.Error_Speed[Now_Error]>0)
+          Direction.PIDbase.P*=(0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
+        else
+          Direction.PIDbase.P*=(-0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
+        
+        if(Direction.PIDbase.Error_Speed[Now_Error]>0)
+          Direction.PIDbase.D*=(0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
+        else
+          Direction.PIDbase.D*=(-0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
 
 	Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
 	TempSpeed = Service.BlueToothBase.Information.speed;
@@ -210,7 +221,8 @@ bool hasToroid()
 		TempSpeed= Service.BlueToothBase.Information.speed / 2;	//开环跑
 		if ((Road_Data[LEFT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed) && (Road_Data[RIGHT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed))
 		{
-			Direction.PIDbase.Error_Speed[Now_Error] = -45;//基本最大误差
+                  TempSpeed= Service.BlueToothBase.Information.speed / 4;
+			//Direction.PIDbase.Error_Speed[Now_Error] = -45;//基本最大误差
 			return true;
 		}
 		return false;
