@@ -38,7 +38,7 @@ void Set_User_Information()
 	}
 	else if (Service.RunMode == SlowMode)
 	{
-		Service.BlueToothBase.Information.speed = 7;
+		Service.BlueToothBase.Information.speed = 15;
 		Service.BlueToothBase.Information.P = 0.6;
 		Service.BlueToothBase.Information.D = 10;
 	}
