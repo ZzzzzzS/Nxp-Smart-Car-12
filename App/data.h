@@ -29,8 +29,8 @@ typedef struct pidbasespeed
 电机控制相关定义
 ==========================================*/
 #define Stable_Times		5					//定义电机滤波速度
-#define MAX_SPEED			99					//定义最大速度
-#define MIN_SPEED			-20				//定义最小速度
+#define MAX_SPEED			50					//定义最大速度
+#define MIN_SPEED			-50				//定义最小速度
 
 #define MOTOR_FTM			FTM0
 #define RIGHT_PWM_BACK	FTM_CH3
@@ -240,5 +240,7 @@ extern inductance Road_Data[AMP_MAX];			//声明一个"Inductance类"的"对象"
 extern direction Direction;									//声明一个"Direction类"的"对象"，方向信息
 
 extern service Service;										//声明一个"service类"的"对象"，串口发送等服务信息
+
+extern int count;
 
 #endif  //__DATA_H__

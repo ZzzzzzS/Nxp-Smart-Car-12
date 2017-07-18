@@ -142,11 +142,11 @@ void Direction_Calculate()
 
 	Direction.PIDbase.Error_Speed[Now_Error] = Direction.err;
 
-	if (Direction.sum[0] > 0)
+	if (Direction.sum[0] > 30)
 	{
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[2]) / 7;
 	}
-	if (Direction.sum[0] < 0)
+	if (Direction.sum[0] < -30)
 	{
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
 	}
