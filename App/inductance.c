@@ -112,7 +112,12 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-		Direction.sum[0] = 100 * ((0 * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) - (0* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / (0 * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed + 0* Road_Data[FRONT_RIGHT].AD_Value_fixed);				//差比和计算
+#define FrontValue 0.5
+		Direction.sum[0] = 100 * ((FrontValue * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) 
+			- (FrontValue* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / 
+			((FrontValue * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed) 
+				+ (Road_Data[RIGHT].AD_Value_fixed + FrontValue* Road_Data[FRONT_RIGHT].AD_Value_fixed));				//差比和计算
+#undef FrontValue
 	}
 	else
 	{
@@ -154,8 +159,8 @@ void Direction_Calculate()
 #define more 32
 #define less 20
 
-	Direction.PIDbase.D = Service.BlueToothBase.Information.D;//20
-	Direction.PIDbase.P = Service.BlueToothBase.Information.P;//0.5
+	Direction.PIDbase.D = Service.BlueToothBase.Information.D;
+	Direction.PIDbase.P = Service.BlueToothBase.Information.P;
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
@@ -176,17 +181,8 @@ void Direction_Calculate()
 #undef less
 
 	Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
+	TempSpeed = Service.BlueToothBase.Information.speed;
 
-	/*if (Direction.PIDbase.Error_Speed[Now_Error] > 20)
-	{
-	//Speed.Left.Base.Aim_Speed-=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
-        Speed.Right.Base.Aim_Speed-=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
-	}
-	else if (Direction.PIDbase.Error_Speed[Now_Error] < -20)
-	{
-	Speed.Left.Base.Aim_Speed+=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
-        //Speed.Right.Base.Aim_Speed+=Direction.PIDbase.Error_Speed[Now_Error]*0.1;
-	}*/
 }
 
 /*============================================
@@ -208,13 +204,21 @@ void Direction_PID()
 
 bool hasToroid()
 {
-	if (false)
+	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 75 && Road_Data[MIDDLE].AD_Value_fixed < 75)
 	{
-		//检测到圆环
-		return true;
+		Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed / 2;
+		TempSpeed= Service.BlueToothBase.Information.speed / 2;	//开环跑
+		if ((Road_Data[LEFT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed) && (Road_Data[RIGHT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed))
+		{
+			Direction.PIDbase.Error_Speed[Now_Error] = -45;//基本最大误差
+			return true;
+		}
+		return false;
+		led(LED2, LED_ON);
 	}
 	else
 	{
 		return false;
+		led(LED2, LED_OFF);
 	}
 }
