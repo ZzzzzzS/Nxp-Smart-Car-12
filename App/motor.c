@@ -8,11 +8,7 @@
 
 void Speed_Control()
 {
-	if (count >= 20)
-	{
-		Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
-		count = 0;
-	}
+	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Comput();													//加入方向环控制
 	//Speed_Stable();														//速度滤波使系统稳定
@@ -86,7 +82,7 @@ void Motor_PID_Init()
 	Speed.Base.Error_Speed[2] = 0;					//电机控制相关初始化				
 
 	Speed.Base.P = 0.05;
-	Speed.Base.I = 0.02;
+	Speed.Base.I = 0.0;
 	Speed.Base.D = 0;
 
 }
@@ -131,8 +127,10 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
+	//Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
+	//Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
+        Speed.Left.Out_Speed = Speed.Left.Turn_Speed + 40;
+	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + 40;
 }
 
 /*============================================
@@ -225,7 +223,7 @@ void Speed_Chack()
 	{
 		if ((Speed.Left.Now_Speed < 1) && (Speed.Left.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
 		{
-			//System_Error(Motor_Stop);
+			System_Error(Motor_Stop);
 		}
 	}
 }

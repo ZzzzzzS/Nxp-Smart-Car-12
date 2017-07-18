@@ -88,7 +88,7 @@ void Get_AD_Value()
 	{
 		Service.InductanceBase.InductanceLost++;
 		if (Service.InductanceBase.InductanceLost >= 50);
-                 // System_Error(Taget_Lost);
+                  System_Error(Taget_Lost);
 	}
 	else
 	{
@@ -151,26 +151,26 @@ void Direction_Calculate()
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
 	}
 
-#define more 70
-#define less 15
+#define more 35
+#define less 20
 
 	Direction.PIDbase.D = Service.BlueToothBase.Information.D;//20
 	Direction.PIDbase.P = Service.BlueToothBase.Information.P;//0.5
 
 	if (Direction.PIDbase.Error_Speed[Now_Error]<less && Direction.PIDbase.Error_Speed[Now_Error]>-less)
 	{
-		//Direction.PIDbase.P *= 0.8;
-		//Direction.PIDbase.D *= 0.5;
+		Direction.PIDbase.P *= 0.3;
+		Direction.PIDbase.D *= 0.3;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
 	{
-		//Direction.PIDbase.P *= 0.8;
-		//Direction.PIDbase.D *= 0.9;
+		Direction.PIDbase.P *= 1.2;
+		Direction.PIDbase.D *= 1.2;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] < -more)
 	{
-		//Direction.PIDbase.P *= 0.8;
-		//Direction.PIDbase.D *= 1.2;
+		Direction.PIDbase.P *= 1.2;
+		Direction.PIDbase.D *= 1.2;
 	}
 #undef more
 #undef less
