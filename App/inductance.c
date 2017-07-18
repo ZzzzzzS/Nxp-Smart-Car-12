@@ -182,9 +182,9 @@ void Direction_Calculate()
         Direction.PIDbase.D = Service.BlueToothBase.Information.D;
 	Direction.PIDbase.P = Service.BlueToothBase.Information.P;
         if(Direction.PIDbase.Error_Speed[Now_Error]>0)
-          Direction.PIDbase.P*=(0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
+          Direction.PIDbase.P*=(0.04*Direction.PIDbase.Error_Speed[Now_Error]+0.1);
         else
-          Direction.PIDbase.P*=(-0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
+          Direction.PIDbase.P*=(-0.04*Direction.PIDbase.Error_Speed[Now_Error]+0.1);
         
         if(Direction.PIDbase.Error_Speed[Now_Error]>0)
           Direction.PIDbase.D*=(0.03*Direction.PIDbase.Error_Speed[Now_Error]+0.18);
