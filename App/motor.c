@@ -35,7 +35,7 @@ void Motor_Init()
 
 void Motor_Control()
 {
-	/*if (Service.MotorBase.AllowRun)																			//判断是否允许电机转动
+	if (Service.MotorBase.AllowRun)																			//判断是否允许电机转动
 	{
 		if (Speed.Right.Out_Speed >= 0)
 		{
@@ -58,11 +58,11 @@ void Motor_Control()
 			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM, 0);
 			ftm_pwm_duty(MOTOR_FTM, LEFT_PWM_BACK, -Speed.Left.Out_Speed);
 		}
-	}*/
-  ftm_pwm_init(MOTOR_FTM, LEFT_PWM, MOTOR_HZ, 100);      //初始化 电机 PWM
+	}
+  /*ftm_pwm_init(MOTOR_FTM, LEFT_PWM, MOTOR_HZ, 50);      //初始化 电机 PWM
 	ftm_pwm_init(MOTOR_FTM, LEFT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
-	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM, MOTOR_HZ, 100);      //初始化 电机 PWM
-	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM, MOTOR_HZ, 50);      //初始化 电机 PWM
+	ftm_pwm_init(MOTOR_FTM, RIGHT_PWM_BACK, MOTOR_HZ, 0);      //初始化 电机 PWM*/
 }
 
 /*============================================
@@ -81,9 +81,9 @@ void Motor_PID_Init()
 	Speed.Base.Error_Speed[1] = 0;					//电机控制相关初始化
 	Speed.Base.Error_Speed[2] = 0;					//电机控制相关初始化				
 
-	Speed.Base.P = 0.4;
+	Speed.Base.P = 0.05;
 	Speed.Base.I = 0.02;
-	Speed.Base.D = 4;
+	Speed.Base.D = 0;
 
 }
 
@@ -127,8 +127,8 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.15;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed;
+	Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
+	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
 }
 
 /*============================================
@@ -217,9 +217,9 @@ void Speed_Chack()
 		Speed.Right.Out_Speed = MIN_SPEED;
 	}
 
-	if ((Speed.Right.Now_Speed < 3) && (Speed.Right.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
+	if ((Speed.Right.Now_Speed < 1) && (Speed.Right.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
 	{
-		if ((Speed.Left.Now_Speed < 3) && (Speed.Left.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
+		if ((Speed.Left.Now_Speed < 1) && (Speed.Left.Out_Speed > 90) && (Service.MotorBase.AllowRun))	//检测系统错误
 		{
 			//System_Error(Motor_Stop);
 		}

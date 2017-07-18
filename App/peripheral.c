@@ -144,7 +144,7 @@ void OLED_Interface()
 	OLED_Print(Position(Line2), "inductance");
 	OLED_Print(Position(Line3), "fast");
 	OLED_Print(Position(Line4), "slow");
-	Service.RunMode = inductance_Mode;							//模式判断标志位
+	Service.RunMode = SlowMode;							//模式判断标志位
 	OLED_Print(100, 2 * Service.RunMode, "<-");
 	while (1)
 	{
@@ -289,7 +289,7 @@ void Debug_Init()
 	Service.OLEDbase.OLED_Renew = 0;
 	Service.OLEDbase.OLED_Interface = Inductance_Interface;
 	Service.BlueToothBase.AllowedReceiveData = true;
-	Service.BlueToothBase.AllowedSendData = false;
+	Service.BlueToothBase.AllowedSendData = true;
 	init_LED();
 	OLED_CLS();
 }

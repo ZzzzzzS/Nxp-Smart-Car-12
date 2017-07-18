@@ -221,7 +221,7 @@ typedef char		bool;
 #define Key4   PTC7									//按键管脚定义
 #define Key1    PTA25									//按键管脚定义
 
-#define Bluetooth		UART1						//宏定义Bluetooth®发送端口
+#define Bluetooth		UART4						//宏定义Bluetooth®发送端口
 #define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 
 #define REED		PTC5						//定义停车检测管脚
