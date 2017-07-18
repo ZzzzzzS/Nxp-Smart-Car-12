@@ -151,7 +151,7 @@ void Direction_Calculate()
 		Direction.PIDbase.Error_Speed[Now_Error] = (Direction.sum[0] * 5 + 2 * Direction.sum[1]) / 7;
 	}
 
-#define more 35
+#define more 32
 #define less 20
 
 	Direction.PIDbase.D = Service.BlueToothBase.Information.D;//20
@@ -164,13 +164,13 @@ void Direction_Calculate()
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] >  more)
 	{
-		Direction.PIDbase.P *= 1.2;
-		Direction.PIDbase.D *= 1.2;
+		Direction.PIDbase.P *= 1.4;
+		Direction.PIDbase.D *= 1.3;
 	}
 	if (Direction.PIDbase.Error_Speed[Now_Error] < -more)
 	{
-		Direction.PIDbase.P *= 1.2;
-		Direction.PIDbase.D *= 1.2;
+		Direction.PIDbase.P *= 1.4;
+		Direction.PIDbase.D *= 1.3;
 	}
 #undef more
 #undef less
