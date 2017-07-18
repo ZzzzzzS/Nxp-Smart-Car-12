@@ -19,7 +19,7 @@ void Stop_Car_Init()
 
 void Stop_Car()
 {
-	if (gpio_get(REED) != 0)
+	if (gpio_get(REED) == 0)
 	{
 		System_Error(Car_Stop);
 	}
@@ -34,11 +34,15 @@ void Send_Data()
 {
 	if (Service.BlueToothBase.AllowedSendData)
 	{
-		char var[AMP_MAX];
+		char var[AMP_MAX+2];
 		for (counter i = 0; i < AMP_MAX; i++)
 		{
 			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
 		}
+                
+                var[AMP_MAX]=Speed.Left.Now_Speed;
+                var[AMP_MAX+1]=Speed.Right.Now_Speed;
+                
 		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}
 }
@@ -48,20 +52,67 @@ void Send_Data()
 作用：蓝牙串口接收
 ==========================================*/
 
+
 void Receive_Data()
 {
 	if (uart_querystr(Bluetooth, Service.BlueToothBase.ReceiveArea, 19))
 	{
 		led(LED1, LED_ON);
-		printf("Reseive:%s", Service.BlueToothBase.ReceiveArea);
-		if (hasData("S"))
+		if (hasData("STOP"))
 		{
 			System_Error(user_Stop);
 		}
-		else if (hasData("..."))
+		else if (hasData("SPEEDADD"))
 		{
-
+			Service.BlueToothBase.Information.speed += 5;
+			printf("Current Speed:%d\n", Service.BlueToothBase.Information.speed);
 		}
+		else if (hasData("SPEEDCUT"))
+		{
+			Service.BlueToothBase.Information.speed -= 5;
+			if (Service.BlueToothBase.Information.speed <= 0)
+				Service.BlueToothBase.Information.speed = 0;
+
+			printf("Current Speed:%d\n", Service.BlueToothBase.Information.speed);
+		}
+		else if (hasData("SENDDATA"))
+		{
+			if (Service.BlueToothBase.AllowedSendData == 1)
+			{
+				Service.BlueToothBase.AllowedSendData = 0;
+				printf("AllowedSendData=false\n");
+			}
+			else if (Service.BlueToothBase.AllowedSendData == 0)
+			{
+				Service.BlueToothBase.AllowedSendData = 1;
+				printf("AllowedSendData=true\n");
+			}
+		}
+       else if(hasData("DADD"))
+       {
+         Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D+1;
+         printf("current D:%f\n",Service.BlueToothBase.Information.D);
+       }
+       else if(hasData("DCUT"))
+       {
+         Service.BlueToothBase.Information.D=Service.BlueToothBase.Information.D-1;
+         printf("current D:%f\n",Service.BlueToothBase.Information.D);
+       }
+		else if(hasData("PADD"))
+       {
+         Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P+0.2;
+         printf("current P:%f\n",Service.BlueToothBase.Information.P);
+       }
+       else if(hasData("PCUT"))
+       {
+         Service.BlueToothBase.Information.P=Service.BlueToothBase.Information.P-0.2;
+         printf("current P:%f\n",Service.BlueToothBase.Information.P);
+       }
+       else
+       {
+         printf("ERROR COMMAND\n");
+       }
+                
 		memset(Service.BlueToothBase.ReceiveArea, 0, 20);		//清零数组防止一些奇怪的情况
 	}
 	else
@@ -91,9 +142,9 @@ void OLED_Interface()
 {
 	OLED_Print(Position(Line1), "Energy Star");
 	OLED_Print(Position(Line2), "inductance");
-	OLED_Print(Position(Line3), "debug");
-	OLED_Print(Position(Line4), "relese");
-	Service.RunMode = Debug_Mode;							//模式判断标志位
+	OLED_Print(Position(Line3), "fast");
+	OLED_Print(Position(Line4), "slow");
+	Service.RunMode = SlowMode;							//模式判断标志位
 	OLED_Print(100, 2 * Service.RunMode, "<-");
 	while (1)
 	{
@@ -111,16 +162,19 @@ void OLED_Interface()
 				case inductance_Mode:
 					Debug_Init();
 					Service.MotorBase.AllowRun = false;
+					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
-				case Debug_Mode:
+				case FastMode:
 					Debug_Init();
 					Service.MotorBase.AllowRun = true;
+					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
-				case Release_Mode:
+				case SlowMode:
+					Debug_Init();
 					Service.MotorBase.AllowRun = true;
-					OLED_CLS();
+					Service.MotorBase.GetSpeedAbs = true;
 					break;
 
 				default:
@@ -139,8 +193,8 @@ void OLED_Interface()
 				OLED_CLS();
 				OLED_Print(Position(Line1), "Energy Star");
 				OLED_Print(Position(Line2), "inductance");
-				OLED_Print(Position(Line3), "debug");
-				OLED_Print(Position(Line4), "relese");
+				OLED_Print(Position(Line3), "fast");
+				OLED_Print(Position(Line4), "slow");
 				Service.RunMode++;
 				if (Service.RunMode >= Max_Mode)
 					Service.RunMode = inductance_Mode;
@@ -156,6 +210,7 @@ void OLED_Interface()
 
 void DeBug_Interface()
 {
+  OLED_CLS();
 	char temp[10];
 	switch (Service.OLEDbase.OLED_Interface)
 	{
@@ -166,7 +221,7 @@ void DeBug_Interface()
 		OLED_Print(Position(Line2), temp);
 		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
-		sprintf(temp, "M=%d", Road_Data[MIDDLE].AD_Value_fixed);
+		sprintf(temp, "M%d", Road_Data[MIDDLE].AD_Value_fixed);
 		OLED_Print(Position(Line4), temp);
 		break;
 
@@ -176,8 +231,8 @@ void DeBug_Interface()
 		OLED_Print(Position(Line1), temp);
 		sprintf(temp, "now L%dR%d", Speed.Left.Now_Speed, Speed.Right.Now_Speed);				//当前速度
 		OLED_Print(Position(Line2), temp);
-		sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
-		OLED_Print(Position(Line3), temp);
+		/*sprintf(temp, "L%dR%d", Speed.Left.Out_Speed, Speed.Right.Out_Speed);							//目标速度
+		OLED_Print(Position(Line3), temp);*/
 		sprintf(temp, "%d %d", Speed.Base.Aim_Speed, Speed.Base.Now_Speed);																//设定速度
 		OLED_Print(Position(Line4), temp);
 
@@ -204,12 +259,6 @@ void DeBug_Interface()
 		OLED_Print(Position(Line3), temp);
 		sprintf(temp, "%d %d %d", Direction.sum[0], Direction.sum[1], Direction.sum[2]);
 		OLED_Print(Position(Line4), temp);
-		break;
-
-	case Fuzzy_interface:
-		OLED_CLS();
-		sprintf(temp, "Fuzzy%d", (int)Fuzzy_Direction.Position.eAngle * 100);
-		OLED_Print(Position(Line1), temp);
 		break;
 
 	default:
@@ -243,7 +292,7 @@ void DeBug_Interface()
 void Debug_Init()
 {
 	Service.OLEDbase.OLED_Renew = 0;
-	Service.OLEDbase.OLED_Interface = Speed_Interface;
+	Service.OLEDbase.OLED_Interface = Inductance_Interface;
 	Service.BlueToothBase.AllowedReceiveData = true;
 	Service.BlueToothBase.AllowedSendData = true;
 	init_LED();
@@ -289,6 +338,13 @@ void System_Error(error Error_Number)
 		OLED_Init();
 		OLED_Print(Position(Line1), "user stop");
 		OLED_Print(Position(Line2), "the Car");
+		break;
+
+	case hardfault:
+		OLED_Init();
+		OLED_Print(Position(Line1), "hardfault");
+		OLED_Print(Position(Line2), "error");
+		OLED_Print(Position(Line3), "restart system");
 		break;
 
 	default:
@@ -344,14 +400,5 @@ void LED_Interface()
 	{
 		led(LED3, LED_OFF);
 		led(LED0, LED_ON);
-	}
-
-	if (Fuzzy_Direction.isMatched)
-	{
-		led(LED2, LED_ON);
-	}
-	else
-	{
-		led(LED2, LED_OFF);
 	}
 }

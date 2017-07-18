@@ -28,15 +28,15 @@ typedef struct pidbasespeed
 /*============================================
 电机控制相关定义
 ==========================================*/
-#define Stable_Times		2					//定义电机滤波速度
-#define MAX_SPEED			99					//定义最大速度
-#define MIN_SPEED			-99				//定义最小速度
+#define Stable_Times		5					//定义电机滤波速度
+#define MAX_SPEED			50					//定义最大速度
+#define MIN_SPEED			-50				//定义最小速度
 
-#define MOTOR_FTM   FTM0
-#define RIGHT_PWM			FTM_CH3
-#define RIGHT_PWM_BACK  FTM_CH4
-#define LEFT_PWM_BACK		FTM_CH1
-#define LEFT_PWM				FTM_CH2
+#define MOTOR_FTM			FTM0
+#define RIGHT_PWM_BACK	FTM_CH3
+#define RIGHT_PWM			FTM_CH4
+#define LEFT_PWM				FTM_CH1
+#define LEFT_PWM_BACK		FTM_CH2
 
 #define MOTOR_HZ    20*1000				//定义电机工作频率
 
@@ -59,20 +59,22 @@ typedef struct
 电感数据采集相关宏定义
 ==========================================*/
 
-#define AD1			ADC0_SE8						//PTB0
-#define AD2			ADC0_SE9						//PTB1
-#define AD3			ADC0_SE12					//PTB2
-#define AD4			ADC0_SE13					//PTB3
-#define AD5			ADC1_SE10					//PTB4
+#define AD1			ADC0_SE8					//PTB0
+#define AD2			ADC0_SE9					//PTB1
+#define AD3			ADC0_SE12				//PTB2
+#define AD4			ADC0_SE13				// PTB3		
+#define AD5			ADC1_SE11				//PTB5
+
+
 #define AMP_MAX	5									//定义最大ADC端口数
 
 typedef enum Inductance_Position				//枚举定义电感位置
 {
 	LEFT,
-	RIGHT,
-	MIDDLE,
-	FRONT_LEFT,
-	FRONT_RIGHT,
+    FRONT_LEFT,
+    MIDDLE,
+    FRONT_RIGHT,
+	RIGHT
 }Inductance_Position;
 
 typedef struct
@@ -80,7 +82,7 @@ typedef struct
 	int16 AD_Value;									//ADC数模转换器采集到的值,8bit
 	int16 AD_Value_fixed;						//滤波后的值
 	int16 Normalized_Value;					//差比和的电感值
-	int16 AD_Value_Old[4];						//权重向前滤波算法储存的前几次采集到的值
+	int16 AD_Value_Old[10];						//权重向前滤波算法储存的前几次采集到的值
 }inductance;
 
 /*============================================
@@ -89,10 +91,10 @@ typedef struct
 
 #define MAX_FUZZY_RULE		6						//模糊论域大小
 
-#define Lk				0.5723
-#define Lb			-0.2530
-#define Rk			-0.5703
-#define Rb			0.2424
+#define Lk				0.7507
+#define Lb			-0.2793
+#define Rk			-0.7098
+#define Rb			-0.2622
 
 typedef struct direction							//差比和法方向控制
 {
@@ -100,20 +102,6 @@ typedef struct direction							//差比和法方向控制
 	int16 sum[3];										//差比和相关定义
 	pidbasespeed PIDbase;						//PID计算类型
 }direction;
-
-typedef struct position
-{
-	float eAngle;									//夹角信息
-	float eLength;								//长度信息
-}position;
-
-typedef struct fuzzy_direction							//模糊控制法方向控制
-{
-	position Position;											//临时储存隶属度
-	position eRule[MAX_FUZZY_RULE];				//储存模糊论域
-	position eGrade[MAX_FUZZY_RULE];				//储存隶属度
-	char		isMatched;										//判断是否匹配到
-}fuzzy_direction;
 
 /*============================================
 OLED显示相关定义
@@ -140,7 +128,6 @@ typedef enum Debug_Interface									//定义调试模式OLED界面编号
 	Inductance_Interface = 1,
 	Speed_Interface,
 	Direction_Interface,
-	Fuzzy_interface,
 
 	MAX_Interface
 }Debug_Interface;
@@ -164,6 +151,7 @@ typedef enum									//定义系统错误编号
 	Car_Stop,
 	No_Mode,
 	user_Stop,
+	hardfault,
 
 	MAX_error
 }Error_Num;
@@ -171,17 +159,26 @@ typedef enum									//定义系统错误编号
 typedef enum Run_Mode											//定义调试模式编号
 {
 	inductance_Mode = 1,
-	Debug_Mode,
-	Release_Mode,
+	FastMode,
+	SlowMode,
 
 	Max_Mode
 }Run_Mode;
+
+typedef struct UserInformation
+{
+	unsigned char speed;
+	float P;
+	float I;
+	float D;
+}UserInformation;
 
 typedef struct BlueTooth
 {
 	char AllowedSendData;					//发送允许位
 	char AllowedReceiveData;				//接收允许位
 	unsigned char ReceiveArea[20];		//接收区临时缓存
+	UserInformation Information;		//储存用户数据
 	union convert_data						//浮点数转换共用体
 	{
 		float Float_Base;
@@ -197,6 +194,7 @@ typedef struct Inductance
 typedef struct Motor
 {
 	char AllowRun;
+	char GetSpeedAbs;
 }Motor;
 
 typedef struct service
@@ -217,16 +215,16 @@ typedef struct service
 #define flase		0
 typedef char		bool;
 
-#define Key1   PTC13									//按键管脚定义
+#define Key5  PTC13									//按键管脚定义
 #define Key2   PTC11									//按键管脚定义
 #define Key3   PTC9									//按键管脚定义,这个按钮有问题
 #define Key4   PTC7									//按键管脚定义
-#define key5	   PTC5									//按键管脚定义
+#define Key1    PTA25									//按键管脚定义
 
-#define Bluetooth		UART1						//宏定义Bluetooth®发送端口
+#define Bluetooth		UART4						//宏定义Bluetooth®发送端口
 #define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 
-#define REED		PTE8						//定义停车检测管脚
+#define REED		PTC5						//定义停车检测管脚
 
 typedef unsigned char		counter;			//定义累加器类型
 typedef unsigned char		error;				//定义错误类型
@@ -241,8 +239,8 @@ extern inductance Road_Data[AMP_MAX];			//声明一个"Inductance类"的"对象"
 
 extern direction Direction;									//声明一个"Direction类"的"对象"，方向信息
 
-extern fuzzy_direction Fuzzy_Direction;				//声明一个"Fuzzy_Direction类"的"对象"，模糊控制方向信息
-
 extern service Service;										//声明一个"service类"的"对象"，串口发送等服务信息
+
+extern int count;
 
 #endif  //__DATA_H__

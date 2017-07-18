@@ -12,6 +12,7 @@ extern void Debug_Init();
 extern char CharAbs(char a);
 extern void init_LED();
 extern void LED_Interface();
+extern void System_Error(error Error_Number);
 
 
 #endif // __PERIPHERAL_H__

@@ -26,7 +26,8 @@ int core_clk_khz;
 int core_clk_mhz;
 int bus_clk_khz;
 
-extern void main(void);
+void main(void)
+{}
 
 /*!
  *  @brief      kinetis Æô¶¯º¯Êý

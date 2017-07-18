@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\ProgramFiles\iar\common\bin\cspybat" -f "D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.general.xcl" --backend -f "D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.driver.xcl" 
+"D:\ProgramFiles\iar\common\bin\cspybat" -f "D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.general.xcl" --backend -f "D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\ProgramFiles\iar\common\bin\cspybat" -f "D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\m1899\Documents\单片机学习\Powered by ZZS\2017赛季\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.driver.xcl" 
+"D:\ProgramFiles\iar\common\bin\cspybat" -f "D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\m1899\Documents\项目与比赛\2017NXP智能车\控制程序\第一版20170202\Prj\IAR\settings\vcan_Kinetis.FN15_Debug.driver.xcl" 
 
 @echo off 
 :end

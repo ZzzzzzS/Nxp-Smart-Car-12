@@ -1,3 +1,12 @@
 *.a
 *.o
 Prj/IAR/FN15_debug/
+*.bin
+*.out
+*.sim
+*.tmp
+*.bak
+*.dep
+*.sfr
+settings/
+*.ink
