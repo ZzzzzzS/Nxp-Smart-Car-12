@@ -64,7 +64,7 @@ typedef struct
 #define AD2			ADC0_SE9					//PTB1
 #define AD3			ADC0_SE12				//PTB2
 #define AD4			ADC0_SE13				// PTB3		
-#define AD5			ADC1_SE11				//PTB5
+#define AD5			ADC1_SE10				//PTB5
 
 
 #define AMP_MAX	5									//定义最大ADC端口数
@@ -82,7 +82,6 @@ typedef struct
 {
 	int16 AD_Value;									//ADC数模转换器采集到的值,8bit
 	int16 AD_Value_fixed;						//滤波后的值
-	int16 Normalized_Value;					//差比和的电感值
 	int16 AD_Value_Old[10];						//权重向前滤波算法储存的前几次采集到的值
 }inductance;
 
@@ -242,6 +241,6 @@ extern direction Direction;									//声明一个"Direction类"的"对象"，�
 
 extern service Service;										//声明一个"service类"的"对象"，串口发送等服务信息
 
-extern int count;
+extern int16 TempSpeed;
 
 #endif  //__DATA_H__
