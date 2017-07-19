@@ -22,7 +22,6 @@ void ADC_Init()
 	adc_init(AD2);													//初始化AMP2通道，PTB1
 	adc_init(AD3);									 				//初始化AMP3通道，PTB2
 	adc_init(AD4);													//初始化AMP4通道，PTB3
-	adc_init(AD5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -54,11 +53,10 @@ void Direction_Control()
 
 void Get_AD_Value()
 {
-	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
+	Road_Data[FRONT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
 	Road_Data[LEFT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
 	Road_Data[RIGHT].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
 	Road_Data[MIDDLE].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
-	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
 
 	//注意修改通道初始化
 	//注意修改通道初始化
@@ -112,12 +110,8 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-#define FrontValue 0
-		Direction.sum[0] = 100 * ((FrontValue * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) 
-			- (FrontValue* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / 
-			((FrontValue * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed) 
-				+ (Road_Data[RIGHT].AD_Value_fixed + FrontValue* Road_Data[FRONT_RIGHT].AD_Value_fixed));				//差比和计算
-#undef FrontValue
+		Direction.sum[0] = 100 * ((Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / 
+			(Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed));				//差比和计算
 	}
 	else
 	{
@@ -221,20 +215,21 @@ bool hasToroid()
 		TempSpeed= Service.BlueToothBase.Information.speed;	//开环跑
 		
 		if (((Road_Data[LEFT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed) && ((Road_Data[RIGHT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed))
-		{
-                  TempSpeed= -10;
-			Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
-                        led(LED2, LED_ON);
+		{	
+			if (true)
+			{
+				TempSpeed= -10;
+				Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
+				led(LED2, LED_ON);
 			return true;
+			}      
 		}
-                led(LED2, LED_OFF);
+		led(LED2, LED_OFF);
 		return false;
-		
 	}
 	else
 	{
-          led(LED2, LED_OFF);
+        led(LED2, LED_OFF);
 		return false;
-		
 	}
 }

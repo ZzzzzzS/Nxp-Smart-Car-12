@@ -217,7 +217,7 @@ void DeBug_Interface()
 	case Inductance_Interface:
 		OLED_CLS();
 		OLED_Print(Position(Line1), "inductance");
-		sprintf(temp, "FL%dFR%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
+		sprintf(temp, "F%d", Road_Data[FRONT].AD_Value_fixed);
 		OLED_Print(Position(Line2), temp);
 		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
