@@ -217,20 +217,24 @@ bool hasToroid()
 {
 	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 75 && Road_Data[MIDDLE].AD_Value_fixed < 75)
 	{
-		Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed / 2;
-		TempSpeed= Service.BlueToothBase.Information.speed / 2;	//开环跑
-		if ((Road_Data[LEFT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed) && (Road_Data[RIGHT].AD_Value_fixed < Road_Data[MIDDLE].AD_Value_fixed))
+		Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
+		TempSpeed= Service.BlueToothBase.Information.speed;	//开环跑
+		
+		if (((Road_Data[LEFT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed) && ((Road_Data[RIGHT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed))
 		{
-                  TempSpeed= Service.BlueToothBase.Information.speed / 4;
-			//Direction.PIDbase.Error_Speed[Now_Error] = -45;//基本最大误差
+                  TempSpeed= -10;
+			Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
+                        led(LED2, LED_ON);
 			return true;
 		}
+                led(LED2, LED_OFF);
 		return false;
-		led(LED2, LED_ON);
+		
 	}
 	else
 	{
+          led(LED2, LED_OFF);
 		return false;
-		led(LED2, LED_OFF);
+		
 	}
 }

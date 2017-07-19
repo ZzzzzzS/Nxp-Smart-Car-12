@@ -30,17 +30,17 @@ void Init_System()
 
 void Set_User_Information()
 {
-	if (Service.RunMode == FastMode)
+	if (Service.RunMode == SlowMode)
 	{
 		Service.BlueToothBase.Information.speed = 30;
 		Service.BlueToothBase.Information.P = 0.6;
 		Service.BlueToothBase.Information.D = 10;
 	}
-	else if (Service.RunMode == SlowMode)
+	else if (Service.RunMode == FastMode)
 	{
 		Service.BlueToothBase.Information.speed = 50;
-		Service.BlueToothBase.Information.P = 0.6;
-		Service.BlueToothBase.Information.D = 40;
+		Service.BlueToothBase.Information.P = 0.8;
+		Service.BlueToothBase.Information.D = 60;
 	}
 	
 }
@@ -82,7 +82,7 @@ void system_RunTime_Update()
 	switch (Service.RunMode)										//判断不同模式执行不同操作
 	{
 	case FastMode:
-		if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
+		/*if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
 		{
 			//OLED_Init();
 			Service.OLEDbase.OLED_Renew = 0;
@@ -90,9 +90,8 @@ void system_RunTime_Update()
 		else
 		{
 			Service.OLEDbase.OLED_Renew++;
-		}
-		DeBug_Interface();
-		LED_Interface();
+		}*/
+		//DeBug_Interface();
 		Send_Data();
 		Receive_Data();
 		break;
@@ -115,7 +114,6 @@ void system_RunTime_Update()
 			Service.OLEDbase.OLED_Renew++;
 		}
 		DeBug_Interface();
-		LED_Interface();
 		Send_Data();
 		Receive_Data();
 		break;
