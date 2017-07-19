@@ -110,8 +110,7 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-		Direction.sum[0] = 100 * ((Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / 
-			(Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed));				//差比和计算
+		Direction.sum[0] = 100 * (Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);				//差比和计算
 	}
 	else
 	{
@@ -209,20 +208,21 @@ void Direction_PID()
 
 bool hasToroid()
 {
-	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 75 && Road_Data[MIDDLE].AD_Value_fixed < 75)
+	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 100 && Road_Data[MIDDLE].AD_Value_fixed < 75)
 	{
-		Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
-		TempSpeed= Service.BlueToothBase.Information.speed;	//开环跑
-		
-		if (((Road_Data[LEFT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed) && ((Road_Data[RIGHT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed))
+		if ((((Road_Data[LEFT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)) || (((Road_Data[RIGHT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)))
 		{	
-			if (true)
-			{
-				TempSpeed= -10;
+			if (1)
+                        {
+                          if(30<Road_Data[RIGHT].AD_Value_fixed&&30<Road_Data[LEFT].AD_Value_fixed)
+                          {
+				TempSpeed= 0;
 				Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
 				led(LED2, LED_ON);
 			return true;
-			}      
+                          } 
+                        }
+			     
 		}
 		led(LED2, LED_OFF);
 		return false;
