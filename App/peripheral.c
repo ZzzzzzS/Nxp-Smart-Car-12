@@ -144,7 +144,7 @@ void OLED_Interface()
 	OLED_Print(Position(Line2), "inductance");
 	OLED_Print(Position(Line3), "fast");
 	OLED_Print(Position(Line4), "slow");
-	Service.RunMode = SlowMode;							//模式判断标志位
+	Service.RunMode = FastMode;							//模式判断标志位
 	OLED_Print(100, 2 * Service.RunMode, "<-");
 	while (1)
 	{

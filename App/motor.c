@@ -131,8 +131,6 @@ void Speed_Comput()
 	//Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
         Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
 	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
-        //if(Direction.PIDbase.Error_Speed[Now_Error]<0)
-          //Speed.Right.Out_Speed*=1.1;
           
 }
 
