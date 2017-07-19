@@ -17,7 +17,7 @@ void Init_System()
 	Get_Motor_Speed_Init();																//TPM解码初始化
 	OLED_Init();																					//OLED初始化
 	Stop_Car_Init();																				//停车检测初始化
-	lptmr_timing_ms(5);																		//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
+	lptmr_timing_ms(2);																		//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, LPTMR_IRQHandler);			//将系统控制主要中断函数加入到中断向量表中
 	EnableInterrupts;																			//宏定义，允许中断
 	disable_irq(LPTMR_IRQn);																//关闭低功耗定时计数器中断
@@ -33,8 +33,8 @@ void Set_User_Information()
 	if (Service.RunMode == SlowMode)
 	{
 		Service.BlueToothBase.Information.speed = 30;
-		Service.BlueToothBase.Information.P = 0.6;
-		Service.BlueToothBase.Information.D = 10;
+		Service.BlueToothBase.Information.P = 0.8;
+		Service.BlueToothBase.Information.D = 60;
 	}
 	else if (Service.RunMode == FastMode)
 	{

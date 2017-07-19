@@ -30,7 +30,7 @@ typedef struct pidbasespeed
 电机控制相关定义
 ==========================================*/
 #define Stable_Times		5					//定义电机滤波速度
-#define MAX_SPEED			80					//定义最大速度
+#define MAX_SPEED			95					//定义最大速度
 #define MIN_SPEED			-50				//定义最小速度
 
 #define MOTOR_FTM			FTM0
