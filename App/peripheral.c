@@ -34,14 +34,12 @@ void Send_Data()
 {
 	if (Service.BlueToothBase.AllowedSendData)
 	{
-		char var[AMP_MAX+2];
-		for (counter i = 0; i < AMP_MAX; i++)
-		{
-			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
-		}
+		char var[4];
                 
-                var[AMP_MAX]=Speed.Left.Now_Speed;
-                var[AMP_MAX+1]=Speed.Right.Now_Speed;
+                var[0]=Speed.Left.Now_Speed;
+                var[1]=Speed.Right.Now_Speed;
+                var[2]=Speed.Left.Out_Speed;
+                var[3]=Speed.Right.Out_Speed;
                 
 		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}

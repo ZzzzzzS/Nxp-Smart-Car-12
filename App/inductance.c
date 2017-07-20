@@ -212,6 +212,11 @@ bool hasToroid()
 {
 	static unsigned char flag = 0;
         static unsigned char stopcheck=0;
+        
+        unsigned char times;
+        times=Service.BlueToothBase.Information.ToroidTurnTimes;
+        
+        
         if(Road_Data[MIDDLE].AD_Value_fixed>100)
         {
           stopcheck=0;
@@ -225,7 +230,7 @@ bool hasToroid()
 	{
           stopcheck=1;
 		flag++;
-		if (  flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
+		if (  flag >= times)
 		{
 			flag = 0;
 			return false;

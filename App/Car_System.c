@@ -33,12 +33,12 @@ void Set_User_Information()
 	if (Service.RunMode == SlowMode)
 	{
 		Service.BlueToothBase.Information.speed = 30;
-		Service.BlueToothBase.Information.P = 0.6;
+		Service.BlueToothBase.Information.P = 0.5;
 		Service.BlueToothBase.Information.D = 50;
 
 		Service.BlueToothBase.Information.MaxSpeed = 80;
 		Service.BlueToothBase.Information.MinSpeed = -60;
-		Service.BlueToothBase.Information.ToroidTurnTimes = 17;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 40;
 		Service.BlueToothBase.Information.ToroidSpeed = 80;
 	}
 	else if (Service.RunMode == FastMode)
@@ -81,6 +81,10 @@ void LPTMR_IRQHandler()
     Get_Motor_Speed();
     flag=0;
   }
+  if(Speed.Base.Now_Speed>100)
+    led(LED0,LED_ON);
+  else
+    led(LED0,LED_OFF);
     Direction_Control();
     Speed_Control();
     //Stop_Car();
