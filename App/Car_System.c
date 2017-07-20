@@ -32,15 +32,25 @@ void Set_User_Information()
 {
 	if (Service.RunMode == SlowMode)
 	{
-		Service.BlueToothBase.Information.speed = 20;
-		Service.BlueToothBase.Information.P = 0.5;
+		Service.BlueToothBase.Information.speed = 30;
+		Service.BlueToothBase.Information.P = 0.6;
 		Service.BlueToothBase.Information.D = 50;
+
+		Service.BlueToothBase.Information.MaxSpeed = 50;
+		Service.BlueToothBase.Information.MinSpeed = -50;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 10;
+		Service.BlueToothBase.Information.ToroidSpeed = 80;
 	}
 	else if (Service.RunMode == FastMode)
 	{
-		Service.BlueToothBase.Information.speed = 40;
+		Service.BlueToothBase.Information.speed = 50;
 		Service.BlueToothBase.Information.P = 0.9;
 		Service.BlueToothBase.Information.D = 99;
+
+		Service.BlueToothBase.Information.MaxSpeed = 95;
+		Service.BlueToothBase.Information.MinSpeed = -50;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 10;
+		Service.BlueToothBase.Information.ToroidSpeed = 100;
 	}
 	
 }

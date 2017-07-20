@@ -29,15 +29,13 @@ typedef struct pidbasespeed
 /*============================================
 电机控制相关定义
 ==========================================*/
-#define Stable_Times		5					//定义电机滤波速度
-#define MAX_SPEED			80					//定义最大速度
-#define MIN_SPEED			-50				//定义最小速度
-
 #define MOTOR_FTM			FTM0
 #define RIGHT_PWM_BACK	FTM_CH3
 #define RIGHT_PWM			FTM_CH4
 #define LEFT_PWM				FTM_CH1
 #define LEFT_PWM_BACK		FTM_CH2
+#define MAX_SPEED Service.BlueToothBase.Information.MaxSpeed
+#define MIN_SPEED	Service.BlueToothBase.Information.MinSpeed
 
 #define MOTOR_HZ    20*1000				//定义电机工作频率
 
@@ -46,7 +44,6 @@ typedef struct
 	int16 Out_Speed;								//最终输出到电机的速度
 	int16 Turn_Speed;								//转向差速度
 	int16 Now_Speed;								//正交解码得出的当前速度
-	int16 Speed_Old[Stable_Times];			//电机功率滤波
 }wheel;
 
 typedef struct
@@ -80,6 +77,7 @@ typedef struct
 {
 	int16 AD_Value;									//ADC数模转换器采集到的值,8bit
 	int16 AD_Value_fixed;						//滤波后的值
+	int16 AD_Value_fixed_Old;
 	int16 AD_Value_Old[10];						//权重向前滤波算法储存的前几次采集到的值
 }inductance;
 
@@ -169,6 +167,10 @@ typedef struct UserInformation
 	float P;
 	float I;
 	float D;
+	char MinSpeed;
+	char MaxSpeed;
+	unsigned char ToroidTurnTimes;
+	char ToroidSpeed;
 }UserInformation;
 
 typedef struct BlueTooth

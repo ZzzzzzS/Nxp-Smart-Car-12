@@ -155,40 +155,6 @@ void Get_Motor_Speed_Init()
 }
 
 /*============================================
-函数名：Speed_Stable()
-作用：将速度控制周期平均到X个控制周期内完成，增加车模稳定性
-==========================================*/
-/*============================================
-滤波说明：
-[0][1][2][3]
-旧数据        新数据
-低权值        高权值
-==========================================*/
-
-void Speed_Stable()
-{
-	for (counter i = 0; i < Stable_Times - 1; i++)
-	{
-		Speed.Left.Speed_Old[i] = Speed.Left.Speed_Old[i + 1];
-		Speed.Right.Speed_Old[i] = Speed.Right.Speed_Old[i + 1];
-	}
-	Speed.Left.Speed_Old[Stable_Times - 1] = Speed.Left.Out_Speed;
-	Speed.Right.Speed_Old[Stable_Times - 1] = Speed.Right.Out_Speed;
-
-	char sum = 0;
-	Speed.Left.Out_Speed = 0;
-	Speed.Right.Out_Speed = 0;
-	for (counter i = 0; i < Stable_Times; i++)
-	{
-		sum += i;
-		Speed.Left.Out_Speed += Speed.Left.Speed_Old[i] * i;
-		Speed.Right.Out_Speed += Speed.Right.Speed_Old[i] * i;
-	}
-	Speed.Left.Out_Speed /= sum;
-	Speed.Right.Out_Speed /= sum;
-}
-
-/*============================================
 函数名： Get_Motor_Speed()
 作用:FTM正交解码获取当前速度
 ==========================================*/
