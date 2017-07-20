@@ -8,7 +8,7 @@
 
 void Speed_Control()
 {
-	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
+	//Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Comput();													//加入方向环控制
 	//Speed_Stable();														//速度滤波使系统稳定

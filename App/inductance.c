@@ -211,8 +211,19 @@ void Direction_PID()
 bool hasToroid()
 {
 	static unsigned char flag = 0;
+        static unsigned char stopcheck=0;
+        if(Road_Data[MIDDLE].AD_Value_fixed>100)
+        {
+          stopcheck=0;
+        }
+        if(stopcheck==1&&flag==0)
+        {
+          led(LED2, LED_OFF);
+          return false;
+        }
 	if (flag != 0)
 	{
+          stopcheck=1;
 		flag++;
 		if (  flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
 		{
@@ -231,13 +242,13 @@ bool hasToroid()
            {
 			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
 			   {
-					Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed;
-                                        Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed;
+					Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                                        Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
 			   }
 			   else
 			   {
-				        Speed.Left.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed;
-                                        Speed.Right.Turn_Speed= Service.BlueToothBase.Information.ToroidSpeed;
+				        Speed.Left.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                                        Speed.Right.Turn_Speed= Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
 			   }
                                 flag = 1;
 				TempSpeed= 0;

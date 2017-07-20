@@ -37,7 +37,7 @@ typedef struct pidbasespeed
 #define MAX_SPEED Service.BlueToothBase.Information.MaxSpeed
 #define MIN_SPEED	Service.BlueToothBase.Information.MinSpeed
 
-#define MOTOR_HZ    20*1000				//定义电机工作频率
+#define MOTOR_HZ    20000				//定义电机工作频率
 
 typedef struct
 {
