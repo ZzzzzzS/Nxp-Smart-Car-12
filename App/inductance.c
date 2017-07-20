@@ -33,11 +33,13 @@ void ADC_Init()
 void Direction_Control()
 {
   Get_AD_Value();
+  
   if (!hasToroid())
   {
           Direction_Calculate();
           Direction_PID();
   }
+
 }
 
 /*============================================
@@ -211,14 +213,8 @@ bool hasToroid()
 	static unsigned char flag = 0;
 	if (flag != 0)
 	{
-          //Get_Motor_Speed
 		flag++;
-                if(Road_Data[MIDDLE].AD_Value_fixed>Road_Data[LEFT].AD_Value_fixed||Road_Data[MIDDLE].AD_Value_fixed>Road_Data[RIGHT].AD_Value_fixed)
-                {
-                  flag=0;
-                  return false;
-                }
-		if (flag >= 10)
+		if (  flag >= 10)
 		{
 			flag = 0;
 			return false;
@@ -235,15 +231,15 @@ bool hasToroid()
            {
 			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
 			   {
-					Speed.Left.Turn_Speed=50;
-                                        Speed.Right.Turn_Speed=-50;
+					Speed.Left.Turn_Speed=90-TempSpeed;
+                                        Speed.Right.Turn_Speed=-100-TempSpeed;
 			   }
 			   else
 			   {
-				   Speed.Left.Turn_Speed=-50;
-                                        Speed.Right.Turn_Speed=50;
+				        Speed.Left.Turn_Speed=-100-TempSpeed;
+                                        Speed.Right.Turn_Speed=90-TempSpeed;
 			   }
-				flag = 1;
+                                flag = 1;
 				TempSpeed= 0;
 				led(LED2, LED_ON);
 				return true;

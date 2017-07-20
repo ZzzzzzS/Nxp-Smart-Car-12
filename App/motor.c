@@ -127,11 +127,20 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	//Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
-	//Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
-        Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
-          
+   //if(Road_Data[FRONT].AD_Value_fixed>   )
+	
+    //  {
+    //    Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
+//	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
+   //    Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
+//	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
+   //   }
+  // else  
+   //   { 
+         Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
+         Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
+  //     }
+         
 }
 
 /*============================================
