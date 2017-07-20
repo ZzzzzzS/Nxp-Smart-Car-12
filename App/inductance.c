@@ -32,12 +32,12 @@ void ADC_Init()
 
 void Direction_Control()
 {
-	Get_AD_Value();
-	if (!hasToroid())
-	{
-		Direction_Calculate();
-	}
-	Direction_PID();
+  Get_AD_Value();
+  if (!hasToroid())
+  {
+          Direction_Calculate();
+          Direction_PID();
+  }
 }
 
 /*============================================
@@ -85,7 +85,7 @@ void Get_AD_Value()
 	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
 	{
 		Service.InductanceBase.InductanceLost++;
-		if (Service.InductanceBase.InductanceLost >= 50);
+		if (Service.InductanceBase.InductanceLost >= 500)
                   System_Error(Taget_Lost);
 	}
 	else
@@ -208,27 +208,54 @@ void Direction_PID()
 
 bool hasToroid()
 {
+	static unsigned char flag = 0;
+	if (flag != 0)
+	{
+          //Get_Motor_Speed
+		flag++;
+                if(Road_Data[MIDDLE].AD_Value_fixed>Road_Data[LEFT].AD_Value_fixed||Road_Data[MIDDLE].AD_Value_fixed>Road_Data[RIGHT].AD_Value_fixed)
+                {
+                  flag=0;
+                  return false;
+                }
+		if (flag >= 10)
+		{
+			flag = 0;
+			return false;
+		}
+		return true;
+	}
+
+
 	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 100 && Road_Data[MIDDLE].AD_Value_fixed < 75)
 	{
 		if ((((Road_Data[LEFT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)) || (((Road_Data[RIGHT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)))
 		{	
-			if (1)
-                        {
-                          if(30<Road_Data[RIGHT].AD_Value_fixed&&30<Road_Data[LEFT].AD_Value_fixed)
-                          {
+           if(30<Road_Data[RIGHT].AD_Value_fixed&&30<Road_Data[LEFT].AD_Value_fixed)
+           {
+			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
+			   {
+					Speed.Left.Turn_Speed=50;
+                                        Speed.Right.Turn_Speed=-50;
+			   }
+			   else
+			   {
+				   Speed.Left.Turn_Speed=-50;
+                                        Speed.Right.Turn_Speed=50;
+			   }
+				flag = 1;
 				TempSpeed= 0;
-				Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
 				led(LED2, LED_ON);
-			return true;
-                          } 
-                        }
-			     
+				return true;
+           }     
 		}
 		led(LED2, LED_OFF);
+		flag = 0;
 		return false;
 	}
 	else
 	{
+		flag = 0;
         led(LED2, LED_OFF);
 		return false;
 	}

@@ -186,7 +186,7 @@ typedef struct BlueTooth
 
 typedef struct Inductance
 {
-	char InductanceLost;
+	unsigned int InductanceLost;
 }Inductance;
 
 typedef struct Motor
