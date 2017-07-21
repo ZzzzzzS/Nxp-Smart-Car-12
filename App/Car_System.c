@@ -38,7 +38,7 @@ void Set_User_Information()
 
 		Service.BlueToothBase.Information.MaxSpeed = 80;
 		Service.BlueToothBase.Information.MinSpeed = -60;
-		Service.BlueToothBase.Information.ToroidTurnTimes = 40;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 25;
 		Service.BlueToothBase.Information.ToroidSpeed = 80;
 	}
 	else if (Service.RunMode == FastMode)

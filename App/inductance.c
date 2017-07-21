@@ -16,6 +16,8 @@
 作用:对采集的数据滤波消除偶然误差
 ==========================================*/
 
+unsigned char flag = 0;
+
 void ADC_Init()
 {
 	adc_init(AD1);													//初始化AMP1通道，PTB0
@@ -39,7 +41,10 @@ void Direction_Control()
           Direction_Calculate();
           Direction_PID();
   }
-
+  if (flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
+  {
+	  TempSpeed = -40;
+  }
 }
 
 /*============================================
@@ -210,29 +215,31 @@ void Direction_PID()
 
 bool hasToroid()
 {
-	static unsigned char flag = 0;
-        static unsigned char stopcheck=0;
-        
-        unsigned char times;
-        times=Service.BlueToothBase.Information.ToroidTurnTimes;
-        
-        
-        if(Road_Data[MIDDLE].AD_Value_fixed>100)
-        {
-          stopcheck=0;
-        }
-        if(stopcheck==1&&flag==0)
-        {
-          led(LED2, LED_OFF);
-          return false;
-        }
+    static unsigned char stopcheck=0;
+             
+    if(Road_Data[MIDDLE].AD_Value_fixed>100)
+    {
+      stopcheck=0;
+    }
+
+    if(stopcheck==1&&flag==0)
+    {
+      led(LED2, LED_OFF);
+      return false;
+    }
+
 	if (flag != 0)
 	{
-          stopcheck=1;
+		stopcheck=1;
 		flag++;
-		if (  flag >= times)
+        if(flag== Service.BlueToothBase.Information.ToroidTurnTimes +80)
+        {
+          TempSpeed=0;
+          flag = 0; 
+        }
+		if (  flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
 		{
-			flag = 0;
+                  TempSpeed=-40;
 			return false;
 		}
 		return true;
@@ -240,14 +247,12 @@ bool hasToroid()
 
 
 	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 100 && Road_Data[MIDDLE].AD_Value_fixed < 75)
-	{
 		if ((((Road_Data[LEFT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)) || (((Road_Data[RIGHT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)))
-		{	
            if(30<Road_Data[RIGHT].AD_Value_fixed&&30<Road_Data[LEFT].AD_Value_fixed)
-           {
+		   {
 			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
 			   {
-					Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                           		Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
                                         Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
 			   }
 			   else
@@ -260,15 +265,10 @@ bool hasToroid()
 				led(LED2, LED_ON);
 				return true;
            }     
-		}
+
+
+
 		led(LED2, LED_OFF);
 		flag = 0;
 		return false;
-	}
-	else
-	{
-		flag = 0;
-        led(LED2, LED_OFF);
-		return false;
-	}
 }
