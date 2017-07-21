@@ -266,8 +266,6 @@ bool hasToroid()
 				return true;
            }     
 
-
-
 		led(LED2, LED_OFF);
 		flag = 0;
 		return false;

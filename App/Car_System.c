@@ -6,6 +6,8 @@
 作用：初始化整个系统
 ==========================================*/
 
+int stopflag;
+
 void Init_System()
 {
 	DisableInterrupts;																			//宏定义，禁止中断
@@ -21,6 +23,7 @@ void Init_System()
 	set_vector_handler(LPTMR_VECTORn, LPTMR_IRQHandler);			//将系统控制主要中断函数加入到中断向量表中
 	EnableInterrupts;																			//宏定义，允许中断
 	disable_irq(LPTMR_IRQn);																//关闭低功耗定时计数器中断
+	stopflag = 0;
 }
 
 /*============================================
@@ -33,8 +36,8 @@ void Set_User_Information()
 	if (Service.RunMode == SlowMode)
 	{
 		Service.BlueToothBase.Information.speed = 30;
-		Service.BlueToothBase.Information.P = 0.5;
-		Service.BlueToothBase.Information.D = 50;
+		Service.BlueToothBase.Information.P = 0.4;
+		Service.BlueToothBase.Information.D = 60;
 
 		Service.BlueToothBase.Information.MaxSpeed = 80;
 		Service.BlueToothBase.Information.MinSpeed = -60;
@@ -64,6 +67,7 @@ void Get_System_Ready()
 {
 	OLED_Interface();														//初始参数设置界面
 	Set_User_Information();												//设置用户参数
+	DELAY_MS(2000);
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -87,7 +91,12 @@ void LPTMR_IRQHandler()
     led(LED0,LED_OFF);
     Direction_Control();
     Speed_Control();
-    //Stop_Car();
+	stopflag++;
+	if (stopflag > 2500)
+	{
+		//Stop_Car();
+		stopflag = 2600;
+	}
     LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断
 }
 
