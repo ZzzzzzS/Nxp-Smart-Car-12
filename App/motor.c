@@ -8,7 +8,7 @@
 
 void Speed_Control()
 {
-	Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
+	//Get_Motor_Speed();												//获取FTM正交解码脉冲采集器的值
 	Motor_PID();															//对电机进行增量式PID调节
 	Speed_Comput();													//加入方向环控制
 	//Speed_Stable();														//速度滤波使系统稳定
@@ -127,11 +127,20 @@ void Motor_PID()
 
 void Speed_Comput()
 {
-	//Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
-	//Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
-        Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
-	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
-          
+   //if(Road_Data[FRONT].AD_Value_fixed>   )
+	
+    //  {
+    //    Speed.Left.Out_Speed = Speed.Left.Turn_Speed + Speed.Base.PID_Out_Speed*1.2;
+//	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + Speed.Base.PID_Out_Speed*0.9;
+   //    Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
+//	Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
+   //   }
+  // else  
+   //   { 
+         Speed.Left.Out_Speed = Speed.Left.Turn_Speed + TempSpeed;
+         Speed.Right.Out_Speed = Speed.Right.Turn_Speed + TempSpeed;
+  //     }
+         
 }
 
 /*============================================
@@ -143,40 +152,6 @@ void Get_Motor_Speed_Init()
 {
 	ftm_quad_init(FTM1);									//FTM1 正交解码初始化（所用的管脚可查 port_cfg.h ）
 	ftm_quad_init(FTM2);									//FTM2 正交解码初始化
-}
-
-/*============================================
-函数名：Speed_Stable()
-作用：将速度控制周期平均到X个控制周期内完成，增加车模稳定性
-==========================================*/
-/*============================================
-滤波说明：
-[0][1][2][3]
-旧数据        新数据
-低权值        高权值
-==========================================*/
-
-void Speed_Stable()
-{
-	for (counter i = 0; i < Stable_Times - 1; i++)
-	{
-		Speed.Left.Speed_Old[i] = Speed.Left.Speed_Old[i + 1];
-		Speed.Right.Speed_Old[i] = Speed.Right.Speed_Old[i + 1];
-	}
-	Speed.Left.Speed_Old[Stable_Times - 1] = Speed.Left.Out_Speed;
-	Speed.Right.Speed_Old[Stable_Times - 1] = Speed.Right.Out_Speed;
-
-	char sum = 0;
-	Speed.Left.Out_Speed = 0;
-	Speed.Right.Out_Speed = 0;
-	for (counter i = 0; i < Stable_Times; i++)
-	{
-		sum += i;
-		Speed.Left.Out_Speed += Speed.Left.Speed_Old[i] * i;
-		Speed.Right.Out_Speed += Speed.Right.Speed_Old[i] * i;
-	}
-	Speed.Left.Out_Speed /= sum;
-	Speed.Right.Out_Speed /= sum;
 }
 
 /*============================================

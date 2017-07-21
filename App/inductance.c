@@ -16,13 +16,14 @@
 作用:对采集的数据滤波消除偶然误差
 ==========================================*/
 
+unsigned char flag = 0;
+
 void ADC_Init()
 {
 	adc_init(AD1);													//初始化AMP1通道，PTB0
 	adc_init(AD2);													//初始化AMP2通道，PTB1
 	adc_init(AD3);									 				//初始化AMP3通道，PTB2
 	adc_init(AD4);													//初始化AMP4通道，PTB3
-	adc_init(AD5);													//初始化AMP5通道，PTB4
 }
 
 
@@ -33,12 +34,17 @@ void ADC_Init()
 
 void Direction_Control()
 {
-	Get_AD_Value();
-	if (!hasToroid())
-	{
-		Direction_Calculate();
-	}
-	Direction_PID();
+  Get_AD_Value();
+  
+  if (!hasToroid())
+  {
+          Direction_Calculate();
+          Direction_PID();
+  }
+  if (flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
+  {
+	  TempSpeed = -40;
+  }
 }
 
 /*============================================
@@ -54,11 +60,10 @@ void Direction_Control()
 
 void Get_AD_Value()
 {
-	Road_Data[FRONT_LEFT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
+	Road_Data[FRONT].AD_Value = adc_once(AD1, ADC_8bit);					//采集过程
 	Road_Data[LEFT].AD_Value = adc_once(AD2, ADC_8bit);				//采集过程
 	Road_Data[RIGHT].AD_Value = adc_once(AD3, ADC_8bit);		//采集过程
 	Road_Data[MIDDLE].AD_Value = adc_once(AD4, ADC_8bit);				//采集过程
-	Road_Data[FRONT_RIGHT].AD_Value = adc_once(AD5, ADC_8bit);	//采集过程
 
 	//注意修改通道初始化
 	//注意修改通道初始化
@@ -87,7 +92,7 @@ void Get_AD_Value()
 	if ((Road_Data[MIDDLE].AD_Value_fixed <= 5) && (Road_Data[LEFT].AD_Value_fixed <= 5) && (Road_Data[RIGHT].AD_Value_fixed <= 5) && (Service.RunMode != inductance_Mode))
 	{
 		Service.InductanceBase.InductanceLost++;
-		if (Service.InductanceBase.InductanceLost >= 50);
+		if (Service.InductanceBase.InductanceLost >= 500)
                   System_Error(Taget_Lost);
 	}
 	else
@@ -112,12 +117,7 @@ void Direction_Calculate()
 
 	if (Road_Data[RIGHT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed != 0)
 	{
-#define FrontValue 0
-		Direction.sum[0] = 100 * ((FrontValue * Road_Data[FRONT_RIGHT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed) 
-			- (FrontValue* Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed)) / 
-			((FrontValue * Road_Data[FRONT_LEFT].AD_Value_fixed + Road_Data[LEFT].AD_Value_fixed) 
-				+ (Road_Data[RIGHT].AD_Value_fixed + FrontValue* Road_Data[FRONT_RIGHT].AD_Value_fixed));				//差比和计算
-#undef FrontValue
+		Direction.sum[0] = 100 * (Road_Data[RIGHT].AD_Value_fixed - Road_Data[LEFT].AD_Value_fixed) / (Road_Data[LEFT].AD_Value_fixed + Road_Data[RIGHT].AD_Value_fixed);				//差比和计算
 	}
 	else
 	{
@@ -215,26 +215,60 @@ void Direction_PID()
 
 bool hasToroid()
 {
-	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 75 && Road_Data[MIDDLE].AD_Value_fixed < 75)
+    static unsigned char stopcheck=0;
+             
+    if(Road_Data[MIDDLE].AD_Value_fixed>100)
+    {
+      stopcheck=0;
+    }
+
+    if(stopcheck==1&&flag==0)
+    {
+      led(LED2, LED_OFF);
+      return false;
+    }
+
+	if (flag != 0)
 	{
-		Speed.Base.Aim_Speed = Service.BlueToothBase.Information.speed;
-		TempSpeed= Service.BlueToothBase.Information.speed;	//开环跑
-		
-		if (((Road_Data[LEFT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed) && ((Road_Data[RIGHT].AD_Value_fixed+7) < Road_Data[MIDDLE].AD_Value_fixed))
+		stopcheck=1;
+		flag++;
+        if(flag== Service.BlueToothBase.Information.ToroidTurnTimes +80)
+        {
+          TempSpeed=0;
+          flag = 0; 
+        }
+		if (  flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
 		{
-                  TempSpeed= -10;
-			Direction.PIDbase.Error_Speed[Now_Error] = -50;//基本最大误差
-                        led(LED2, LED_ON);
-			return true;
+                  TempSpeed=-40;
+			return false;
 		}
-                led(LED2, LED_OFF);
-		return false;
-		
+		return true;
 	}
-	else
-	{
-          led(LED2, LED_OFF);
+
+
+	if (Road_Data[LEFT].AD_Value_fixed < 75 && Road_Data[RIGHT].AD_Value_fixed < 100 && Road_Data[MIDDLE].AD_Value_fixed < 75)
+		if ((((Road_Data[LEFT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)) || (((Road_Data[RIGHT].AD_Value_fixed+10) < Road_Data[MIDDLE].AD_Value_fixed)))
+           if(30<Road_Data[RIGHT].AD_Value_fixed&&30<Road_Data[LEFT].AD_Value_fixed)
+		   {
+			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
+			   {
+                           		Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                                        Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+			   }
+			   else
+			   {
+				        Speed.Left.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                                        Speed.Right.Turn_Speed= Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+			   }
+                                flag = 1;
+				TempSpeed= 0;
+				led(LED2, LED_ON);
+				return true;
+           }     
+
+
+
+		led(LED2, LED_OFF);
+		flag = 0;
 		return false;
-		
-	}
 }

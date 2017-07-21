@@ -34,14 +34,12 @@ void Send_Data()
 {
 	if (Service.BlueToothBase.AllowedSendData)
 	{
-		char var[AMP_MAX+2];
-		for (counter i = 0; i < AMP_MAX; i++)
-		{
-			var[i] = Road_Data[i].AD_Value_fixed;						//向上位机发送电感归一化后的值
-		}
+		char var[4];
                 
-                var[AMP_MAX]=Speed.Left.Now_Speed;
-                var[AMP_MAX+1]=Speed.Right.Now_Speed;
+                var[0]=Speed.Left.Now_Speed;
+                var[1]=Speed.Right.Now_Speed;
+                var[2]=Speed.Left.Out_Speed;
+                var[3]=Speed.Right.Out_Speed;
                 
 		vcan_sendware(var, sizeof(var));							//发送到上位机，注意发送协议，发送端口
 	}
@@ -217,7 +215,7 @@ void DeBug_Interface()
 	case Inductance_Interface:
 		OLED_CLS();
 		OLED_Print(Position(Line1), "inductance");
-		sprintf(temp, "FL%dFR%d", Road_Data[FRONT_LEFT].AD_Value_fixed, Road_Data[FRONT_RIGHT].AD_Value_fixed);
+		sprintf(temp, "F%d", Road_Data[FRONT].AD_Value_fixed);
 		OLED_Print(Position(Line2), temp);
 		sprintf(temp, "L%dR%d", Road_Data[LEFT].AD_Value_fixed, Road_Data[RIGHT].AD_Value_fixed);
 		OLED_Print(Position(Line3), temp);
