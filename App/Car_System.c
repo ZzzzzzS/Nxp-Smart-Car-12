@@ -17,8 +17,7 @@ void Init_System()
 	Motor_Init();																					//电机初始化
 	Motor_PID_Init();																			//电机PID控制初始化
 	Get_Motor_Speed_Init();																//TPM解码初始化
-	OLED_Init();																					//OLED初始化
-	Stop_Car_Init();																				//停车检测初始化
+	OLED_Init();																					//OLED初始化																				//停车检测初始化
 	lptmr_timing_ms(2);																		//采用低功耗定时计数器，初始化定时计数器为定时模式，单位:ms
 	set_vector_handler(LPTMR_VECTORn, LPTMR_IRQHandler);			//将系统控制主要中断函数加入到中断向量表中
 	EnableInterrupts;																			//宏定义，允许中断
@@ -46,13 +45,13 @@ void Set_User_Information()
 	}
 	else if (Service.RunMode == FastMode)
 	{
-		Service.BlueToothBase.Information.speed = 50;
-		Service.BlueToothBase.Information.P = 0.9;
-		Service.BlueToothBase.Information.D = 99;
+		Service.BlueToothBase.Information.speed = 40;
+		Service.BlueToothBase.Information.P = 0.5;
+		Service.BlueToothBase.Information.D = 80;
 
 		Service.BlueToothBase.Information.MaxSpeed = 95;
 		Service.BlueToothBase.Information.MinSpeed = -50;
-		Service.BlueToothBase.Information.ToroidTurnTimes = 10;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 25;
 		Service.BlueToothBase.Information.ToroidSpeed = 100;
 	}
 	
@@ -68,6 +67,7 @@ void Get_System_Ready()
 	OLED_Interface();														//初始参数设置界面
 	Set_User_Information();												//设置用户参数
 	DELAY_MS(2000);
+        Stop_Car_Init();
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -94,7 +94,7 @@ void LPTMR_IRQHandler()
 	stopflag++;
 	if (stopflag > 2500)
 	{
-		//Stop_Car();
+		Stop_Car();
 		stopflag = 2600;
 	}
     LPTMR_Flag_Clear();												//清除中断标志位，准备下一次中断

@@ -300,9 +300,13 @@ void Debug_Init()
 void System_Error(error Error_Number)
 {
 	disable_irq(LPTMR_IRQn);									//禁止低功耗定时计数器中断
-	Speed.Right.Out_Speed = 0;								//调整速度为0
+	Speed.Right.Out_Speed = -50;								//调整速度为0
+	Speed.Left.Out_Speed = -50;								//调整速度为0
+	Motor_Control();//控制电机
+        DELAY_MS(400);
+        Speed.Right.Out_Speed = 0;								//调整速度为0
 	Speed.Left.Out_Speed = 0;								//调整速度为0
-	Motor_Control();												//控制电机
+	Motor_Control();//控制电机
 
 	switch (Error_Number)
 	{
