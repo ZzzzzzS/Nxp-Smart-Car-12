@@ -40,19 +40,21 @@ void Set_User_Information()
 
 		Service.BlueToothBase.Information.MaxSpeed = 80;
 		Service.BlueToothBase.Information.MinSpeed = -60;
-		Service.BlueToothBase.Information.ToroidTurnTimes = 25;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 30;
 		Service.BlueToothBase.Information.ToroidSpeed = 80;
+                Service.BlueToothBase.Information.StopTimes=100;
 	}
 	else if (Service.RunMode == FastMode)
 	{
 		Service.BlueToothBase.Information.speed = 40;
 		Service.BlueToothBase.Information.P = 0.5;
-		Service.BlueToothBase.Information.D = 80;
+		Service.BlueToothBase.Information.D = 70;
 
-		Service.BlueToothBase.Information.MaxSpeed = 95;
-		Service.BlueToothBase.Information.MinSpeed = -50;
-		Service.BlueToothBase.Information.ToroidTurnTimes = 25;
-		Service.BlueToothBase.Information.ToroidSpeed = 100;
+		Service.BlueToothBase.Information.MaxSpeed = 80;
+		Service.BlueToothBase.Information.MinSpeed = -80;
+		Service.BlueToothBase.Information.ToroidTurnTimes = 30;
+		Service.BlueToothBase.Information.ToroidSpeed = 80;
+                Service.BlueToothBase.Information.StopTimes=120;
 	}
 	
 }

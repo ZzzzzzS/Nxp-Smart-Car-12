@@ -232,14 +232,14 @@ bool hasToroid()
 	{
 		stopcheck=1;
 		flag++;
-        if(flag== Service.BlueToothBase.Information.ToroidTurnTimes +80)
+        if(flag== Service.BlueToothBase.Information.ToroidTurnTimes +Service.BlueToothBase.Information.StopTimes)
         {
           TempSpeed=0;
           flag = 0; 
         }
 		if (  flag >= Service.BlueToothBase.Information.ToroidTurnTimes)
 		{
-                  TempSpeed=-40;
+                  TempSpeed=Service.BlueToothBase.Information.MinSpeed;
 			return false;
 		}
 		return true;
@@ -252,13 +252,13 @@ bool hasToroid()
 		   {
 			   if (Road_Data[LEFT].AD_Value_fixed < Road_Data[RIGHT].AD_Value_fixed)
 			   {
-                           		Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
-                                        Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+                           		Speed.Left.Turn_Speed=Service.BlueToothBase.Information.ToroidSpeed;
+                                        Speed.Right.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed;
 			   }
 			   else
 			   {
-				        Speed.Left.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
-                                        Speed.Right.Turn_Speed= Service.BlueToothBase.Information.ToroidSpeed-TempSpeed;
+				        Speed.Left.Turn_Speed= -Service.BlueToothBase.Information.ToroidSpeed;
+                                        Speed.Right.Turn_Speed= Service.BlueToothBase.Information.ToroidSpeed;
 			   }
                                 flag = 1;
 				TempSpeed= 0;

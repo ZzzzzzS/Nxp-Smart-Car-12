@@ -171,6 +171,7 @@ typedef struct UserInformation
 	char MaxSpeed;
 	unsigned char ToroidTurnTimes;
 	char ToroidSpeed;
+        unsigned char StopTimes;
 }UserInformation;
 
 typedef struct BlueTooth
