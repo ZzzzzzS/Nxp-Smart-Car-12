@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ELF Linker V7.80.4.12462/W32 for ARM                21/Jul/2017  16:26:19
+# IAR ELF Linker V7.80.4.12462/W32 for ARM                21/Jul/2017  20:42:53
 # Copyright 2007-2017 IAR Systems AB.
 #
 #    Output file  =  
@@ -378,7 +378,7 @@ GPIOX                   0x1fff0428   0x14  Data  Gb  MK60_gpio.o [1]
 Get_AD_Value            0x0000ba4d  0x188  Code  Gb  inductance.o [1]
 Get_Motor_Speed         0x00009c15   0x48  Code  Gb  motor.o [1]
 Get_Motor_Speed_Init    0x00009c05   0x10  Code  Gb  motor.o [1]
-Get_System_Ready        0x0000d097   0x1e  Code  Gb  Car_System.o [1]
+Get_System_Ready        0x0000d099   0x1e  Code  Gb  Car_System.o [1]
 ILI9325_get_h           0x0000ada7    0x6  Code  Gb  VCAN_LCD_ILI9325.o [1]
 ILI9325_get_w           0x0000adad    0x6  Code  Gb  VCAN_LCD_ILI9325.o [1]
 Init_Key                0x00008713   0x2c  Code  Gb  peripheral.o [1]
@@ -392,7 +392,7 @@ LCD_char                0x0000adff   0xba  Code  Gb  VCAN_LCD.o [1]
 LCD_rectangle           0x0000adc9   0x36  Code  Gb  VCAN_LCD.o [1]
 LED_Interface           0x00008bff   0x46  Code  Gb  peripheral.o [1]
 LED_PTxn                0x1fff04c4    0x4  Data  Gb  VCAN_LED.o [1]
-LPTMR_IRQHandler        0x0000d0b5   0x72  Code  Gb  Car_System.o [1]
+LPTMR_IRQHandler        0x0000d0b9   0x72  Code  Gb  Car_System.o [1]
 LPTMR_IRQHandler::flag  0x1fff0636    0x1  Data  Lc  Car_System.o [1]
 Motor_Control           0x000099d9   0xa4  Code  Gb  motor.o [1]
 Motor_Init              0x0000999d   0x3c  Code  Gb  motor.o [1]
@@ -421,7 +421,7 @@ Reset_Handler           0x00008411         Code  Gb  startup_MK60DZ10.o [1]
 Road_Data               0x1fff054c   0x68  Data  Gb  data.o [1]
 Send_Data               0x00008467   0x40  Code  Gb  peripheral.o [1]
 Service                 0x1fff05d8   0x40  Data  Gb  data.o [1]
-Set_User_Information    0x0000d007   0x90  Code  Gb  Car_System.o [1]
+Set_User_Information    0x0000d007   0x92  Code  Gb  Car_System.o [1]
 Speed                   0x1fff0524   0x28  Data  Gb  data.o [1]
 Speed_Chack             0x00009c5d   0xba  Code  Gb  motor.o [1]
 Speed_Comput            0x00009be7   0x1e  Code  Gb  motor.o [1]
@@ -507,7 +507,7 @@ stopflag                0x1fff0520    0x4  Data  Gb  Car_System.o [1]
 strchr                  0x0000b09d         Code  Gb  strchr.o [5]
 strstr                  0x00009291   0x10  Code  Gb  peripheral.o [1]
 sysinit                 0x0000d281   0x3c  Code  Gb  system_MK60DZ10.o [1]
-system_RunTime_Update   0x0000d127   0x6e  Code  Gb  Car_System.o [1]
+system_RunTime_Update   0x0000d12b   0x6e  Code  Gb  Car_System.o [1]
 systick_delay           0x00009925   0x36  Code  Gb  MK60_SysTick.o [1]
 systick_delay_ms        0x0000995b   0x18  Code  Gb  MK60_SysTick.o [1]
 uart_init               0x00008ef1  0x214  Code  Gb  MK60_uart.o [1]
