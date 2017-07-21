@@ -224,7 +224,7 @@ typedef char		bool;
 #define Bluetooth		UART4						//宏定义Bluetooth®发送端口
 #define Bluetooth_Band	9600				//宏定义Bluetooth®发送波特率
 
-#define REED		PTC5						//定义停车检测管脚
+#define REED		PTA3						//定义停车检测管脚
 
 typedef unsigned char		counter;			//定义累加器类型
 typedef unsigned char		error;				//定义错误类型
