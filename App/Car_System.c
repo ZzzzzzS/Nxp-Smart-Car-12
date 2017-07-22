@@ -42,7 +42,7 @@ void Set_User_Information()
 		Service.BlueToothBase.Information.MinSpeed = -60;
 		Service.BlueToothBase.Information.ToroidTurnTimes = 30;
 		Service.BlueToothBase.Information.ToroidSpeed = 80;
-                Service.BlueToothBase.Information.StopTimes=100;
+        Service.BlueToothBase.Information.StopTimes=100;
 	}
 	else if (Service.RunMode == FastMode)
 	{
@@ -54,7 +54,7 @@ void Set_User_Information()
 		Service.BlueToothBase.Information.MinSpeed = -80;
 		Service.BlueToothBase.Information.ToroidTurnTimes = 30;
 		Service.BlueToothBase.Information.ToroidSpeed = 80;
-                Service.BlueToothBase.Information.StopTimes=120;
+        Service.BlueToothBase.Information.StopTimes=120;
 	}
 	
 }
@@ -69,7 +69,7 @@ void Get_System_Ready()
 	OLED_Interface();														//初始参数设置界面
 	Set_User_Information();												//设置用户参数
 	DELAY_MS(2000);
-        Stop_Car_Init();
+    Stop_Car_Init();
 	enable_irq(LPTMR_IRQn);											//开启低功耗定时计数器中断，准备发车
 }
 
@@ -114,18 +114,8 @@ void system_RunTime_Update()
 	switch (Service.RunMode)										//判断不同模式执行不同操作
 	{
 	case FastMode:
-		/*if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
-		{
-			//OLED_Init();
-			Service.OLEDbase.OLED_Renew = 0;
-		}
-		else
-		{
-			Service.OLEDbase.OLED_Renew++;
-		}*/
-		//DeBug_Interface();
 		Send_Data();
-		Receive_Data();
+		//Receive_Data();
 		break;
 
 	case inductance_Mode:
@@ -136,18 +126,8 @@ void system_RunTime_Update()
 		break;
 
 	case SlowMode:
-		if (Service.OLEDbase.OLED_Renew >= 10)			//重新初始化屏幕,一定程度防止花屏
-		{
-			//OLED_Init();
-			Service.OLEDbase.OLED_Renew = 0;
-		}
-		else
-		{
-			Service.OLEDbase.OLED_Renew++;
-		}
-		DeBug_Interface();
 		Send_Data();
-		Receive_Data();
+		//Receive_Data();
 		break;
 
 	default:
