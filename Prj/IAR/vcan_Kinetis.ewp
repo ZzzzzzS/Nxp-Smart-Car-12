@@ -77,7 +77,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>7.80.4.12487</state>
+          <state>7.80.3.12143</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -736,7 +736,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\config files\vcan_ROM_K60N1M.icf</state>
+          <state>C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\config\linker\NXP\MK60xX512_15.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
